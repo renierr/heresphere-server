@@ -2,22 +2,16 @@ from flask import Flask, render_template, request, jsonify
 import os
 import logging
 import sys
-import datetime
-from logger_config import get_logger
+from loguru import logger
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
-from ws_server import start_websocket_server_thread
-
-logger = get_logger()
 
 DEBUG = 1
 UI_PORT = 5000
-WS_PORT = 6789
 
 log_level = 'DEBUG' if DEBUG else 'INFO'
-timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-log_file_path = f"logs/log_{timestamp}.log"
-logger.add(log_file_path, rotation="1 week", level=log_level)
+logger.remove()
+logger.add(sys.stdout, level=log_level)
 
 # Hide Flask debug banner
 cli = sys.modules['flask.cli']
