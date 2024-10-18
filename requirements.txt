@@ -1,5 +1,4 @@
 flask
 loguru
 yt_dlp
-websockets
 moviepy

@@ -5,13 +5,20 @@ import sys
 from loguru import logger
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
+import argparse
 
-DEBUG = 1
-UI_PORT = 5000
+parser = argparse.ArgumentParser(description='Start the server.')
+parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
+parser.add_argument('--debug', action='store_true', help='Run the server in debug mode')
+args = parser.parse_args()
+
+DEBUG = args.debug
+UI_PORT = args.port
 
 log_level = 'DEBUG' if DEBUG else 'INFO'
 logger.remove()
 logger.add(sys.stdout, level=log_level)
+
 
 # Hide Flask debug banner
 cli = sys.modules['flask.cli']
