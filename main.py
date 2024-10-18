@@ -4,7 +4,6 @@ import logging
 import sys
 import datetime
 import threading
-import network
 from logger_config import get_logger
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
@@ -31,9 +30,6 @@ logger.debug(f"Static Folder Path: {static_folder_path}")
 
 app = Flask(__name__, static_folder=static_folder_path)
 app.logger.setLevel(logging.WARNING)
-
-all_ips = network.get_all_ips()
-lan_ip = network.get_lan_ip()
 
 def download_progress(d):
     if d['status'] == 'downloading':
@@ -100,28 +96,10 @@ def start_server():
     tab = "\t"
     tabnewline = "\n\t"
     logger.info(f"""
-██   ██ ███████ ███████ ███████ ██████  ██    ██ ███████ ██████
-██   ██ ██      ██      ██      ██   ██ ██    ██ ██      ██   ██
-███████ ███████ ███████ █████   ██████  ██    ██ █████   ██████
-██   ██      ██      ██ ██      ██   ██  ██  ██  ██      ██   ██
-██   ██ ███████ ███████ ███████ ██   ██   ████   ███████ ██   ██
-
-┌───────────────────────────────────────────────────────────────┐
-│                        STEAM USERS                            │
-└───────────────────────────────────────────────────────────────┘
-  SteamVR users need to connect via the localhost address.
-  Your localhost address is:
-{tab}http://localhost:{UI_PORT}/
-
 ┌───────────────────────────────────────────────────────────────┐
 │                        QUEST USERS                            │
 └───────────────────────────────────────────────────────────────┘
   Quest users will need to connect via the LAN IP.
-  I think your LAN IP is {lan_ip}, so your LAN address would be:
-{tab}http://{lan_ip}:{UI_PORT}/
-
-  Here is a list of all the other network interfaces on this machine:
-{tabnewline}{tabnewline.join([f"{interface}: http://{', '.join(ips)}:{UI_PORT}/" for interface, ips in all_ips.items() if interface != "lo"])}
     """)
 
 if __name__ == '__main__':
