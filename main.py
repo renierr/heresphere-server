@@ -3,7 +3,6 @@ import os
 import logging
 import sys
 import datetime
-import threading
 from logger_config import get_logger
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
@@ -52,7 +51,7 @@ def get_files():
 @app.route('/download', methods=['POST'])
 def download():
     data = request.get_json()
-    url = data.get("url")
+    url = data.get("videoUrl")
 
     if not url:
         logger.error("No direct video URL provided in the request")
@@ -67,12 +66,12 @@ def download():
 
     if video_url is None:
         return jsonify({"success": False, "error": "Failed to download video"}), 500
-    return jsonify({"success": True, "url": video_url, "videoUrl": f"http://{lan_ip}:{UI_PORT}{video_url}"})
+    return jsonify({"success": True, "url": video_url, "videoUrl": video_url})
 
 @app.route('/stream', methods=['POST'])
 def resolve_yt():
     data = request.get_json()
-    url = data.get("url")
+    url = data.get("videoUrl")
 
     if not url:
         logger.error("No URL provided in the request")
@@ -87,20 +86,15 @@ def start_server():
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
 
-    flask_thread = threading.Thread(target=lambda: app.run(debug=DEBUG, port=UI_PORT, use_reloader=False, host='0.0.0.0'))
-    flask_thread.start()
-
-    ws_thread = threading.Thread(target=start_websocket_server_thread, args=(WS_PORT,))
-    ws_thread.start()
-
-    tab = "\t"
-    tabnewline = "\n\t"
     logger.info(f"""
 ┌───────────────────────────────────────────────────────────────┐
 │                        QUEST USERS                            │
 └───────────────────────────────────────────────────────────────┘
   Quest users will need to connect via the LAN IP.
+  most likely: http://localhost:{UI_PORT}
     """)
+
+    app.run(debug=DEBUG, port=UI_PORT, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':
     start_server()
