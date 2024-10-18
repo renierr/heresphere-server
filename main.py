@@ -9,7 +9,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
-parser.add_argument('--debug', action='store_true', help='Run the server in debug mode')
+parser.add_argument('--debug', action='store_true', default=False, help='Run the server in debug mode')
 args = parser.parse_args()
 
 DEBUG = args.debug

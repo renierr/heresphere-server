@@ -30,6 +30,7 @@ def get_static_directory():
 # Set the path to the static ffmpeg executable for Windows
 if is_windows:
     ffmpeg_path = os.path.join(get_application_path(), 'ffmpeg_x64', 'ffmpeg.exe')
+    logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
 else:
     ffmpeg_path = None
 
