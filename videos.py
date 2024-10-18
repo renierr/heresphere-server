@@ -2,11 +2,9 @@ import os
 import sys
 import re
 import yt_dlp
-from logger_config import get_logger
+from loguru import logger
 
-logger = get_logger()
 root_path = os.path.dirname(os.path.abspath(__file__))
-
 is_windows = os.name == 'nt' # Anguish
 
 def get_application_path():

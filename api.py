@@ -1,11 +1,9 @@
 import os
 import time
 import platform
-from logger_config import get_logger
+from loguru import logger
 from moviepy.editor import VideoFileClip
 from videos import get_static_directory
-
-logger = get_logger()
 
 def get_video_info(filename):
     try:
