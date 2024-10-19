@@ -30,4 +30,6 @@
 LICENSE
 README.md
 **/*.tar
+**/*.bat
+
 
