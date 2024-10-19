@@ -29,3 +29,5 @@
 **/logs
 LICENSE
 README.md
+**/*.tar
+

@@ -8,4 +8,6 @@ venv
 main.spec
 .venv
 .vscode
+*.tar
+
 
