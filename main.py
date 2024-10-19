@@ -37,6 +37,13 @@ def download_progress(d):
     elif d['status'] == 'finished':
         logger.info("Download completed", d['filename'])
 
+@app.before_request
+def log_request_info():
+    logger.debug(f"Request: {request.method} {request.url}")
+    logger.debug(f"Headers: {request.headers}")
+    logger.debug(f"Body: {request.get_data()}")
+
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -52,7 +59,7 @@ def get_files():
 @app.route('/download', methods=['POST'])
 def download():
     data = request.get_json()
-    url = data.get("videoUrl")
+    url = data.get("sourceUrl")
 
     if not url:
         logger.error("No direct video URL provided in the request")
@@ -72,7 +79,7 @@ def download():
 @app.route('/stream', methods=['POST'])
 def resolve_yt():
     data = request.get_json()
-    url = data.get("videoUrl")
+    url = data.get("url")
 
     if not url:
         logger.error("No URL provided in the request")
