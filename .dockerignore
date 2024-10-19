@@ -23,5 +23,7 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/static/videos
+**/dist
 LICENSE
 README.md
