@@ -1,0 +1,1 @@
+docker save -o heresphere-server.tar heresphere-server:latest
