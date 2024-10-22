@@ -1,3 +1,4 @@
 flask
+flask-sse
 loguru
 yt_dlp

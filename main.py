@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, Response, render_template, request, jsonify
 import os
 import logging
 import sys
@@ -6,6 +6,7 @@ from loguru import logger
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
 import argparse
+import time
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -49,6 +50,15 @@ def log_request_info():
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/sse')
+def sse():
+    def event_stream():
+        while True:
+            time.sleep(1)
+            yield f'data: Server time is {time.ctime()}\n\n'
+    return Response(event_stream(), mimetype="text/event-stream")
+
 
 @app.route('/connection_test')
 def connection_test():
