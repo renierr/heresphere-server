@@ -77,10 +77,15 @@ def download():
 
     video_url = None
 
-    if is_youtube_url(url):
-        video_url = download_yt(url, download_progress)
-    else:
-        video_url = download_direct(url, download_progress)
+    try:
+        if is_youtube_url(url):
+            video_url = download_yt(url, download_progress)
+        else:
+            video_url = download_direct(url, download_progress)
+    except Exception as e:
+        logger.error(f"Failed to download video: {e}")
+        push_text_to_client(f"Download failed: {e}")
+        return jsonify({"success": False, "error": "Failed to download video"}), 500
 
     if video_url is None:
         push_text_to_client(f"Download failed.")
