@@ -29,6 +29,8 @@ static_folder_path = get_static_directory()
 logger.debug(f"Static Folder Path: {static_folder_path}")
 
 app = Flask(__name__, static_folder=static_folder_path)
+if DEBUG:
+    app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
 
 def download_progress(d):
@@ -95,11 +97,7 @@ def start_server():
     sys.stderr = open(os.devnull, 'w')
 
     logger.info(f"""
-┌───────────────────────────────────────────────────────────────┐
-│                        QUEST USERS                            │
-└───────────────────────────────────────────────────────────────┘
-  Quest users will need to connect via the LAN IP.
-  most likely: http://localhost:{UI_PORT}
+Serving most likely on: http://localhost:{UI_PORT}
     """)
 
     app.run(debug=DEBUG, port=UI_PORT, use_reloader=False, host='0.0.0.0')
