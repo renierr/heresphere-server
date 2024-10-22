@@ -94,7 +94,6 @@
                     alert('Please enter a video URL');
                     return;
                 }
-                this.loading = true;
                 fetch('/download', {
                     method: 'POST',
                     headers: {
@@ -104,14 +103,15 @@
                 })
                     .then(response => response.json())
                     .then(data => {
-                        this.loading = false;
-                        alert('Video download initiated');
+                        console.log('Success:', data);
+                        this.videoUrl = '';
+                        this.fetchFiles();
                     })
                     .catch(error => {
-                        this.loading = false;
                         console.error('Error:', error);
                         alert('Failed to initiate video download');
                     });
+                alert('Video download initiated');
             }
         },
         computed: {
