@@ -6,7 +6,7 @@ from loguru import logger
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
 import argparse
-import time
+from bus import event_bus, push_text_to_client
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -35,17 +35,13 @@ if DEBUG:
 app.logger.setLevel(logging.WARNING)
 
 def download_progress(d):
+    output = ''
     if d['status'] == 'downloading':
-        logger.info(f"Downloading... {d['_percent_str']} complete at {d['_speed_str']}, ETA {d['_eta_str']}")
+        output = f"Downloading... {d['_percent_str']} complete at {d['_speed_str']}, ETA {d['_eta_str']}"
     elif d['status'] == 'finished':
-        logger.info("Download completed", d['filename'])
-
-@app.before_request
-def log_request_info():
-    logger.debug(f"Request: {request.method} {request.url}")
-    logger.debug(f"Headers: {request.headers}")
-    logger.debug(f"Body: {request.get_data()}")
-
+        output = "Download completed", d['filename']
+    push_text_to_client(output)
+    logger.info(output)
 
 @app.route('/')
 def home():
@@ -55,8 +51,10 @@ def home():
 def sse():
     def event_stream():
         while True:
-            time.sleep(1)
-            yield f'data: Server time is {time.ctime()}\n\n'
+            # Wait for a message from the event bus
+            message = event_bus.get()
+            logger.debug(f"Sending message to client: {message}")
+            yield f'data: {message}\n\n'
     return Response(event_stream(), mimetype="text/event-stream")
 
 
@@ -70,6 +68,7 @@ def get_files():
 
 @app.route('/download', methods=['POST'])
 def download():
+    push_text_to_client(f"Downloag triggered")
     data = request.get_json()
     url = data.get("sourceUrl")
 
@@ -85,7 +84,9 @@ def download():
         video_url = download_direct(url, download_progress)
 
     if video_url is None:
+        push_text_to_client(f"Download failed.")
         return jsonify({"success": False, "error": "Failed to download video"}), 500
+    push_text_to_client(f"Download finished.")
     return jsonify({"success": True, "url": video_url, "videoUrl": video_url})
 
 @app.route('/stream', methods=['POST'])
