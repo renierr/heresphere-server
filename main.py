@@ -41,7 +41,7 @@ def download_progress(d):
     elif d['status'] == 'finished':
         output = "Download completed", d['filename']
     push_text_to_client(output)
-    logger.info(output)
+    logger.debug(output)
 
 @app.route('/')
 def home():
@@ -53,7 +53,6 @@ def sse():
         while True:
             # Wait for a message from the event bus
             message = event_bus.get()
-            logger.debug(f"Sending message to client: {message}")
             yield f'data: {message}\n\n'
     return Response(event_stream(), mimetype="text/event-stream")
 
