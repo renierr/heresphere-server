@@ -140,7 +140,7 @@
             const serverOutput = [];
             eventSource.onmessage = event => {
                 serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);
-                if (serverOutput.length > 10) {
+                if (serverOutput.length > 100) {
                     serverOutput.shift();
                 }
                 console.log('ServerOut***: ', serverOutput);
