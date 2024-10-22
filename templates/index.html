@@ -8,7 +8,6 @@
     <title>HSServer</title>
     <link href="/static/tailwind.min.css" rel="stylesheet">
     <script src="/static/vue.min.js"></script>
-    <script src="/static/axios.min.js"></script>
 </head>
 
 <body class="bg-gray-100 p-2">
@@ -47,9 +46,15 @@
                 this.files = this.files.filter(file => file.filename !== fileName);
             },
             fetchFiles: function () {
-                axios.get('/api/list')
+                fetch('/api/list')
                     .then(response => {
-                        this.files = response.data;
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.files = data;
                     })
                     .catch(error => {
                         console.error('There was an error fetching the files:', error);
