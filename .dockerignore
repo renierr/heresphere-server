@@ -31,5 +31,6 @@ LICENSE
 README.md
 **/*.tar
 **/*.bat
+**/ffmpeg_x64
 
 
