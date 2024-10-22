@@ -1,4 +1,3 @@
 flask
 loguru
 yt_dlp
-moviepy

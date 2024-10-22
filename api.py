@@ -2,17 +2,12 @@ import os
 import time
 import platform
 from loguru import logger
-from moviepy.editor import VideoFileClip
 from videos import get_static_directory
 
 def get_video_info(filename):
     try:
         clip_info = ('Unknown', 'Unknown')
-        with VideoFileClip(filename) as clip:
-            resolution = f"{clip.size[0]}x{clip.size[1]}"
-            fps = clip.fps
-            duration = clip.duration
-        return (resolution, fps, duration)
+        return ("?", 0, 0)
     except OSError as e:
         logger.error(f"Error getting video info: {e}")
         return clip_info
