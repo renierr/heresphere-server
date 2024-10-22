@@ -6,8 +6,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HSServer</title>
-    <link href="/static/tailwind.min.css" rel="stylesheet">
-    <script src="/static/vue.min.js"></script>
+    <link href="/static/tailwind.min.css?v=2.2.19" rel="stylesheet">
+    <script src="/static/vue.min.js?v=2.6.14"></script>
 </head>
 
 <body class="bg-gray-100 p-2">
@@ -16,16 +16,19 @@
             class="mb-4 p-2 border-2 border-gray-300 rounded-md">
 
         <div class="bg-white shadow overflow-hidden sm:rounded-md">
-            <div v-if="filteredFiles.length === 0">No Files present</div>
-            <div v-for="file in filteredFiles" :key="file.filename" class="p-4 border-b border-gray-200">
-                <div class="text-lg font-bold"><a class="text-blue-900" :href="file.filename">{{ file.title }}</a></div>
-                <div class="text-sm text-gray-600">
-                    <p v-if="file.yt_id" class="text-blue-500"><a
-                            :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
-                    <p>Size: {{ file.filesize }}</p>
-                    <p>Created: {{ file.created }}</p>
-                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
-                        @click="deleteFile(file.filename)">Delete</button>
+            <div v-if="loading" class="p-4 text-center">Loading...</div>
+            <div v-else>
+                <div v-if="filteredFiles.length === 0">No Files present</div>
+                <div v-for="file in filteredFiles" :key="file.filename" class="p-4 border-b border-gray-200">
+                    <div class="text-lg font-bold"><a class="text-blue-900" :href="file.filename">{{ file.title }}</a></div>
+                    <div class="text-sm text-gray-600">
+                        <p v-if="file.yt_id" class="text-blue-500"><a
+                                :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
+                        <p>Size: {{ file.filesize }}</p>
+                        <p>Created: {{ file.created }}</p>
+                        <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mt-2"
+                            @click="deleteFile(file.filename)">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,6 +41,7 @@
         data: {
             files: [],
             filter: '',
+            loading: false,
             currentSort: 'name',
             currentSortDir: 'asc'
         },
@@ -46,6 +50,7 @@
                 this.files = this.files.filter(file => file.filename !== fileName);
             },
             fetchFiles: function () {
+                this.loading = true;
                 fetch('/api/list')
                     .then(response => {
                         if (!response.ok) {
@@ -55,9 +60,11 @@
                     })
                     .then(data => {
                         this.files = data;
+                        this.loading = false;
                     })
                     .catch(error => {
                         console.error('There was an error fetching the files:', error);
+                        this.loading = false;
                     });
             }
         },
