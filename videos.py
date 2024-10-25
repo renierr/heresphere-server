@@ -72,6 +72,7 @@ def download_yt(url, progress_function):
       'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
       'outtmpl': os.path.join('static', 'videos', 'youtube', filename) + '.%(ext)s',
       'progress_hooks': [progress_function],
+      'updatetime': False,
   }
 
   if is_windows:
@@ -131,6 +132,7 @@ def download_direct(url, progress_function):
   ydl_opts = {
       'outtmpl': os.path.join('static', 'videos', 'direct', filename) + '.%(ext)s',
       'progress_hooks': [progress_function],
+      'updatetime': False,
   }
 
   if is_windows:
