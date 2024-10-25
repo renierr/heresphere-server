@@ -10,5 +10,6 @@ main.spec
 .vscode
 .history
 *.tar
+.idea
 
 
