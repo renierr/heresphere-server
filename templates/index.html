@@ -54,7 +54,7 @@
                         <div class="text-muted">
                             <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
                             <p>Size: {{ file.filesize }}</p>
-                            <p>Created: {{ file.created }}</p>
+                            <p>Created: {{ formatDate(file.created) }}</p>
                         </div>
                     </li>
                 </ul>
@@ -71,8 +71,8 @@
             filter: '',
             videoUrl: '',
             loading: false,
-            currentSort: 'name',
-            currentSortDir: 'asc',
+            currentSort: 'created',
+            currentSortDir: 'desc',
             serverOutput: ''
         },
         methods: {
@@ -114,7 +114,12 @@
                     .catch(error => {
                         console.error('Error:', error);
                     });
-            }
+            },
+            formatDate(epochSeconds) {
+                const date = new Date(epochSeconds * 1000);
+                const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                return date.toLocaleDateString(undefined, options);
+            },
         },
         computed: {
             filteredFiles: function () {

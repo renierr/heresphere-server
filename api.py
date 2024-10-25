@@ -36,7 +36,7 @@ def get_creation_date(filename):
         creation_time = os.path.getmtime(filename)
 
     readable_time = time.ctime(creation_time)
-    return readable_time
+    return creation_time
 
 def parse_youtube_filename(filename):
     parts = filename.split('___')
