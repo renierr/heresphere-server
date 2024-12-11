@@ -8,6 +8,7 @@ import api
 import argparse
 from bus import event_bus, push_text_to_client
 import threading
+import traceback
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -75,7 +76,8 @@ def download_video(url):
             video_url = download_direct(url, download_progress)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
-        logger.error(f"Failed to download video: {e}")
+        error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
+        logger.error(error_message)
         push_text_to_client(f"Download failed: {e}")
 
 @app.route('/download', methods=['POST'])
@@ -91,7 +93,10 @@ def download():
 
     # Start a new thread for the download process
     download_thread = threading.Thread(target=download_video, args=(url,))
+    download_thread.daemon = True
     download_thread.start()
+
+    push_text_to_client(f"Download started in the background")
 
     return jsonify({"success": True, "message": "Download started in the background"})
 #    return jsonify({"success": True, "url": video_url, "videoUrl": video_url})
