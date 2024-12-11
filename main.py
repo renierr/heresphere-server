@@ -7,6 +7,7 @@ from videos import download_yt, get_stream, download_direct, is_youtube_url, get
 import api
 import argparse
 from bus import event_bus, push_text_to_client
+import threading
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -65,6 +66,18 @@ def connection_test():
 def get_files():
     return jsonify(api.list_files())
 
+def download_video(url):
+    try:
+        video_url = None
+        if is_youtube_url(url):
+            video_url = download_yt(url, download_progress)
+        else:
+            video_url = download_direct(url, download_progress)
+        push_text_to_client(f"Download finished: {video_url}")
+    except Exception as e:
+        logger.error(f"Failed to download video: {e}")
+        push_text_to_client(f"Download failed: {e}")
+
 @app.route('/download', methods=['POST'])
 def download():
     push_text_to_client(f"Downloag triggered")
@@ -75,23 +88,13 @@ def download():
         logger.error("No direct video URL provided in the request")
         return jsonify({"success": False, "error": "No URL provided"}), 400
 
-    video_url = None
 
-    try:
-        if is_youtube_url(url):
-            video_url = download_yt(url, download_progress)
-        else:
-            video_url = download_direct(url, download_progress)
-    except Exception as e:
-        logger.error(f"Failed to download video: {e}")
-        push_text_to_client(f"Download failed: {e}")
-        return jsonify({"success": False, "error": "Failed to download video"}), 500
+    # Start a new thread for the download process
+    download_thread = threading.Thread(target=download_video, args=(url,))
+    download_thread.start()
 
-    if video_url is None:
-        push_text_to_client(f"Download failed.")
-        return jsonify({"success": False, "error": "Failed to download video"}), 500
-    push_text_to_client(f"Download finished.")
-    return jsonify({"success": True, "url": video_url, "videoUrl": video_url})
+    return jsonify({"success": True, "message": "Download started in the background"})
+#    return jsonify({"success": True, "url": video_url, "videoUrl": video_url})
 
 @app.route('/stream', methods=['POST'])
 def resolve_yt():

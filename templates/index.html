@@ -56,6 +56,7 @@
                             <p>Size: {{ file.filesize }}</p>
                             <p>Created: {{ formatDate(file.created) }}</p>
                         </div>
+                        <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
                     </li>
                 </ul>
             </div>
@@ -108,10 +109,11 @@
                 })
                     .then(response => response.json())
                     .then(data => {
+                        this.serverOutput += new Date().toLocaleTimeString() + ': Starting download of ' + this.videoUrl + '\n';
                         this.videoUrl = '';
-                        this.fetchFiles();
                     })
                     .catch(error => {
+                        this.serverOutput += new Date().toLocaleTimeString() + ': Error for download of ' + this.videoUrl + ' - ' + error + '\n';
                         console.error('Error:', error);
                     });
             },
@@ -145,8 +147,11 @@
                 if (serverOutput.length > 100) {
                     serverOutput.shift();
                 }
-                console.log('ServerOut***: ', serverOutput);
                 this.serverOutput = serverOutput.slice().reverse().join('\n');
+                if (event.data.includes('Download finished')) {
+                    console.log('Download finished*********');
+                    this.fetchFiles();
+                }
             };
         }
     });

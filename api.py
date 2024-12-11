@@ -63,7 +63,8 @@ def list_files():
                     'duration': format_duration(duration),
                     'filename': f"/static/videos/youtube/{filename}",
                     'created': get_creation_date(os.path.join(root, filename)),
-                    'filesize': get_file_size_formatted(os.path.join(root, filename))
+                    'filesize': get_file_size_formatted(os.path.join(root, filename)),
+                    'partial': filename.endswith('.part')
                 })
             else:
                 extracted_details.append({
