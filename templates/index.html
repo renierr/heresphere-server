@@ -56,8 +56,13 @@
                             <p>Size: {{ file.filesize }}</p>
                             <p>Created: {{ formatDate(file.created) }}</p>
                         </div>
+                        <div v-if="getProgressForId(file.url_id) > 0" class="progress">
+                            <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
+                            <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                         <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
-                        <button v-if="file.orig_link" class="btn btn-primary btn-sm" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
+                        <button v-if="file.orig_link" class="btn btn-primary btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
+                        <button v-if="file.orig_link" class="btn btn-secondary btn-sm m-2" @click="copyToClipboard(file.orig_link)">Copy Original Link</button>
                     </li>
                 </ul>
             </div>
@@ -75,7 +80,8 @@
             loading: false,
             currentSort: 'created',
             currentSortDir: 'desc',
-            serverOutput: ''
+            serverOutput: '',
+            downloadProgress: {}
         },
         methods: {
             redownload: function (url) {
@@ -127,6 +133,13 @@
                 const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                 return date.toLocaleDateString(undefined, options);
             },
+            copyToClipboard: function (text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Link copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            },
         },
         computed: {
             filteredFiles: function () {
@@ -141,6 +154,11 @@
                     if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
                     return 0;
                 });
+            },
+            getProgressForId: function () {
+                return function (id) {
+                    return this.downloadProgress[id] || 0;
+                };
             }
         },
         mounted: function () {
@@ -148,13 +166,18 @@
             const eventSource = new EventSource('/sse');
             const serverOutput = [];
             eventSource.onmessage = event => {
+                let progressExp = event.data.match(/(\d+.\d+)% complete/);
+                let progressId = event.data.match(/Downloading...\[(\d+)]/);
+                if (progressId) {
+                    this.downloadProgress = this.downloadProgress || {};
+                    this.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
+                }
                 serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);
                 if (serverOutput.length > 100) {
                     serverOutput.shift();
                 }
                 this.serverOutput = serverOutput.slice().reverse().join('\n');
-                if (event.data.includes('Download finished')) {
-                    console.log('Download finished*********');
+                if (event.data.includes('Download finished') || event.data.includes(' 0.0% complete')) {
                     this.fetchFiles();
                 }
             };
