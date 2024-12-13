@@ -3,7 +3,8 @@ import time
 import platform
 from loguru import logger
 from videos import get_static_directory
-from globals import url_map, url_counter
+from globals import url_map, url_counter, find_url_info
+
 
 def get_video_info(filename):
     try:
@@ -54,14 +55,10 @@ def list_files():
     for root, _, files in os.walk(os.path.join(get_static_directory(), 'videos')):
         for filename in files:
             resolution, fps, duration = get_video_info(os.path.join(root, filename))
-            url_id = None
-            orig_link = None
-            for idnr, url_info in url_map.items():
-                filename_check = os.path.splitext(filename.rstrip('.part'))[0]
-                if url_info['filename'] == filename_check:
-                    url_id = idnr
-                    orig_link = url_info['url']
-                    break
+
+            url_id, url_info = find_url_info(filename)
+            orig_link = url_info['url'] if url_info and 'url' in url_info else None
+
             if filename.count('___') == 1:
                 id, title = parse_youtube_filename(filename)
                 extracted_details.append({
