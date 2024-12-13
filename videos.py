@@ -3,6 +3,7 @@ import sys
 import re
 import yt_dlp
 from loguru import logger
+from globals import url_map, url_counter
 
 root_path = os.path.dirname(os.path.abspath(__file__))
 is_windows = os.name == 'nt' # Anguish
@@ -63,10 +64,11 @@ def get_video_info(url):
         filename = re.sub(r'\W+', '_', video_title)
         return vid, filename
 
-def download_yt(url, progress_function):
+def download_yt(url, progress_function, url_id):
   vid, filename = get_video_info(url)
   filename = f"{vid}___{filename}"
   logger.debug(f"Downloading YouTube video {filename}")
+  url_map[url_id]['filename'] = filename
 
   ydl_opts = {
       'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
@@ -124,10 +126,11 @@ def get_stream(url):
       logger.error(f"Error retrieving video and audio streams: {e}")
       return None, None
 
-def download_direct(url, progress_function):
+def download_direct(url, progress_function, url_id):
   _, filename = get_video_info(url)
 
   logger.debug(f"Downloading direct video {filename}")
+  url_map[url_id]['filename'] = filename
 
   ydl_opts = {
       'outtmpl': os.path.join('static', 'videos', 'direct', filename) + '.%(ext)s',

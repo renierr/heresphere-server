@@ -57,6 +57,7 @@
                             <p>Created: {{ formatDate(file.created) }}</p>
                         </div>
                         <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
+                        <button v-if="file.orig_link" class="btn btn-primary btn-sm" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
                     </li>
                 </ul>
             </div>
@@ -77,6 +78,10 @@
             serverOutput: ''
         },
         methods: {
+            redownload: function (url) {
+                this.videoUrl = url;
+                this.postVideoUrl();
+            },
             fetchFiles: function () {
                 this.loading = true;
                 fetch('/api/list')

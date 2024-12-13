@@ -3,6 +3,7 @@ import time
 import platform
 from loguru import logger
 from videos import get_static_directory
+from globals import url_map, url_counter
 
 def get_video_info(filename):
     try:
@@ -53,6 +54,14 @@ def list_files():
     for root, _, files in os.walk(os.path.join(get_static_directory(), 'videos')):
         for filename in files:
             resolution, fps, duration = get_video_info(os.path.join(root, filename))
+            url_id = None
+            orig_link = None
+            for idnr, url_info in url_map.items():
+                filename_check = os.path.splitext(filename.rstrip('.part'))[0]
+                if url_info['filename'] == filename_check:
+                    url_id = idnr
+                    orig_link = url_info['url']
+                    break
             if filename.count('___') == 1:
                 id, title = parse_youtube_filename(filename)
                 extracted_details.append({
@@ -64,7 +73,9 @@ def list_files():
                     'filename': f"/static/videos/youtube/{filename}",
                     'created': get_creation_date(os.path.join(root, filename)),
                     'filesize': get_file_size_formatted(os.path.join(root, filename)),
-                    'partial': filename.endswith('.part')
+                    'partial': filename.endswith('.part'),
+                    'url_id': url_id,
+                    'orig_link': orig_link
                 })
             else:
                 extracted_details.append({
@@ -76,7 +87,9 @@ def list_files():
                     'filename': f"/static/videos/direct/{filename}",
                     'created': get_creation_date(os.path.join(root, filename)),
                     'filesize': get_file_size_formatted(os.path.join(root, filename)),
-                    'partial': filename.endswith('.part')
+                    'partial': filename.endswith('.part'),
+                    'url_id': url_id,
+                    'orig_link': orig_link
                 })
 
     return extracted_details

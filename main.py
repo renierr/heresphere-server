@@ -9,6 +9,7 @@ import argparse
 from bus import event_bus, push_text_to_client
 import threading
 import traceback
+from globals import url_map, url_counter
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -67,18 +68,26 @@ def connection_test():
 def get_files():
     return jsonify(api.list_files())
 
+
 def download_video(url):
+    global url_counter
+    url_id = url_counter
+    url_map[url_id] = {'url': url, 'filename': None}
+    url_counter += 1
+
     try:
         video_url = None
         if is_youtube_url(url):
-            video_url = download_yt(url, download_progress)
+            video_url = download_yt(url, download_progress, url_id)
         else:
-            video_url = download_direct(url, download_progress)
+            video_url = download_direct(url, download_progress, url_id)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
         logger.error(error_message)
         push_text_to_client(f"Download failed: {e}")
+    finally:
+        del url_map[url_id]
 
 @app.route('/download', methods=['POST'])
 def download():
@@ -99,7 +108,6 @@ def download():
     push_text_to_client(f"Download started in the background")
 
     return jsonify({"success": True, "message": "Download started in the background"})
-#    return jsonify({"success": True, "url": video_url, "videoUrl": video_url})
 
 @app.route('/stream', methods=['POST'])
 def resolve_yt():
