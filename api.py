@@ -57,7 +57,6 @@ def list_files():
             resolution, fps, duration = get_video_info(os.path.join(root, filename))
 
             url_id, url_info = find_url_info(filename)
-            orig_link = url_info['url'] if url_info and 'url' in url_info else None
 
             if filename.count('___') == 1:
                 id, title = parse_youtube_filename(filename)
@@ -72,7 +71,8 @@ def list_files():
                     'filesize': get_file_size_formatted(os.path.join(root, filename)),
                     'partial': filename.endswith('.part'),
                     'url_id': url_id,
-                    'orig_link': orig_link
+                    'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
+                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None
                 })
             else:
                 extracted_details.append({
@@ -86,7 +86,8 @@ def list_files():
                     'filesize': get_file_size_formatted(os.path.join(root, filename)),
                     'partial': filename.endswith('.part'),
                     'url_id': url_id,
-                    'orig_link': orig_link
+                    'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
+                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None
                 })
 
     return extracted_details
