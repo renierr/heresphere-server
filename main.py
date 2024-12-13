@@ -9,7 +9,8 @@ import argparse
 from bus import event_bus, push_text_to_client
 import threading
 import traceback
-from globals import url_map, url_counter
+from globals import url_map, url_counter, find_url_info
+import re
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -37,12 +38,18 @@ if DEBUG:
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
 
+def remove_ansi_codes(text):
+    ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', text)
+
 def download_progress(d):
     output = ''
+    fname = os.path.splitext(os.path.basename(d['filename']))[0]
     if d['status'] == 'downloading':
-        output = f"Downloading... {d['_percent_str']} complete at {d['_speed_str']}, ETA {d['_eta_str']}"
+        idnr, _ = find_url_info(fname)
+        output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
     elif d['status'] == 'finished':
-        output = "Download completed", d['filename']
+        output = f"Download completed: {fname}"
     push_text_to_client(output)
     logger.debug(output)
 
@@ -72,7 +79,7 @@ def get_files():
 def download_video(url):
     global url_counter
     url_id = url_counter
-    url_map[url_id] = {'url': url, 'filename': None}
+    url_map[url_id] = {'url': url, 'filename': None, 'video_url': None}
     url_counter += 1
 
     try:
@@ -81,13 +88,14 @@ def download_video(url):
             video_url = download_yt(url, download_progress, url_id)
         else:
             video_url = download_direct(url, download_progress, url_id)
+        url_map[url_id]['video_url'] = video_url
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
         logger.error(error_message)
         push_text_to_client(f"Download failed: {e}")
-    finally:
-        del url_map[url_id]
+    #finally:
+    #    del url_map[url_id]
 
 @app.route('/download', methods=['POST'])
 def download():
