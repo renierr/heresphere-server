@@ -3,7 +3,7 @@ import sys
 import re
 import yt_dlp
 from loguru import logger
-from globals import url_map, url_counter
+from globals import get_url_map
 
 root_path = os.path.dirname(os.path.abspath(__file__))
 is_windows = os.name == 'nt' # Anguish
@@ -68,6 +68,7 @@ def download_yt(url, progress_function, url_id):
   vid, filename = get_video_info(url)
   filename = f"{vid}___{filename}"
   logger.debug(f"Downloading YouTube video {filename}")
+  url_map = get_url_map()
   url_map[url_id]['filename'] = filename
 
   ydl_opts = {
@@ -131,6 +132,7 @@ def download_direct(url, progress_function, url_id):
   _, filename = get_video_info(url)
 
   logger.debug(f"Downloading direct video {filename}")
+  url_map = get_url_map()
   url_map[url_id]['filename'] = filename
 
   ydl_opts = {

@@ -1,3 +1,4 @@
+import atexit
 from flask import Flask, Response, render_template, request, jsonify
 import os
 import logging
@@ -9,7 +10,7 @@ import argparse
 from bus import event_bus, push_text_to_client
 import threading
 import traceback
-from globals import url_map, url_counter, find_url_info
+from globals import find_url_info, save_url_map, load_url_map, get_url_counter, get_url_map, increment_url_counter
 import re
 
 parser = argparse.ArgumentParser(description='Start the server.')
@@ -77,10 +78,10 @@ def get_files():
 
 
 def download_video(url):
-    global url_counter
-    url_id = url_counter
+    url_map = get_url_map()
+    url_id = get_url_counter()
     url_map[url_id] = {'url': url, 'filename': None, 'video_url': None}
-    url_counter += 1
+    increment_url_counter()
 
     try:
         video_url = None
@@ -132,6 +133,12 @@ def resolve_yt():
     return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url})
 
 def start_server():
+    # Load url_map on startup
+    load_url_map()
+
+    # Register save_url_map to be called on application exit
+    atexit.register(save_url_map)
+
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
 
