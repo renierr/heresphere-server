@@ -77,6 +77,30 @@ def get_files():
     return jsonify(api.list_files())
 
 
+@app.route('/cleanup')
+def cleanup_maps():
+    url_map = get_url_map()
+    static_dir = get_static_directory()
+
+    to_remove = []
+    for url_id, url_info in url_map.items():
+        filename = url_info.get('filename')
+        logger.debug(f"Checking file: {filename}")
+        if filename:
+            youtube_dir = os.path.join(static_dir, 'videos', 'youtube')
+            direct_dir = os.path.join(static_dir, 'videos', 'direct')
+            youtube_files = os.listdir(youtube_dir)
+            direct_files = os.listdir(direct_dir)
+            if not any(f.startswith(filename) for f in youtube_files) and not any(f.startswith(filename) for f in direct_files):
+                to_remove.append(url_id)
+
+    logger.debug(f"to removed: {to_remove}")
+    for url_id in to_remove:
+        del url_map[url_id]
+
+    save_url_map()
+    return jsonify({"success": True, "removed": to_remove})
+
 def download_video(url):
     url_map = get_url_map()
     url_id = get_url_counter()

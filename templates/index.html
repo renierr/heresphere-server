@@ -69,6 +69,12 @@
                     </li>
                 </ul>
             </div>
+            <div class="text-center mt-4">
+                <a href="#" @click.prevent="cleanup" class="btn btn-danger">Cleanup Server tracked internal Map</a>
+                <div v-if="cleanupResult" class="mt-2">
+                    <p>Cleanup Result: {{ cleanupResult }}</p>
+                </div>
+            </div>
         </div>
     </div>
 </body>
@@ -84,7 +90,8 @@
             currentSort: 'created',
             currentSortDir: 'desc',
             serverOutput: '',
-            downloadProgress: {}
+            downloadProgress: {},
+            cleanupResult: null
         },
         methods: {
             redownload: function (url) {
@@ -144,6 +151,19 @@
                     console.error('Failed to copy: ', err);
                 });
             },
+            cleanup() { // Add this method
+                fetch('/cleanup')
+                    .then(response => response.json())
+                    .then(data => {
+                        this.cleanupResult = JSON.stringify(data);
+                        this.fetchFiles();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.cleanupResult = 'Error occurred during cleanup';
+                    });
+            },
+
         },
         computed: {
             filteredFiles: function () {
