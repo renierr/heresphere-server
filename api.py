@@ -72,7 +72,8 @@ def list_files():
                     'partial': filename.endswith('.part'),
                     'url_id': url_id,
                     'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
-                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None
+                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,
+                    'downloaded_date': url_info['downloaded_date'] if url_info and 'downloaded_date' in url_info else None
                 })
             else:
                 extracted_details.append({
@@ -87,7 +88,8 @@ def list_files():
                     'partial': filename.endswith('.part'),
                     'url_id': url_id,
                     'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
-                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None
+                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,
+                    'downloaded_date': url_info['downloaded_date'] if url_info and 'downloaded_date' in url_info else None
                 })
 
     return extracted_details

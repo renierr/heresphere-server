@@ -58,6 +58,7 @@
                             <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
                             <p>Size: {{ file.filesize }}</p>
                             <p>Created: {{ formatDate(file.created) }}</p>
+                            <p>Downloaded: {{ formatDate(file.downloaded_date) }}</p>
                         </div>
                         <div v-if="getProgressForId(file.url_id) > 0" class="progress">
                             <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
@@ -139,6 +140,9 @@
                     });
             },
             formatDate(epochSeconds) {
+                if (epochSeconds < 1) {
+                    return '';
+                }
                 const date = new Date(epochSeconds * 1000);
                 const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                 return date.toLocaleDateString(undefined, options);

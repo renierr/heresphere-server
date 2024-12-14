@@ -15,6 +15,12 @@ def increment_url_counter():
     url_counter += 1
     return url_counter
 
+def find_url_id(url):
+    for url_id, url_info in url_map.items():
+        if url_info.get('url') == url:
+            return url_id
+    return None
+
 def find_url_info(filename):
     for idnr, url_info in url_map.items():
         filename_check = os.path.splitext(filename.rstrip('.part'))[0]

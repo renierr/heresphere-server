@@ -10,8 +10,10 @@ import argparse
 from bus import event_bus, push_text_to_client
 import threading
 import traceback
-from globals import find_url_info, save_url_map, load_url_map, get_url_counter, get_url_map, increment_url_counter
+from globals import find_url_info, save_url_map, load_url_map, get_url_counter, get_url_map, increment_url_counter, \
+    find_url_id
 import re
+from datetime import datetime
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -103,9 +105,14 @@ def cleanup_maps():
 
 def download_video(url):
     url_map = get_url_map()
-    url_id = get_url_counter()
-    url_map[url_id] = {'url': url, 'filename': None, 'video_url': None}
-    increment_url_counter()
+    url_id = find_url_id(url)
+    if url_id is None:
+        url_id = get_url_counter()
+        increment_url_counter()
+        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'downloaded_date': int(datetime.now().timestamp())}
+    else:
+        url_map[url_id]['url'] = url
+        url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
 
     try:
         video_url = None
@@ -119,8 +126,6 @@ def download_video(url):
         error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
         logger.error(error_message)
         push_text_to_client(f"Download failed: {e}")
-    #finally:
-    #    del url_map[url_id]
 
 @app.route('/download', methods=['POST'])
 def download():
