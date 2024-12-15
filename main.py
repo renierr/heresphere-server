@@ -58,26 +58,37 @@ def download_progress(d):
     push_text_to_client(output)
     logger.debug(output)
 
-#@app.before_request
-#def log_request_info():
-#    logger.info(f"Request: {request.method} {request.url}")
-#    logger.info(f"Headers: {request.headers}")
-#    logger.info(f"Body: {request.get_data()}")
+# @app.before_request
+# def log_request_info():
+#     logger.info(f"Request: {request.method} {request.url}")
+#     logger.info(f"Headers: {request.headers}")
+#     logger.info(f"Body: {request.get_data()}")
+#
+# @app.after_request
+# def log_response_info(response):
+#     logger.info(f"Response: {response.status}")
+#     logger.info(f"Headers: {response.headers}")
+#     logger.info(f"Body: {response.get_data()}")
+#     return response
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/heresphere', methods=['GET'])
+@app.route('/heresphere', methods=['POST', 'GET'])
 def heresphere():
+    logger.debug(f"HereSphere Request: {request.get_data()}")
     try:
         server_path = f"{request.scheme}://{request.host}"
-        return jsonify(generate_heresphere_json(server_path))
+        response = jsonify(generate_heresphere_json(server_path))
+        response.headers['heresphere-json-version'] = '1'
+        return response
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/heresphere/<file_base64>')
 def heresphere_file(file_base64):
+    logger.debug(f"HereSphere File Request: {request.get_data()}")
     try:
         server_path = f"{request.scheme}://{request.host}"
         return jsonify(generate_heresphere_json_item(server_path, file_base64))

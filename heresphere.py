@@ -24,7 +24,7 @@ def generate_heresphere_json(server_path):
         file_base64 = base64.urlsafe_b64encode(filename.encode()).decode()
         url = f"{server_path}/heresphere/{file_base64}"
         url_list.append(url)
-    result_json["library"][0]["list"].append(url_list)
+    result_json["library"][0]["list"] = url_list
     return result_json
 
 def generate_heresphere_json_item(server_path, file_base64):
