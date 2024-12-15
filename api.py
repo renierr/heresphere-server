@@ -6,13 +6,13 @@ from videos import get_static_directory
 from globals import url_map, url_counter, find_url_info
 
 
-def get_video_info(filename):
-    try:
-        clip_info = ('Unknown', 'Unknown')
-        return ("?", 0, 0)
-    except OSError as e:
-        logger.error(f"Error getting video info: {e}")
-        return clip_info
+def get_thumbnail(filename):
+    base_name = os.path.basename(filename)
+    thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.jpg")
+    if not os.path.exists(thumbfile):
+        return None
+    relative_thumbfile = os.path.relpath(thumbfile, start=os.path.join(os.path.dirname(filename), '..')).replace('\\', '/')
+    return f"/static/videos/{relative_thumbfile}"
 
 def get_file_size_formatted(filename):
     size_bytes = os.path.getsize(filename)
@@ -52,10 +52,14 @@ def parse_youtube_filename(filename):
 def list_files():
     extracted_details = []
 
-    for root, _, files in os.walk(os.path.join(get_static_directory(), 'videos')):
-        for filename in files:
-            resolution, fps, duration = get_video_info(os.path.join(root, filename))
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'videos')):
+        # Exclude directories that start with a dot
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
 
+        for filename in files:
+            realfile = os.path.join(root, filename)
+            partial = filename.endswith('.part')
+            thumbnail = get_thumbnail(realfile) if not partial else None
             url_id, url_info = find_url_info(filename)
 
             if filename.count('___') == 1:
@@ -63,13 +67,11 @@ def list_files():
                 extracted_details.append({
                     'yt_id': id,
                     'title': title,
-                    'fps': fps,
-                    'resolution': resolution,
-                    'duration': format_duration(duration),
+                    'thumbnail': thumbnail,
                     'filename': f"/static/videos/youtube/{filename}",
-                    'created': get_creation_date(os.path.join(root, filename)),
-                    'filesize': get_file_size_formatted(os.path.join(root, filename)),
-                    'partial': filename.endswith('.part'),
+                    'created': get_creation_date(realfile),
+                    'filesize': get_file_size_formatted(realfile),
+                    'partial': partial,
                     'url_id': url_id,
                     'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
                     'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,
@@ -79,13 +81,11 @@ def list_files():
                 extracted_details.append({
                     'yt_id': None,
                     'title': os.path.splitext(filename)[0],
-                    'fps': fps,
-                    'resolution': resolution,
-                    'duration': format_duration(duration),
+                    'thumbnail': thumbnail,
                     'filename': f"/static/videos/direct/{filename}",
                     'created': get_creation_date(os.path.join(root, filename)),
                     'filesize': get_file_size_formatted(os.path.join(root, filename)),
-                    'partial': filename.endswith('.part'),
+                    'partial': partial,
                     'url_id': url_id,
                     'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
                     'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,

@@ -53,20 +53,25 @@
                 <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
                 <ul class="list-group list-group-flush">
                     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
-                        <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
-                        <div class="text-muted">
-                            <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
-                            <p>Size: {{ file.filesize }}</p>
-                            <p>Created: {{ formatDate(file.created) }}</p>
-                            <p>Downloaded: {{ formatDate(file.downloaded_date) }}</p>
+                        <div class="d-flex align-items-center">
+                            <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px">
+                            <div>
+                                <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
+                                <div class="text-muted">
+                                    <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
+                                    <p>Size: {{ file.filesize }}</p>
+                                    <p>Created: {{ formatDate(file.created) }}</p>
+                                    <p>Downloaded: {{ formatDate(file.downloaded_date) }}</p>
+                                </div>
+                                <div v-if="getProgressForId(file.url_id) > 0" class="progress">
+                                    <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
+                                    <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
+                                <button v-if="file.orig_link" class="btn btn-primary btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
+                                <a v-if="file.orig_link" class="btn-secondary btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
+                            </div>
                         </div>
-                        <div v-if="getProgressForId(file.url_id) > 0" class="progress">
-                            <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
-                            <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                        <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
-                        <button v-if="file.orig_link" class="btn btn-primary btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
-                        <a v-if="file.orig_link" class="btn-secondary btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
                     </li>
                 </ul>
             </div>
