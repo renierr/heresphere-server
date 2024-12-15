@@ -9,7 +9,8 @@ new Vue({
         currentSortDir: 'desc',
         serverOutput: '',
         downloadProgress: {},
-        serverResult: null
+        serverResult: null,
+        currentThumbnail: null,
     },
     methods: {
         redownload: function (url) {
@@ -100,7 +101,11 @@ new Vue({
                     this.thumbnailResult = 'Error generating thumbnails';
                 });
         },
-
+        openThumbnail(thumbnail) {
+            this.currentThumbnail = thumbnail;
+            const modal = new bootstrap.Modal(document.getElementById('thumbnailModal'));
+            modal.show();
+        },
     },
     computed: {
         filteredFiles: function () {

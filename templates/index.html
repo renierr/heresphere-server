@@ -15,11 +15,28 @@
         .list-group-item {
             margin-bottom: 1rem;
         }
+        .modal-dialog {
+            max-width: 90vw;
+        }
     </style>
 </head>
 
 <body class="bg-light p-2">
     <div id="app" class="container">
+        <div class="modal fade" id="thumbnailModal" tabindex="-1" aria-labelledby="thumbnailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="thumbnailModalLabel">Thumbnail</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img :src="currentThumbnail" alt="Thumbnail" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row mb-4">
             <div class="col">
                 <input type="text" v-model="filter" placeholder="Filter files..."
@@ -54,7 +71,7 @@
                 <ul class="list-group list-group-flush">
                     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
                         <div class="d-flex align-items-center">
-                            <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px">
+                            <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px" @click="openThumbnail(file.thumbnail)">
                             <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="me-3" style="width: 100px; height: auto; max-height: 200px">
                             <div>
                                 <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
