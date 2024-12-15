@@ -97,6 +97,7 @@
             <div class="text-center mt-4">
                 <a href="#" @click.prevent="cleanup" class="btn btn-danger">Cleanup Server tracked internal Map</a>
                 <a href="#" @click.prevent="generateThumbnails" class="btn btn-primary ms-2">Generate Thumbnails</a>
+                <a href="#" @click.prevent="fetchFiles" class="btn btn-primary ms-2">Reload files</a>
 
                 <div v-if="serverResult" class="mt-2">
                     <p>Server Result: {{ serverResult }}</p>
