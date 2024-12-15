@@ -2,6 +2,8 @@ import os
 import time
 import platform
 from loguru import logger
+
+from bus import push_text_to_client
 from videos import get_static_directory
 from globals import url_map, url_counter, find_url_info
 
@@ -112,10 +114,12 @@ def generate_thumbnails():
     static_dir = get_static_directory()
     video_dir = os.path.join(static_dir, 'videos')
     generated_thumbnails = []
+    logger.debug(f"Generating thumbnails for videos in {video_dir}")
+    push_text_to_client(f"Generating thumbnails for videos")
 
     for root, dirs, files in os.walk(video_dir):
         for filename in files:
-            if filename.endswith(('.mp4', '.mkv', '.avi')):  # Add other video formats if needed
+            if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
                 video_path = os.path.join(root, filename)
                 thumbnail_dir = os.path.join(root, '.thumb')
                 os.makedirs(thumbnail_dir, exist_ok=True)
@@ -125,5 +129,5 @@ def generate_thumbnails():
                     success = generate_thumbnail(video_path, thumbnail_path)
                     if success:
                         generated_thumbnails.append(thumbnail_path)
-
+    push_text_to_client(f"Generated thumbnails finished with {len(generated_thumbnails)} thumbnails")
     return {"success": True, "generated_thumbnails": generated_thumbnails}

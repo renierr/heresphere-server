@@ -138,7 +138,9 @@ new Vue({
                 serverOutput.shift();
             }
             this.serverOutput = serverOutput.slice().reverse().join('\n');
-            if (event.data.includes('Download finished') || event.data.includes(' 0.0% complete')) {
+            if (event.data.includes('Download finished') ||
+                event.data.includes('Generated thumbnails finished') ||
+                event.data.includes(' 0.0% complete')) {
                 this.fetchFiles();
             }
         };
