@@ -55,6 +55,7 @@
                     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
                         <div class="d-flex align-items-center">
                             <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px">
+                            <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="me-3" style="width: 100px; height: auto; max-height: 200px">
                             <div>
                                 <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
                                 <div class="text-muted">
