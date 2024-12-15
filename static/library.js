@@ -10,6 +10,8 @@ new Vue({
         serverOutput: '',
         serverResult: null,
         currentThumbnail: null,
+        currentPage: 1,
+        pageSize: 10,
     },
     methods: {
         redownload: function (url) {
@@ -81,6 +83,9 @@ new Vue({
             const modal = new bootstrap.Modal(document.getElementById('thumbnailModal'));
             modal.show();
         },
+        changePage(page) {
+            this.currentPage = page;
+        },
     },
     computed: {
         filteredFiles: function () {
@@ -88,13 +93,20 @@ new Vue({
                 return file.filename.toLowerCase().includes(this.filter.toLowerCase());
             });
 
-            return filtered.sort((a, b) => {
+            filtered = filtered.sort((a, b) => {
                 let modifier = 1;
                 if (this.currentSortDir === 'desc') modifier = -1;
                 if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
                 if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
                 return 0;
             });
+
+            const start = (this.currentPage - 1) * this.pageSize;
+            const end = start + this.pageSize;
+            return filtered.slice(start, end);
+        },
+        totalPages: function () {
+            return Math.ceil(this.files.length / this.pageSize);
         },
     },
     mounted: function () {

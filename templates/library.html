@@ -63,6 +63,11 @@
             </div>
             <div v-else>
                 <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
+                <div v-if="totalPages > 1" class="pagination mb-4">
+                    <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="btn btn-secondary">Previous</button>
+                    <span class="p-2">Page {{ currentPage }} of {{ totalPages }}</span>
+                    <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="btn btn-secondary">Next</button>
+                </div>
                 <ul class="list-group list-group-flush">
                     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
                         <div class="d-flex align-items-center">
