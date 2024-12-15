@@ -6,7 +6,7 @@ from os.path import devnull
 from loguru import logger
 
 from bus import push_text_to_client
-from videos import get_static_directory
+from videos import get_static_directory, generate_thumbnail
 from globals import url_map, url_counter, find_url_info
 
 
@@ -97,21 +97,6 @@ def list_files():
                 })
 
     return extracted_details
-
-
-import subprocess
-
-def generate_thumbnail(video_path, thumbnail_path):
-    try:
-        # Use ffmpeg to generate a thumbnail
-        with open(os.devnull, 'w') as devnull:
-            subprocess.run([
-                'ffmpeg', '-i', video_path, '-vf', 'thumbnail', '-ss', '00:00:10.000', '-frames:v', '1', thumbnail_path
-            ], check=True, stdout=devnull, stderr=devnull)
-        return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
-        return False
 
 def generate_thumbnails():
     static_dir = get_static_directory()

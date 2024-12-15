@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import re
 import yt_dlp
@@ -154,3 +155,15 @@ def download_direct(url, progress_function, url_id):
       logger.error(f"Error downloading direct video: {e}")
       return None
   return f"/static/videos/direct/{filename_with_ext(filename, False)}"
+
+def generate_thumbnail(video_path, thumbnail_path):
+    try:
+        # Use ffmpeg to generate a thumbnail
+        with open(os.devnull, 'w') as devnull:
+            subprocess.run([
+                'ffmpeg', '-i', video_path, '-vf', 'thumbnail', '-ss', '00:00:10.000', '-frames:v', '1', thumbnail_path
+            ], check=True, stdout=devnull, stderr=devnull)
+        return True
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
+        return False
