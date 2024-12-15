@@ -1,6 +1,8 @@
 import os
 import time
 import platform
+from os.path import devnull
+
 from loguru import logger
 
 from bus import push_text_to_client
@@ -102,9 +104,10 @@ import subprocess
 def generate_thumbnail(video_path, thumbnail_path):
     try:
         # Use ffmpeg to generate a thumbnail
-        subprocess.run([
-            'ffmpeg', '-i', video_path, '-ss', '00:00:05.000', '-vframes', '1', thumbnail_path
-        ], check=True)
+        with open(os.devnull, 'w') as devnull:
+            subprocess.run([
+                'ffmpeg', '-i', video_path, '-ss', '00:00:05.000', '-vframes', '1', thumbnail_path
+            ], check=True, stdout=devnull, stderr=devnull)
         return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
