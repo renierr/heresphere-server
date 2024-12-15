@@ -1,4 +1,5 @@
 import os
+import shutil
 import time
 import platform
 
@@ -157,8 +158,10 @@ def move_to_library(video_path):
         if os.path.exists(library_path):
             return {"success": False, "error": f"Target exists in library: {base_name}"}
 
-        os.rename(real_path, library_path)
+        shutil.move(real_path, library_path)
         return {"success": True, "library_path": library_path}
+    else:
+        return {"success": False, "error": "Invalid video path"}
 
 def generate_thumbnail_for_path(video_path):
     push_text_to_client(f"Generating thumbnail for {video_path}")
