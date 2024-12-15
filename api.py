@@ -12,7 +12,7 @@ from globals import url_map, url_counter, find_url_info
 
 def get_thumbnail(filename):
     base_name = os.path.basename(filename)
-    thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.jpg")
+    thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.webp")
     if not os.path.exists(thumbfile):
         return None
     relative_thumbfile = os.path.relpath(thumbfile, start=os.path.join(os.path.dirname(filename), '..')).replace('\\', '/')
@@ -111,7 +111,7 @@ def generate_thumbnails():
                 video_path = os.path.join(root, filename)
                 thumbnail_dir = os.path.join(root, '.thumb')
                 os.makedirs(thumbnail_dir, exist_ok=True)
-                thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.jpg")
+                thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.webp")
 
                 if not os.path.exists(thumbnail_path):
                     success = generate_thumbnail(video_path, thumbnail_path)
@@ -129,7 +129,7 @@ def generate_thumbnail_for_path(video_path):
     base_name = os.path.basename(real_path)
     thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
     os.makedirs(thumbnail_dir, exist_ok=True)
-    thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}.thumb.jpg")
+    thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}.thumb.webp")
 
     if not os.path.exists(real_path):
         return {"success": False, "error": "Video file does not exist"}
