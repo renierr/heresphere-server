@@ -1,7 +1,6 @@
 import os
 import time
 import platform
-from os.path import devnull
 
 from loguru import logger
 
@@ -11,12 +10,13 @@ from globals import url_map, url_counter, find_url_info
 
 
 def get_thumbnail(filename):
+    static_path = 'videos' if 'videos' in filename else '.'
     base_name = os.path.basename(filename)
     thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.webp")
     if not os.path.exists(thumbfile):
         return None
     relative_thumbfile = os.path.relpath(thumbfile, start=os.path.join(os.path.dirname(filename), '..')).replace('\\', '/')
-    return f"/static/videos/{relative_thumbfile}"
+    return f"/static/{static_path}/{relative_thumbfile}"
 
 def get_file_size_formatted(filename):
     size_bytes = os.path.getsize(filename)
@@ -52,6 +52,27 @@ def parse_youtube_filename(filename):
     title_part = parts[1]
 
     return id_part, title_part
+
+def list_library_files():
+    extracted_details = []
+
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'library')):
+        # Exclude directories that start with a dot
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+
+        for filename in files:
+            realfile = os.path.join(root, filename)
+            thumbnail = get_thumbnail(realfile)
+            extracted_details.append({
+                'yt_id': None,
+                'title': os.path.splitext(filename)[0],
+                'thumbnail': thumbnail,
+                'filename': f"/static/library/{filename}",
+                'created': get_creation_date(os.path.join(root, filename)),
+                'filesize': get_file_size_formatted(os.path.join(root, filename)),
+            })
+
+    return extracted_details
 
 def list_files():
     extracted_details = []
@@ -98,9 +119,9 @@ def list_files():
 
     return extracted_details
 
-def generate_thumbnails():
+def generate_thumbnails(library=False):
     static_dir = get_static_directory()
-    video_dir = os.path.join(static_dir, 'videos')
+    video_dir = os.path.join(static_dir, 'videos' if not library else 'library')
     generated_thumbnails = []
     logger.debug(f"Generating thumbnails for videos in {video_dir}")
     push_text_to_client(f"Generating thumbnails for videos")
@@ -123,8 +144,12 @@ def generate_thumbnails():
 def generate_thumbnail_for_path(video_path):
     push_text_to_client(f"Generating thumbnail for {video_path}")
     static_dir = get_static_directory()
-    relative_path = video_path.replace('/static/videos/', '')
-    real_path = os.path.join(static_dir, 'videos', relative_path)
+    if video_path.includes('/static/library/'):
+        relative_path = video_path.replace('/static/library/', '')
+        real_path = os.path.join(static_dir, 'library', relative_path)
+    else:
+        relative_path = video_path.replace('/static/videos/', '')
+        real_path = os.path.join(static_dir, 'videos', relative_path)
 
     base_name = os.path.basename(real_path)
     thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')

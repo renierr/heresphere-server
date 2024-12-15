@@ -60,6 +60,10 @@ def download_progress(d):
 def home():
     return render_template('index.html')
 
+@app.route('/library')
+def library():
+    return render_template('library.html')
+
 @app.route('/sse')
 def sse():
     def event_stream():
@@ -74,13 +78,22 @@ def sse():
 def connection_test():
     return jsonify({"success": True})
 
+@app.route('/api/library/list')
+def get_library_files():
+    return jsonify(api.list_library_files())
+
+@app.route('/api/library/generate_thumbnails', methods=['POST'])
+def generate_library_thumbnails():
+    return jsonify(api.generate_thumbnails(library=True))
+
 @app.route('/api/list')
 def get_files():
     return jsonify(api.list_files())
 
+
 @app.route('/api/generate_thumbnails', methods=['POST'])
 def generate_thumbnails():
-    return jsonify(api.generate_thumbnails())
+    return jsonify(api.generate_thumbnails(library=False))
 
 @app.route('/api/generate_thumbnail', methods=['POST'])
 def generate_thumbnail():

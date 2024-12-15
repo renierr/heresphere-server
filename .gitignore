@@ -1,6 +1,7 @@
 __pycache__
 logs
 static/videos
+static/library
 ffmpeg_x64
 dist
 build
@@ -11,6 +12,4 @@ main.spec
 .history
 *.tar
 .idea
-
-
 /url_map.json
