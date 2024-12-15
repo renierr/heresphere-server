@@ -78,6 +78,9 @@ def connection_test():
 def get_files():
     return jsonify(api.list_files())
 
+@app.route('/api/generate_thumbnails', methods=['POST'])
+def generate_thumbnails():
+    return jsonify(api.generate_thumbnails())
 
 @app.route('/cleanup')
 def cleanup_maps():

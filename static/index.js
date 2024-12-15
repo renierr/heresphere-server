@@ -9,7 +9,7 @@ new Vue({
         currentSortDir: 'desc',
         serverOutput: '',
         downloadProgress: {},
-        cleanupResult: null
+        serverResult: null
     },
     methods: {
         redownload: function (url) {
@@ -76,12 +76,28 @@ new Vue({
             fetch('/cleanup')
                 .then(response => response.json())
                 .then(data => {
-                    this.cleanupResult = JSON.stringify(data);
+                    this.serverResult = JSON.stringify(data);
                     this.fetchFiles();
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    this.cleanupResult = 'Error occurred during cleanup';
+                    this.serverResult = 'Error occurred during cleanup';
+                });
+        },
+        generateThumbnails() {
+            fetch('/api/generate_thumbnails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.thumbnailResult = data.success ? 'Thumbnails generated successfully' : 'Failed to generate thumbnails';
+                })
+                .catch(error => {
+                    console.error('Error generating thumbnails:', error);
+                    this.thumbnailResult = 'Error generating thumbnails';
                 });
         },
 

@@ -93,3 +93,37 @@ def list_files():
                 })
 
     return extracted_details
+
+
+import subprocess
+
+def generate_thumbnail(video_path, thumbnail_path):
+    try:
+        # Use ffmpeg to generate a thumbnail
+        subprocess.run([
+            'ffmpeg', '-i', video_path, '-ss', '00:00:05.000', '-vframes', '1', thumbnail_path
+        ], check=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
+        return False
+
+def generate_thumbnails():
+    static_dir = get_static_directory()
+    video_dir = os.path.join(static_dir, 'videos')
+    generated_thumbnails = []
+
+    for root, dirs, files in os.walk(video_dir):
+        for filename in files:
+            if filename.endswith(('.mp4', '.mkv', '.avi')):  # Add other video formats if needed
+                video_path = os.path.join(root, filename)
+                thumbnail_dir = os.path.join(root, '.thumb')
+                os.makedirs(thumbnail_dir, exist_ok=True)
+                thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.jpg")
+
+                if not os.path.exists(thumbnail_path):
+                    success = generate_thumbnail(video_path, thumbnail_path)
+                    if success:
+                        generated_thumbnails.append(thumbnail_path)
+
+    return {"success": True, "generated_thumbnails": generated_thumbnails}
