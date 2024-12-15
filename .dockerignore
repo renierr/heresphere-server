@@ -27,6 +27,7 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/static/videos
+**/static/library
 **/dist
 **/build
 **/logs
