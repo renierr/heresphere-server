@@ -136,7 +136,7 @@ new Vue({
                 })
                 .catch(error => {
                     console.error('Error moving file:', error);
-                    this.serverResult = 'Error generating thumbnails';
+                    this.serverResult = 'Error moving file: ' + error;
                 });
 
         },
