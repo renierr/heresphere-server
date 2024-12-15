@@ -84,16 +84,25 @@ def get_library_files():
 
 @app.route('/api/library/generate_thumbnails', methods=['POST'])
 def generate_library_thumbnails():
-    return jsonify(api.generate_thumbnails(library=True))
+    try:
+        return jsonify(api.generate_thumbnails(library=True))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/list')
 def get_files():
-    return jsonify(api.list_files())
+    try:
+        return jsonify(api.list_files())
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 @app.route('/api/generate_thumbnails', methods=['POST'])
 def generate_thumbnails():
-    return jsonify(api.generate_thumbnails(library=False))
+    try:
+        return jsonify(api.generate_thumbnails(library=False))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/generate_thumbnail', methods=['POST'])
 def generate_thumbnail():
@@ -103,8 +112,11 @@ def generate_thumbnail():
     if not video_path:
         return jsonify({"success": False, "error": "No video path provided"}), 400
 
-    result = api.generate_thumbnail_for_path(video_path)
-    return jsonify(result)
+    try:
+        result = api.generate_thumbnail_for_path(video_path)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/move_to_library', methods=['POST'])
 def move_to_library():
@@ -114,8 +126,11 @@ def move_to_library():
     if not video_path:
         return jsonify({"success": False, "error": "No video path provided"}), 400
 
-    result = api.move_to_library(video_path)
-    return jsonify(result)
+    try:
+        result = api.move_to_library(video_path)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/cleanup')
 def cleanup_maps():
