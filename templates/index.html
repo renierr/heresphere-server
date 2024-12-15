@@ -85,6 +85,7 @@
                                     <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
                                     <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
+                                <button class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
                                 <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
                                 <button v-if="file.orig_link" class="btn btn-primary btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
                                 <a v-if="file.orig_link" class="btn-secondary btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
@@ -98,7 +99,7 @@
                 <a href="#" @click.prevent="generateThumbnails" class="btn btn-primary ms-2">Generate Thumbnails</a>
 
                 <div v-if="serverResult" class="mt-2">
-                    <p>Cleanup Result: {{ serverResult }}</p>
+                    <p>Server Result: {{ serverResult }}</p>
                 </div>
             </div>
         </div>

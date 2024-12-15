@@ -82,6 +82,17 @@ def get_files():
 def generate_thumbnails():
     return jsonify(api.generate_thumbnails())
 
+@app.route('/api/generate_thumbnail', methods=['POST'])
+def generate_thumbnail():
+    data = request.get_json()
+    video_path = data.get("video_path")
+
+    if not video_path:
+        return jsonify({"success": False, "error": "No video path provided"}), 400
+
+    result = api.generate_thumbnail_for_path(video_path)
+    return jsonify(result)
+
 @app.route('/cleanup')
 def cleanup_maps():
     url_map = get_url_map()

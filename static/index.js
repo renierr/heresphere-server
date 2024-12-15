@@ -94,12 +94,30 @@ new Vue({
             })
                 .then(response => response.json())
                 .then(data => {
-                    this.thumbnailResult = data.success ? 'Thumbnails generated successfully' : 'Failed to generate thumbnails';
+                    this.serverResult = data.success ? 'Thumbnails generated successfully' : 'Failed to generate thumbnails';
                 })
                 .catch(error => {
                     console.error('Error generating thumbnails:', error);
-                    this.thumbnailResult = 'Error generating thumbnails';
+                    this.serverResult = 'Error generating thumbnails';
                 });
+        },
+        generateThumbnail(file) {
+            fetch('/api/generate_thumbnail', {
+                method: 'POST',
+                body: JSON.stringify({ video_path: file }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.serverResult = data.success ? 'Thumbnail generated successfully' : 'Failed to generate thumbnail';
+                })
+                .catch(error => {
+                    console.error('Error generating thumbnail:', error);
+                    this.serverResult = 'Error generating thumbnails';
+                });
+
         },
         openThumbnail(thumbnail) {
             this.currentThumbnail = thumbnail;

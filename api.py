@@ -106,7 +106,7 @@ def generate_thumbnail(video_path, thumbnail_path):
         # Use ffmpeg to generate a thumbnail
         with open(os.devnull, 'w') as devnull:
             subprocess.run([
-                'ffmpeg', '-i', video_path, '-ss', '00:00:05.000', '-vframes', '1', thumbnail_path
+                'ffmpeg', '-i', video_path, '-vf', 'thumbnail', '-ss', '00:00:10.000', '-frames:v', '1', thumbnail_path
             ], check=True, stdout=devnull, stderr=devnull)
         return True
     except subprocess.CalledProcessError as e:
@@ -134,3 +134,25 @@ def generate_thumbnails():
                         generated_thumbnails.append(thumbnail_path)
     push_text_to_client(f"Generated thumbnails finished with {len(generated_thumbnails)} thumbnails")
     return {"success": True, "generated_thumbnails": generated_thumbnails}
+
+def generate_thumbnail_for_path(video_path):
+    push_text_to_client(f"Generating thumbnail for {video_path}")
+    static_dir = get_static_directory()
+    relative_path = video_path.replace('/static/videos/', '')
+    real_path = os.path.join(static_dir, 'videos', relative_path)
+
+    base_name = os.path.basename(real_path)
+    thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
+    os.makedirs(thumbnail_dir, exist_ok=True)
+    thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}.thumb.jpg")
+
+    if not os.path.exists(real_path):
+        return {"success": False, "error": "Video file does not exist"}
+
+    if os.path.exists(thumbnail_path):
+        os.remove(thumbnail_path)
+    success = generate_thumbnail(real_path, thumbnail_path)
+    if success:
+        return {"success": True, "thumbnail_path": thumbnail_path}
+    else:
+        return {"success": False, "error": "Failed to generate thumbnail"}
