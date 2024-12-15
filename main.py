@@ -4,6 +4,8 @@ import os
 import logging
 import sys
 from loguru import logger
+
+from heresphere import generate_heresphere_json, generate_heresphere_json_item
 from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
 import api
 import argparse
@@ -56,9 +58,31 @@ def download_progress(d):
     push_text_to_client(output)
     logger.debug(output)
 
+#@app.before_request
+#def log_request_info():
+#    logger.info(f"Request: {request.method} {request.url}")
+#    logger.info(f"Headers: {request.headers}")
+#    logger.info(f"Body: {request.get_data()}")
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/heresphere', methods=['GET'])
+def heresphere():
+    try:
+        server_path = f"{request.scheme}://{request.host}"
+        return jsonify(generate_heresphere_json(server_path))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/heresphere/<file_base64>')
+def heresphere_file(file_base64):
+    try:
+        server_path = f"{request.scheme}://{request.host}"
+        return jsonify(generate_heresphere_json_item(server_path, file_base64))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/library')
 def library():
