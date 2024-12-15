@@ -141,6 +141,25 @@ def generate_thumbnails(library=False):
     push_text_to_client(f"Generated thumbnails finished with {len(generated_thumbnails)} thumbnails")
     return {"success": True, "generated_thumbnails": generated_thumbnails}
 
+def move_to_library(video_path):
+    push_text_to_client(f"Move file to library: {video_path}")
+    static_dir = get_static_directory()
+    if '/static/videos/' in video_path:
+        relative_path = video_path.replace('/static/videos/', '')
+        real_path = os.path.join(static_dir, 'videos', relative_path)
+
+        if not os.path.exists(real_path):
+            return {"success": False, "error": "Video file does not exist"}
+
+        base_name = os.path.basename(real_path)
+        library_path = os.path.join(static_dir, 'library', base_name)
+
+        if os.path.exists(library_path):
+            return {"success": False, "error": f"Target exists in library: {base_name}"}
+
+        os.rename(real_path, library_path)
+        return {"success": True, "library_path": library_path}
+
 def generate_thumbnail_for_path(video_path):
     push_text_to_client(f"Generating thumbnail for {video_path}")
     static_dir = get_static_directory()

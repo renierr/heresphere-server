@@ -121,6 +121,25 @@ new Vue({
                 });
 
         },
+        moveToLibrary(file) {
+            fetch('/api/move_to_library', {
+                method: 'POST',
+                body: JSON.stringify({ video_path: file }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.serverResult = JSON.stringify(data);
+                    this.fetchFiles();
+                })
+                .catch(error => {
+                    console.error('Error moving file:', error);
+                    this.serverResult = 'Error generating thumbnails';
+                });
+
+        },
         openThumbnail(thumbnail) {
             this.currentThumbnail = thumbnail;
             const modal = new bootstrap.Modal(document.getElementById('thumbnailModal'));
