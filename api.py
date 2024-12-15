@@ -144,7 +144,7 @@ def generate_thumbnails(library=False):
 def generate_thumbnail_for_path(video_path):
     push_text_to_client(f"Generating thumbnail for {video_path}")
     static_dir = get_static_directory()
-    if video_path.includes('/static/library/'):
+    if '/static/library/' in video_path:
         relative_path = video_path.replace('/static/library/', '')
         real_path = os.path.join(static_dir, 'library', relative_path)
     else:

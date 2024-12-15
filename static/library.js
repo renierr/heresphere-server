@@ -59,7 +59,7 @@ new Vue({
                 });
         },
         generateThumbnail(file) {
-            fetch('/api/library/generate_thumbnail', {
+            fetch('/api/generate_thumbnail', {
                 method: 'POST',
                 body: JSON.stringify({ video_path: file }),
                 headers: {
