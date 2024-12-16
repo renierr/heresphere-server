@@ -86,7 +86,7 @@ def heresphere():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/heresphere/<file_base64>')
+@app.route('/heresphere/<file_base64>', methods=['POST', 'GET'])
 def heresphere_file(file_base64):
     logger.debug(f"HereSphere File Request: {request.get_data()}")
     try:
