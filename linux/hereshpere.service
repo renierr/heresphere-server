@@ -1,0 +1,12 @@
+[Unit]
+Description=Hereshpere Service
+After=network.target
+
+[Service]
+#User=your_username
+WorkingDirectory=/opt/hereshpere
+ExecStart=./linux/start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
