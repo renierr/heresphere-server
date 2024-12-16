@@ -42,11 +42,17 @@ def generate_heresphere_json_item(server_path, file_base64):
     else:
         thumbnail = f"{server_path}/static/images/placeholder.png"
 
+    thumbnail_video_path = os.path.join(static_dir, 'library/.thumb', f"{base_name}.thumb.webm")
+    if os.path.exists(thumbnail_video_path):
+        thumbnail_video = f"{server_path}/static/library/.thumb/{os.path.basename(thumbnail_video_path)}"
+    else:
+        thumbnail_video = ""
+
     result = {
         "title": os.path.splitext(base_name)[0],
         "description": "",
         "thumbnailImage": f"{thumbnail}",
-        "thumbnailVideo": f"{server_path}/static/library/.thumb/{base_name}.thumb.webp",
+        "thumbnailVideo": f"{thumbnail_video}",
         "dateReleased": "",
         "dateAdded": "",
         "duration": "",
