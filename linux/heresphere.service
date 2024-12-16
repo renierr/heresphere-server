@@ -1,16 +1,16 @@
-# copy this to /etc/systemd/system/hereshpere.service
-# then run `sudo systemctl enable hereshpere.service`
+# copy this to /etc/systemd/system/heresphere.service
+# then run `sudo systemctl enable heresphere.service`
 # reload systemd with `sudo systemctl daemon-reload`
-# and `sudo systemctl start hereshpere.service`
+# and `sudo systemctl start heresphere.service`
 
 [Unit]
-Description=Hereshpere Service
+Description=Heresphere Service
 After=network.target
 
 [Service]
 #User=your_username
-WorkingDirectory=/opt/hereshpere
-ExecStart=./linux/start.sh
+WorkingDirectory=/opt/heresphere
+ExecStart=/opt/heresphere/linux/start.sh
 Restart=always
 
 [Install]
