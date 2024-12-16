@@ -1,3 +1,7 @@
+# copy this to /etc/systemd/system/hereshpere.service
+# then run `sudo systemctl enable hereshpere.service`
+# and `sudo systemctl start hereshpere.service`
+
 [Unit]
 Description=Hereshpere Service
 After=network.target
