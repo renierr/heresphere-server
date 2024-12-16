@@ -57,7 +57,7 @@ def parse_youtube_filename(filename):
 def list_library_files():
     extracted_details = []
 
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'library')):
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'library'), followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
@@ -78,7 +78,7 @@ def list_library_files():
 def list_files():
     extracted_details = []
 
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'videos')):
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'videos'), followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
