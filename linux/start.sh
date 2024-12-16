@@ -1,4 +1,4 @@
-!#/bin/sh
+!#/bin/bash
 
 # Start the server
 source .venv/bin/activate
