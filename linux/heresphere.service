@@ -1,5 +1,6 @@
 # copy this to /etc/systemd/system/hereshpere.service
 # then run `sudo systemctl enable hereshpere.service`
+# reload systemd with `sudo systemctl daemon-reload`
 # and `sudo systemctl start hereshpere.service`
 
 [Unit]
