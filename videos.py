@@ -162,13 +162,13 @@ def generate_thumbnail(video_path, thumbnail_path):
         #ffmpeg -i input_video.mp4 -vf "select='not(mod(n\,floor(n/10)))',scale=320:-1" -vsync vfr -frames:v 10 preview_%02d.png
         with open(os.devnull, 'w') as devnull:
             subprocess.run([
-                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1920:h=1080:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', thumbnail_path
+                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', thumbnail_path
             ], check=True, stdout=devnull, stderr=devnull)
             subprocess.run([
-                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1920:h=1080:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
+                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=devnull, stderr=devnull)
             subprocess.run([
-                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1920:h=1080:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
+                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
             ], check=True, stdout=devnull, stderr=devnull)
         return True
     except subprocess.CalledProcessError as e:

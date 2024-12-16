@@ -128,6 +128,9 @@ def generate_thumbnails(library=False):
     push_text_to_client(f"Generating thumbnails for videos")
 
     for root, dirs, files in os.walk(video_dir):
+        # Exclude directories that start with a dot
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+
         for filename in files:
             if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
                 video_path = os.path.join(root, filename)
