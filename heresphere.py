@@ -36,10 +36,17 @@ def generate_heresphere_json_item(server_path, file_base64):
     if not os.path.exists(real_path):
         return {}
 
+    thumbnail_path = os.path.join(static_dir, 'library/.thumb', f"{base_name}.thumb.jpg")
+    if os.path.exists(thumbnail_path):
+        thumbnail = f"{server_path}/static/library/.thumb/{os.path.basename(thumbnail_path)}"
+    else:
+        thumbnail = f"{server_path}/static/images/placeholder.png"
+
     result = {
         "title": os.path.splitext(base_name)[0],
         "description": "",
-        "thumbnailImage": f"{server_path}/static/library/.thumb/{base_name}.thumb.webp",
+        "thumbnailImage": f"{thumbnail}",
+        "thumbnailVideo": f"{server_path}/static/library/.thumb/{base_name}.thumb.webp",
         "dateReleased": "",
         "dateAdded": "",
         "duration": "",
@@ -69,6 +76,5 @@ def generate_heresphere_json_item(server_path, file_base64):
         "rating": 0,
         "isFavorite": False,
         "writeFavorite": False,
-        "thumbnailVideo": ""
     }
     return result

@@ -42,6 +42,9 @@ app = Flask(__name__, static_folder=static_folder_path)
 if DEBUG:
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
+app.config['MIMETYPE'] = {
+    '.webp': 'image/webp'
+}
 
 def remove_ansi_codes(text):
     ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
