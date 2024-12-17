@@ -12,7 +12,7 @@ def generate_thumbnails(library=False):
     video_dir = os.path.join(static_dir, 'videos' if not library else 'library')
     generated_thumbnails = []
     logger.debug(f"Generating thumbnails for videos in {video_dir}")
-    push_text_to_client(f"Generating thumbnails for videos")
+    push_text_to_client(f"Generating thumbnails for {'library' if library else 'videos'}")
 
     for root, dirs, files in os.walk(video_dir):
         # Exclude directories that start with a dot

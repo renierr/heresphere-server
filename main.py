@@ -121,7 +121,7 @@ def generate_thumbnails(library=False):
         thumbnail_thread.daemon = True
         thumbnail_thread.start()
 
-        push_text_to_client(f"Generate Thumbnails started in the background")
+        push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
         return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
