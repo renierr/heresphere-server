@@ -25,16 +25,19 @@ def generate_thumbnails(library=False):
                 os.makedirs(thumbnail_dir, exist_ok=True)
                 thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.webp")
 
-                if not os.path.exists(thumbnail_path):
+                # if one of the thumbs for file is missing, generate all thumbs
+                if not os.path.exists(thumbnail_path) or not os.path.exists(os.path.splitext(thumbnail_path)[0] + '.jpg') or not os.path.exists(os.path.splitext(thumbnail_path)[0] + '.webm'):
                     success = generate_thumbnail(video_path, thumbnail_path)
                     if success:
                         generated_thumbnails.append(thumbnail_path)
+
     push_text_to_client(f"Generated thumbnails finished with {len(generated_thumbnails)} thumbnails")
     return {"success": True, "generated_thumbnails": generated_thumbnails}
 
 
 def generate_thumbnail(video_path, thumbnail_path):
     try:
+        push_text_to_client(f"Generating thumbnail for {os.path.basename(video_path)}")
         logger.debug(f"Generating thumbnail for {video_path}")
         # Use ffmpeg to generate a thumbnail
         #ffmpeg -i input_video.mp4 -vf "select='not(mod(n\,floor(n/10)))',scale=320:-1" -vsync vfr -frames:v 10 preview_%02d.png
@@ -70,7 +73,6 @@ def get_thumbnail(filename):
 
 
 def generate_thumbnail_for_path(video_path):
-    push_text_to_client(f"Generating thumbnail for {os.path.basename(video_path)}")
     static_dir = get_static_directory()
     if '/static/library/' in video_path:
         relative_path = video_path.replace('/static/library/', '')
