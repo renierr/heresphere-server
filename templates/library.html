@@ -18,11 +18,14 @@
         .modal-dialog {
             max-width: 90vw;
         }
+        [v-cloak] {
+            display: none;
+        }
     </style>
 </head>
 
 <body class="bg-light p-2">
-    <div id="app" class="container">
+    <div id="app" v-cloak class="container">
         <div class="modal fade" id="thumbnailModal" tabindex="-1" aria-labelledby="thumbnailModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
