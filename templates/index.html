@@ -56,7 +56,7 @@
 
             <div class="col p-2">
                 <h2 class="h6">Server Information</h2>
-                <textarea v-model="serverOutput" class="form-control" rows="3" readonly></textarea>
+                <div v-text="serverOutput" class="form-control" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
             </div>
         </div>
 
