@@ -6,18 +6,9 @@ import platform
 from loguru import logger
 
 from bus import push_text_to_client
-from videos import get_static_directory, generate_thumbnail
-from globals import url_map, url_counter, find_url_info
+from thumbnail import generate_thumbnail, get_thumbnail
+from globals import find_url_info, get_static_directory
 
-
-def get_thumbnail(filename):
-    static_path = 'videos' if 'videos' in filename else '.'
-    base_name = os.path.basename(filename)
-    thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.webp")
-    if not os.path.exists(thumbfile):
-        return None
-    relative_thumbfile = os.path.relpath(thumbfile, start=os.path.join(os.path.dirname(filename), '..')).replace('\\', '/')
-    return f"/static/{static_path}/{relative_thumbfile}"
 
 def get_file_size_formatted(filename):
     size_bytes = os.path.getsize(filename)
@@ -120,30 +111,6 @@ def list_files():
 
     return extracted_details
 
-def generate_thumbnails(library=False):
-    static_dir = get_static_directory()
-    video_dir = os.path.join(static_dir, 'videos' if not library else 'library')
-    generated_thumbnails = []
-    logger.debug(f"Generating thumbnails for videos in {video_dir}")
-    push_text_to_client(f"Generating thumbnails for videos")
-
-    for root, dirs, files in os.walk(video_dir):
-        # Exclude directories that start with a dot
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
-
-        for filename in files:
-            if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
-                video_path = os.path.join(root, filename)
-                thumbnail_dir = os.path.join(root, '.thumb')
-                os.makedirs(thumbnail_dir, exist_ok=True)
-                thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.webp")
-
-                if not os.path.exists(thumbnail_path):
-                    success = generate_thumbnail(video_path, thumbnail_path)
-                    if success:
-                        generated_thumbnails.append(thumbnail_path)
-    push_text_to_client(f"Generated thumbnails finished with {len(generated_thumbnails)} thumbnails")
-    return {"success": True, "generated_thumbnails": generated_thumbnails}
 
 def move_to_library(video_path):
     push_text_to_client(f"Move file to library: {video_path}")

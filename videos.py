@@ -1,33 +1,17 @@
 import os
-import subprocess
-import sys
 import re
+import traceback
+from datetime import datetime
+
 import yt_dlp
 from loguru import logger
-from globals import get_url_map
+
+from bus import push_text_to_client
+from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
+    find_url_info, remove_ansi_codes
 
 root_path = os.path.dirname(os.path.abspath(__file__))
 is_windows = os.name == 'nt' # Anguish
-
-def get_application_path():
-    application_path = os.path.dirname(os.path.abspath(__file__))
-    if getattr(sys, 'frozen', False):
-        application_path = os.path.dirname(sys.executable)
-        logger.debug('Running mode: Frozen/executable')
-    else:
-        try:
-            app_full_path = os.path.realpath(__file__)
-            application_path = os.path.dirname(app_full_path)
-            logger.debug("Running mode: Non-interactive")
-        except NameError:
-            application_path = os.getcwd()
-            logger.debug("Running mode: Interactive")
-    return application_path
-
-def get_static_directory():
-    application_path = get_application_path()
-    logger.debug(application_path)
-    return os.path.join(application_path, 'static')
 
 # Set the path to the static ffmpeg executable for Windows
 if is_windows:
@@ -156,22 +140,39 @@ def download_direct(url, progress_function, url_id):
       return None
   return f"/static/videos/direct/{filename_with_ext(filename, False)}"
 
-def generate_thumbnail(video_path, thumbnail_path):
-    try:
-        # Use ffmpeg to generate a thumbnail
-        #ffmpeg -i input_video.mp4 -vf "select='not(mod(n\,floor(n/10)))',scale=320:-1" -vsync vfr -frames:v 10 preview_%02d.png
-        with open(os.devnull, 'w') as devnull:
-            subprocess.run([
-                'ffmpeg', '-i', video_path, '-loop', 0, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', thumbnail_path
-            ], check=True, stdout=devnull, stderr=devnull)
-            subprocess.run([
-                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
-            ], check=True, stdout=devnull, stderr=devnull)
-            subprocess.run([
-                'ffmpeg', '-i', video_path, '-vf', 'thumbnail,scale=w=380:h=240:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
-            ], check=True, stdout=devnull, stderr=devnull)
-        return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
-        return False
 
+def download_video(url):
+    url_map = get_url_map()
+    url_id = find_url_id(url)
+    if url_id is None:
+        url_id = get_url_counter()
+        increment_url_counter()
+        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'downloaded_date': int(datetime.now().timestamp())}
+    else:
+        url_map[url_id]['url'] = url
+        url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
+
+    try:
+        video_url = None
+        if is_youtube_url(url):
+            video_url = download_yt(url, download_progress, url_id)
+        else:
+            video_url = download_direct(url, download_progress, url_id)
+        url_map[url_id]['video_url'] = video_url
+        push_text_to_client(f"Download finished: {video_url}")
+    except Exception as e:
+        error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
+        logger.error(error_message)
+        push_text_to_client(f"Download failed: {e}")
+
+
+def download_progress(d):
+    output = ''
+    fname = os.path.splitext(os.path.basename(d['filename']))[0]
+    if d['status'] == 'downloading':
+        idnr, _ = find_url_info(fname)
+        output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
+    elif d['status'] == 'finished':
+        output = f"Download completed: {fname}"
+    push_text_to_client(output)
+    logger.debug(output)

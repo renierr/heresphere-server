@@ -2,7 +2,7 @@ import base64
 import os
 
 from api import list_library_files
-from videos import get_static_directory
+from globals import get_static_directory
 
 
 def generate_heresphere_json(server_path):

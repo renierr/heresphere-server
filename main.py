@@ -5,17 +5,14 @@ import logging
 import sys
 from loguru import logger
 
+import thumbnail
 from heresphere import generate_heresphere_json, generate_heresphere_json_item
-from videos import download_yt, get_stream, download_direct, is_youtube_url, get_static_directory
+from videos import get_stream, download_video
 import api
 import argparse
 from bus import event_bus, push_text_to_client
 import threading
-import traceback
-from globals import find_url_info, save_url_map, load_url_map, get_url_counter, get_url_map, increment_url_counter, \
-    find_url_id
-import re
-from datetime import datetime
+from globals import save_url_map, load_url_map, get_url_map, get_static_directory
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -46,20 +43,6 @@ app.logger.setLevel(logging.WARNING)
 #     '.webp': 'image/webp'
 # }
 
-def remove_ansi_codes(text):
-    ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
-    return ansi_escape.sub('', text)
-
-def download_progress(d):
-    output = ''
-    fname = os.path.splitext(os.path.basename(d['filename']))[0]
-    if d['status'] == 'downloading':
-        idnr, _ = find_url_info(fname)
-        output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
-    elif d['status'] == 'finished':
-        output = f"Download completed: {fname}"
-    push_text_to_client(output)
-    logger.debug(output)
 
 # @app.before_request
 # def log_request_info():
@@ -123,7 +106,7 @@ def get_library_files():
 @app.route('/api/library/generate_thumbnails', methods=['POST'])
 def generate_library_thumbnails():
     try:
-        return jsonify(api.generate_thumbnails(library=True))
+        return jsonify(thumbnail.generate_thumbnails(library=True))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -138,7 +121,7 @@ def get_files():
 @app.route('/api/generate_thumbnails', methods=['POST'])
 def generate_thumbnails():
     try:
-        return jsonify(api.generate_thumbnails(library=False))
+        return jsonify(thumbnail.generate_thumbnails(library=False))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -194,29 +177,6 @@ def cleanup_maps():
     save_url_map()
     return jsonify({"success": True, "removed": to_remove})
 
-def download_video(url):
-    url_map = get_url_map()
-    url_id = find_url_id(url)
-    if url_id is None:
-        url_id = get_url_counter()
-        increment_url_counter()
-        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'downloaded_date': int(datetime.now().timestamp())}
-    else:
-        url_map[url_id]['url'] = url
-        url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
-
-    try:
-        video_url = None
-        if is_youtube_url(url):
-            video_url = download_yt(url, download_progress, url_id)
-        else:
-            video_url = download_direct(url, download_progress, url_id)
-        url_map[url_id]['video_url'] = video_url
-        push_text_to_client(f"Download finished: {video_url}")
-    except Exception as e:
-        error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
-        logger.error(error_message)
-        push_text_to_client(f"Download failed: {e}")
 
 @app.route('/download', methods=['POST'])
 def download():
@@ -239,7 +199,7 @@ def download():
     return jsonify({"success": True, "message": "Download started in the background"})
 
 @app.route('/stream', methods=['POST'])
-def resolve_yt():
+def request_stream():
     data = request.get_json()
     url = data.get("url")
 
