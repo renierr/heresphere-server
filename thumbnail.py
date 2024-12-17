@@ -14,7 +14,7 @@ def generate_thumbnails(library=False):
     logger.debug(f"Generating thumbnails for videos in {video_dir}")
     push_text_to_client(f"Generating thumbnails for {'library' if library else 'videos'}")
 
-    for root, dirs, files in os.walk(video_dir):
+    for root, dirs, files in os.walk(video_dir, followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
