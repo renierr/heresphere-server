@@ -25,6 +25,7 @@ def generate_thumbnails(library=False):
                 os.makedirs(thumbnail_dir, exist_ok=True)
                 thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.webp")
 
+                logger.debug(f"Checking thumbnail for {filename}")
                 # if one of the thumbs for file is missing, generate all thumbs
                 if not os.path.exists(thumbnail_path) or not os.path.exists(os.path.splitext(thumbnail_path)[0] + '.jpg') or not os.path.exists(os.path.splitext(thumbnail_path)[0] + '.webm'):
                     success = generate_thumbnail(video_path, thumbnail_path)
