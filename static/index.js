@@ -79,7 +79,7 @@ new Vue({
             fetch('/cleanup')
                 .then(response => response.json())
                 .then(data => {
-                    this.serverResult = JSON.stringify(data);
+                    this.serverResult = data;
                     this.fetchFiles();
                 })
                 .catch(error => {
@@ -96,7 +96,7 @@ new Vue({
             })
                 .then(response => response.json())
                 .then(data => {
-                    this.serverResult = data.success ? 'Thumbnails generated successfully' : 'Failed to generate thumbnails';
+                    this.serverResult = data.success ? data : 'Failed to generate thumbnails';
                 })
                 .catch(error => {
                     console.error('Error generating thumbnails:', error);
@@ -113,7 +113,7 @@ new Vue({
             })
                 .then(response => response.json())
                 .then(data => {
-                    this.serverResult = data.success ? 'Thumbnail generated successfully' : 'Failed to generate thumbnail';
+                    this.serverResult = data.success ? data : 'Failed to generate thumbnail';
                 })
                 .catch(error => {
                     console.error('Error generating thumbnail:', error);
@@ -131,7 +131,7 @@ new Vue({
             })
                 .then(response => response.json())
                 .then(data => {
-                    this.serverResult = JSON.stringify(data);
+                    this.serverResult = data;
                     this.fetchFiles();
                 })
                 .catch(error => {

@@ -103,13 +103,6 @@ def connection_test():
 def get_library_files():
     return jsonify(api.list_library_files())
 
-@app.route('/api/library/generate_thumbnails', methods=['POST'])
-def generate_library_thumbnails():
-    try:
-        return jsonify(thumbnail.generate_thumbnails(library=True))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
 @app.route('/api/list')
 def get_files():
     try:
@@ -117,11 +110,19 @@ def get_files():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route('/api/library/generate_thumbnails', methods=['POST'])
+def generate_library_thumbnails():
+    return generate_thumbnails(library=True)
 
 @app.route('/api/generate_thumbnails', methods=['POST'])
-def generate_thumbnails():
+def generate_thumbnails(library=False):
     try:
-        return jsonify(thumbnail.generate_thumbnails(library=False))
+        thumbnail_thread = threading.Thread(target=thumbnail.generate_thumbnails, args=(library,))
+        thumbnail_thread.daemon = True
+        thumbnail_thread.start()
+
+        push_text_to_client(f"Generate Thumbnails started in the background")
+        return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
