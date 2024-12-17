@@ -131,7 +131,7 @@ def generate_thumbnail(video_path, thumbnail_path):
             ]
             logger.debug(f"Running command: {' '.join(command)}")
 
-            subprocess.run(command, check=True)
+            subprocess.run(command, check=True, stdout=stdout, stderr=stdout)
 
         logger.debug(f"Generating thumbnail for {video_path} finished.")
         return True
