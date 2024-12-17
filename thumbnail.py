@@ -127,7 +127,7 @@ def generate_thumbnail(video_path, thumbnail_path):
 
             command = [
                 'ffmpeg', '-y', '-i', video_path, '-filter_complex', filter_complex,
-                '-map', '[v]', '-map', '[a]', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '4', '-b:v', '128k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
+                '-map', '[v]', '-map', '[a]', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
             ]
             logger.debug(f"Running command: {' '.join(command)}")
 
