@@ -125,10 +125,13 @@ def generate_thumbnail(video_path, thumbnail_path):
             filter_complex += "".join([f"[v{i}][a{i}]" for i in range(len(points))])
             filter_complex += f"concat=n={len(points)}:v=1:a=1[v][a]"
 
-            subprocess.run([
-                'ffmpeg', '-i', video_path, '-filter_complex', filter_complex,
+            command = [
+                'ffmpeg', '-y', '-i', video_path, '-filter_complex', filter_complex,
                 '-map', '[v]', '-map', '[a]', '-c:v', 'libvpx', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
-            ], check=True)
+            ]
+            logger.debug(f"Running command: {' '.join(command)}")
+
+            subprocess.run(command, check=True)
 
         logger.debug(f"Generating thumbnail for {video_path} finished.")
         return True
