@@ -1,17 +1,56 @@
 import os
 import subprocess
-
+import json
 from loguru import logger
-
 from bus import push_text_to_client
 from globals import is_debug, get_static_directory
 
 
+def get_video_info(video_path):
+    """
+    Get video info using ffprobe, try to load from .thumb folder first
+    if not found, run ffprobe command
+
+    Example:
+    {
+        "streams": [ ... ],
+        "format": { ... }
+    }
+
+    :param video_path: full path to video file
+    :return: json object or None
+    """
+    try:
+        # find the video json in .thumb folder first
+        json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + '.thumb.json'
+        if os.path.exists(json_path):
+            with open(json_path, 'r') as f:
+                logger.debug(f"Loading pre existing video info from {json_path}")
+                info = json.load(f)
+                return info
+
+        logger.debug(f"Running ffprobe for {video_path}")
+        result = subprocess.run(
+            ['ffprobe', '-v', 'error', '-show_entries', 'format', '-show_entries', 'stream', '-of', 'json', video_path],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+        )
+        info = json.loads(result.stdout)
+        return info
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to get video info for {video_path}: {e}")
+        return None
+
 def generate_thumbnails(library=False):
+    """
+    Generate thumbnails for all videos in the static/videos or static/library folder
+
+    :param library: if true use the library folder instead of videos
+    :return: json object with success and generated_thumbnails
+    """
     static_dir = get_static_directory()
     video_dir = os.path.join(static_dir, 'videos' if not library else 'library')
     generated_thumbnails = []
-    logger.debug(f"Generating thumbnails for videos in {video_dir}")
+    logger.debug(f"Generating thumbnails for {video_dir}")
     push_text_to_client(f"Generating thumbnails for {'library' if library else 'videos'}")
 
     for root, dirs, files in os.walk(video_dir, followlinks=True):
@@ -37,11 +76,31 @@ def generate_thumbnails(library=False):
 
 
 def generate_thumbnail(video_path, thumbnail_path):
+    """
+    Generate thumbnail for video file using ffmpeg
+    this method will generate a webp, jpg and webm thumbnails
+    also generate a json file with video info retrieved from video_path (if not exists)
+
+    :param video_path: full path to video file
+    :param thumbnail_path: full path to thumbnail file that will be generated (default webp)
+    :return: true if success, false if failed
+    """
     try:
-        push_text_to_client(f"Generating thumbnail for {os.path.basename(video_path)}")
-        logger.debug(f"Generating thumbnail for {video_path}")
-        # Use ffmpeg to generate a thumbnail
-        #ffmpeg -i input_video.mp4 -vf "select='not(mod(n\,floor(n/10)))',scale=320:-1" -vsync vfr -frames:v 10 preview_%02d.png
+        push_text_to_client(f"Generating thumbnail and info for {os.path.basename(video_path)}")
+
+        video_info = get_video_info(video_path)
+        if not video_info:
+            logger.error(f"Failed to get video info for {video_path}")
+            return False
+
+        duration = float(video_info['format']['duration'])
+        logger.debug(f"Video duration: {duration} seconds")
+
+        # store json to .thumb folder
+        json_path = os.path.splitext(thumbnail_path)[0] + '.json'
+        with open(json_path, 'w') as f:
+            json.dump(video_info, f, indent=2)
+
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
             logger.debug(f"Starting ffmpeg for webp")
@@ -64,6 +123,13 @@ def generate_thumbnail(video_path, thumbnail_path):
 
 
 def get_thumbnail(filename):
+    """
+    Get thumbnail path for video file
+    if thumbnail does not exist, return None
+
+    :param filename: full path to video file
+    :return: url path to thumbnail or None
+    """
     static_path = 'videos' if 'videos' in filename else '.'
     base_name = os.path.basename(filename)
     thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.webp")
@@ -74,6 +140,16 @@ def get_thumbnail(filename):
 
 
 def generate_thumbnail_for_path(video_path):
+    """
+    Generate thumbnail for a single provided video url link
+    will always generate a new set of thumbnails
+
+    the video_path should be a url path to the video file it should be in the static/videos or static/library folder
+    the url is used to determine the thumbnail path (library or videos)
+
+    :param video_path: url part of the video file
+    :return: json object with success and message
+    """
     static_dir = get_static_directory()
     if '/static/library/' in video_path:
         relative_path = video_path.replace('/static/library/', '')

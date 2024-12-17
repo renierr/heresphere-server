@@ -16,5 +16,5 @@ class AutoRemovingQueue(queue.Queue):
 event_bus = AutoRemovingQueue(maxsize=100)
 
 def push_text_to_client(txt):
+    logger.debug(f"{txt}")
     event_bus.put(txt)
-    logger.debug(f"Added message to event bus: {txt}")

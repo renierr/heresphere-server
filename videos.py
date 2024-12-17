@@ -153,7 +153,6 @@ def download_video(url):
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
 
     try:
-        video_url = None
         if is_youtube_url(url):
             video_url = download_yt(url, download_progress, url_id)
         else:
@@ -175,4 +174,3 @@ def download_progress(d):
     elif d['status'] == 'finished':
         output = f"Download completed: {fname}"
     push_text_to_client(output)
-    logger.debug(output)

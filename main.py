@@ -181,7 +181,7 @@ def cleanup_maps():
 
 @app.route('/download', methods=['POST'])
 def download():
-    push_text_to_client(f"Downloag triggered")
+    push_text_to_client(f"Download triggered")
     data = request.get_json()
     url = data.get("sourceUrl")
 
