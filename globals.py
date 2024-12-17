@@ -3,10 +3,16 @@ import json
 import re
 import sys
 
-from loguru import logger
-
+DEBUG = False
 url_map = {}
 url_counter = 1
+
+def set_debug(value):
+    global DEBUG
+    DEBUG = value
+
+def is_debug():
+    return DEBUG
 
 def get_url_map():
     return url_map

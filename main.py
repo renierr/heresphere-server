@@ -12,17 +12,17 @@ import api
 import argparse
 from bus import event_bus, push_text_to_client
 import threading
-from globals import save_url_map, load_url_map, get_url_map, get_static_directory
+from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
 parser.add_argument('--debug', action='store_true', default=False, help='Run the server in debug mode')
 args = parser.parse_args()
 
-DEBUG = args.debug
+set_debug(args.debug)
 UI_PORT = args.port
 
-log_level = 'DEBUG' if DEBUG else 'INFO'
+log_level = 'DEBUG' if is_debug() else 'INFO'
 logger.remove()
 logger.add(sys.stdout, level=log_level)
 
@@ -36,7 +36,7 @@ static_folder_path = get_static_directory()
 logger.debug(f"Static Folder Path: {static_folder_path}")
 
 app = Flask(__name__, static_folder=static_folder_path)
-if DEBUG:
+if is_debug():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
 # app.config['MIMETYPE'] = {
@@ -134,7 +134,7 @@ def generate_thumbnail():
         return jsonify({"success": False, "error": "No video path provided"}), 400
 
     try:
-        result = api.generate_thumbnail_for_path(video_path)
+        result = thumbnail.generate_thumbnail_for_path(video_path)
         return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
@@ -226,7 +226,7 @@ def start_server():
 Serving most likely on: http://localhost:{UI_PORT}
     """)
 
-    app.run(debug=DEBUG, port=UI_PORT, use_reloader=False, host='0.0.0.0')
+    app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':
     start_server()

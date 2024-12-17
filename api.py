@@ -6,7 +6,7 @@ import platform
 from loguru import logger
 
 from bus import push_text_to_client
-from thumbnail import generate_thumbnail, get_thumbnail
+from thumbnail import get_thumbnail
 from globals import find_url_info, get_static_directory
 
 
@@ -133,28 +133,3 @@ def move_to_library(video_path):
     else:
         return {"success": False, "error": "Invalid video path"}
 
-def generate_thumbnail_for_path(video_path):
-    push_text_to_client(f"Generating thumbnail for {video_path}")
-    static_dir = get_static_directory()
-    if '/static/library/' in video_path:
-        relative_path = video_path.replace('/static/library/', '')
-        real_path = os.path.join(static_dir, 'library', relative_path)
-    else:
-        relative_path = video_path.replace('/static/videos/', '')
-        real_path = os.path.join(static_dir, 'videos', relative_path)
-
-    base_name = os.path.basename(real_path)
-    thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
-    os.makedirs(thumbnail_dir, exist_ok=True)
-    thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}.thumb.webp")
-
-    if not os.path.exists(real_path):
-        return {"success": False, "error": "Video file does not exist"}
-
-    if os.path.exists(thumbnail_path):
-        os.remove(thumbnail_path)
-    success = generate_thumbnail(real_path, thumbnail_path)
-    if success:
-        return {"success": True, "thumbnail_path": thumbnail_path}
-    else:
-        return {"success": False, "error": "Failed to generate thumbnail"}
