@@ -99,6 +99,8 @@ def generate_thumbnail(video_path, thumbnail_path):
 
         duration = float(video_info['format']['duration'])
         midpoint = duration / 2
+        segment_duration = 1
+        points = [duration * 0.1, duration * 0.5, duration * 0.9]
         logger.debug(f"Video duration: {duration} seconds - taking thumbnail at {midpoint} seconds")
 
         with open(os.devnull, 'w') as devnull:
@@ -112,9 +114,22 @@ def generate_thumbnail(video_path, thumbnail_path):
                 'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=stdout, stderr=stdout)
             logger.debug(f"Starting ffmpeg for webm")
+            #subprocess.run([
+            #    'ffmpeg', '-ss', str(midpoint), '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=380:h=240:force_original_aspect_ratio=decrease', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
+            #], check=True, stdout=stdout, stderr=stdout)
+            filter_complex = ""
+            for i, point in enumerate(points):
+                filter_complex += f"[0:v]trim=start={point}:duration={segment_duration},setpts=PTS-STARTPTS,scale=w=380:h=-1[v{i}];"
+                filter_complex += f"[0:a]atrim=start={point}:duration={segment_duration},asetpts=PTS-STARTPTS[a{i}];"
+
+            filter_complex += "".join([f"[v{i}][a{i}]" for i in range(len(points))])
+            filter_complex += f"concat=n={len(points)}:v=1:a=1[v][a]"
+
             subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=380:h=240:force_original_aspect_ratio=decrease', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
-            ], check=True, stdout=stdout, stderr=stdout)
+                'ffmpeg', '-i', video_path, '-filter_complex', filter_complex,
+                '-map', '[v]', '-map', '[a]', '-c:v', 'libvpx', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
+            ], check=True)
+
         logger.debug(f"Generating thumbnail for {video_path} finished.")
         return True
     except subprocess.CalledProcessError as e:
