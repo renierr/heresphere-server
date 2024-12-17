@@ -14,10 +14,6 @@ export const data = {
 };
 
 export const methods = {
-    redownload(url) {
-        this.videoUrl = url;
-        this.postVideoUrl();
-    },
     formatDate(epochSeconds) {
         if (epochSeconds < 1) {
             return '';

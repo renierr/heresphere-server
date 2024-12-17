@@ -8,7 +8,10 @@ new Vue({
     },
     methods: {
         ...methods,
-
+        redownload(url) {
+            this.videoUrl = url;
+            this.postVideoUrl();
+        },
         postVideoUrl() {
             if (this.videoUrl.trim() === '') {
                 alert('Please enter a video URL');
