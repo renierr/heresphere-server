@@ -70,7 +70,7 @@ def get_thumbnail(filename):
 
 
 def generate_thumbnail_for_path(video_path):
-    push_text_to_client(f"Generating thumbnail for {video_path}")
+    push_text_to_client(f"Generating thumbnail for {os.path.basename(video_path)}")
     static_dir = get_static_directory()
     if '/static/library/' in video_path:
         relative_path = video_path.replace('/static/library/', '')
@@ -89,6 +89,6 @@ def generate_thumbnail_for_path(video_path):
 
     success = generate_thumbnail(real_path, thumbnail_path)
     if success:
-        return {"success": True, "thumbnail_path": thumbnail_path}
+        return {"success": True, "message": "generate thumbnail finished" }
     else:
         return {"success": False, "error": "Failed to generate thumbnail"}
