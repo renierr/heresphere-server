@@ -9,7 +9,7 @@ from globals import is_debug, get_static_directory
 def get_video_info(video_path):
     """
     Get video info using ffprobe, try to load from .thumb folder first
-    if not found, run ffprobe command
+    if not found, run ffprobe command and store the json in .thumb folder
 
     Example:
     {
@@ -35,6 +35,11 @@ def get_video_info(video_path):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
         )
         info = json.loads(result.stdout)
+
+        # store json to .thumb folder
+        with open(json_path, 'w') as f:
+            json.dump(json_path, f, indent=2)
+
         return info
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to get video info for {video_path}: {e}")
@@ -79,7 +84,6 @@ def generate_thumbnail(video_path, thumbnail_path):
     """
     Generate thumbnail for video file using ffmpeg
     this method will generate a webp, jpg and webm thumbnails
-    also generate a json file with video info retrieved from video_path (if not exists)
 
     :param video_path: full path to video file
     :param thumbnail_path: full path to thumbnail file that will be generated (default webp)
@@ -94,26 +98,22 @@ def generate_thumbnail(video_path, thumbnail_path):
             return False
 
         duration = float(video_info['format']['duration'])
-        logger.debug(f"Video duration: {duration} seconds")
-
-        # store json to .thumb folder
-        json_path = os.path.splitext(thumbnail_path)[0] + '.json'
-        with open(json_path, 'w') as f:
-            json.dump(video_info, f, indent=2)
+        midpoint = duration / 2
+        logger.debug(f"Video duration: {duration} seconds - taking thumbnail at {midpoint} seconds")
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
             logger.debug(f"Starting ffmpeg for webp")
             subprocess.run([
-                'ffmpeg', '-y', '-i', video_path, '-loop', '0', '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', thumbnail_path
+                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-loop', '0', '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '5', thumbnail_path
             ], check=True, stdout=stdout, stderr=stdout)
             logger.debug(f"Starting ffmpeg for jpg")
             subprocess.run([
-                'ffmpeg', '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
+                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=stdout, stderr=stdout)
             logger.debug(f"Starting ffmpeg for webm")
             subprocess.run([
-                'ffmpeg', '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=380:h=240:force_original_aspect_ratio=decrease', '-ss', '00:00:10.000', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
+                'ffmpeg', '-ss', str(midpoint), '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=380:h=240:force_original_aspect_ratio=decrease', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
             ], check=True, stdout=stdout, stderr=stdout)
         logger.debug(f"Generating thumbnail for {video_path} finished.")
         return True
