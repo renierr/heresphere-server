@@ -24,7 +24,7 @@ def get_video_info(video_path):
         # find the video json in .thumb folder first
         json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + '.thumb.json'
         if os.path.exists(json_path):
-            with open(json_path, 'r') as f:
+            with open(json_path, 'r', encoding='utf-8') as f:
                 logger.debug(f"Loading pre existing video info from {json_path}")
                 info = json.load(f)
                 return info
@@ -37,8 +37,8 @@ def get_video_info(video_path):
         info = json.loads(result.stdout)
 
         # store json to .thumb folder
-        with open(json_path, 'w') as f:
-            json.dump(json_path, f, indent=2)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(info, f, indent=2, ensure_ascii=False)
 
         return info
     except subprocess.CalledProcessError as e:
