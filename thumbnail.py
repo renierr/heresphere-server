@@ -105,6 +105,7 @@ def generate_thumbnail(video_path, thumbnail_path):
     """
     try:
         push_text_to_client(f"Generating thumbnail and info for {os.path.basename(video_path)}")
+        get_thumbnails.evict_cache_key(video_path)   # evict cache for thumbnails
 
         video_info = get_video_info(video_path)
         if not video_info:
@@ -186,7 +187,7 @@ def get_thumbnail(filename, *formats):
             return thumbs[fmt]
     return None
 
-
+@cache(maxsize=512, ttl=3600)
 def get_thumbnails(filename):
     """
     Get thumbnail object with all possible thumbnail formats as url paths for a video file
