@@ -23,5 +23,18 @@ def cache(maxsize=128, ttl=None):
                 local_cache._timestamps[args] = current_time
             return result
 
+        def clear_cache():
+            local_cache._cache.clear()
+            local_cache._timestamps.clear()
+
+        def evict_cache_key(*args, **kwargs):
+            key = args
+            if key in local_cache._cache:
+                del local_cache._cache[key]
+                del local_cache._timestamps[key]
+
+
+        wrapped.clear_cache = clear_cache
+        wrapped.evict_cache_key = evict_cache_key
         return wrapped
     return decorator
