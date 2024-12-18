@@ -1,7 +1,7 @@
 import base64
 import os
 
-from api import list_library_files
+from api import list_files
 from globals import get_static_directory
 
 
@@ -16,7 +16,7 @@ def generate_heresphere_json(server_path):
         ]
     }
 
-    files = list_library_files()
+    files = list_files('library')
     url_list = []
 
     for file in files:

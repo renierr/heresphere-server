@@ -101,7 +101,10 @@ def connection_test():
 
 @app.route('/api/library/list')
 def get_library_files():
-    return jsonify(api.list_library_files())
+    try:
+        return jsonify(api.list_files('library'))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/list')
 def get_files():

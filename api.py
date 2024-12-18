@@ -83,51 +83,40 @@ def extract_file_details(root, filename, base_path):
         'filesize': get_file_size_formatted(realfile),
     }
 
-def list_library_files():
+def list_files(directory='videos'):
     extracted_details = []
-    base_path = "/static/library"
+    base_path = f"/static/{directory}"
 
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'library'), followlinks=True):
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), directory), followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
         for filename in files:
-            extracted_details.append(extract_file_details(root, filename, base_path))
-
-    return extracted_details
-
-def list_files():
-    extracted_details = []
-    base_path = "/static/videos"
-
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'videos'), followlinks=True):
-        # Exclude directories that start with a dot
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
-
-        for filename in files:
-            partial = filename.endswith('.part')
-            url_id, url_info = find_url_info(filename)
-
             common_details = extract_file_details(root, filename, base_path)
-            common_details.update({
-                'partial': partial,
-                'url_id': url_id,
-                'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
-                'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,
-                'downloaded_date': url_info['downloaded_date'] if url_info and 'downloaded_date' in url_info else None
-            })
 
-            if filename.count('___') == 1:
-                id, title = parse_youtube_filename(filename)
+            # only for videos directory
+            if directory == 'videos':
+                partial = filename.endswith('.part')
+                url_id, url_info = find_url_info(filename)
                 common_details.update({
-                    'yt_id': id,
-                    'title': title,
-                    'filename': f"{base_path}/youtube/{filename}"
+                    'partial': partial,
+                    'url_id': url_id,
+                    'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
+                    'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,
+                    'downloaded_date': url_info['downloaded_date'] if url_info and 'downloaded_date' in url_info else None
                 })
-            else:
-                common_details.update({
-                    'filename': f"{base_path}/direct/{filename}"
-                })
+
+                if filename.count('___') == 1:
+                    id, title = parse_youtube_filename(filename)
+                    common_details.update({
+                        'yt_id': id,
+                        'title': title,
+                        'filename': f"{base_path}/youtube/{filename}"
+                    })
+                else:
+                    common_details.update({
+                        'filename': f"{base_path}/direct/{filename}"
+                    })
             extracted_details.append(common_details)
 
     return extracted_details
