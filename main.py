@@ -6,6 +6,7 @@ import sys
 from loguru import logger
 
 import thumbnail
+import cache
 from heresphere import generate_heresphere_json, generate_heresphere_json_item
 from videos import get_stream, download_video
 import api
@@ -61,6 +62,14 @@ app.logger.setLevel(logging.WARNING)
 def home():
     return render_template('index.html')
 
+@app.route('/library')
+def library():
+    return render_template('library.html')
+
+@app.route('/cache')
+def cache_stats():
+    return cache.get_all_cache_stats()
+
 @app.route('/heresphere', methods=['POST', 'GET'])
 def heresphere():
     try:
@@ -77,9 +86,6 @@ def heresphere_file(file_base64):
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route('/library')
-def library():
-    return render_template('library.html')
 
 @app.route('/sse')
 def sse():

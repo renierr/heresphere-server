@@ -53,5 +53,5 @@ def cache(maxsize=128, ttl=None):
     return decorator
 
 def get_all_cache_stats():
-    stats = {func.__name__: func.cache_stats() for func in cache_registry}
+    stats = {func.__name__: func.cache__stats() for func in cache_registry}
     return stats
