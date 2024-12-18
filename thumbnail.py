@@ -200,7 +200,7 @@ def get_thumbnails(filename):
     for fmt in ThumbnailFormat:
         result[fmt] = None
         if os.path.exists(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}")):
-            result[fmt] = f"/static/{os.path.relpath(thumbnail_directory, get_static_directory()).replace(r'\\', '/')}/{base_name}{fmt.extension}"
+            result[fmt] = f"/static/{os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\\\', '/')}/{base_name}{fmt.extension}"
     return result
 
 
