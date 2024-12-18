@@ -3,16 +3,16 @@ import os
 import logging
 import sys
 import cache
-import api
 import argparse
 
 from loguru import logger
-from flask import Flask, Response, render_template, request, jsonify
+from flask import Flask, Response, render_template, jsonify
 from heresphere import heresphere_bp
-from bus import event_bus, push_text_to_client
+from bus import event_bus
 from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
 from thumbnail import thumbnail_bp
 from videos import video_bp
+from api import api_bp
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -42,7 +42,7 @@ app.logger.setLevel(logging.WARNING)
 
 # Register blueprints
 app.register_blueprint(heresphere_bp)
-app.register_blueprint(api.api_bp)
+app.register_blueprint(api_bp)
 app.register_blueprint(video_bp)
 app.register_blueprint(thumbnail_bp)
 

@@ -1,6 +1,5 @@
 import os
 import shutil
-import time
 import platform
 
 from flask import Blueprint, jsonify, request
@@ -83,12 +82,11 @@ def get_creation_date(filename):
     else:
         creation_time = os.path.getmtime(filename)
 
-    readable_time = time.ctime(creation_time)
     return creation_time
 
 def parse_youtube_filename(filename):
     """
-    Parse a youtube filename into id and title
+    Parse a YouTube filename into id and title
     The stored filename is in the format: id___title.ext
 
     :param filename: filename to parse
@@ -136,9 +134,9 @@ def list_files(directory='videos'):
                 })
 
                 if filename.count('___') == 1:
-                    id, title = parse_youtube_filename(filename)
+                    yt_id, title = parse_youtube_filename(filename)
                     common_details.update({
-                        'yt_id': id,
+                        'yt_id': yt_id,
                         'title': title,
                         'filename': f"{base_path}/youtube/{filename}"
                     })

@@ -250,7 +250,7 @@ def generate_thumbnail_for_path(video_path):
     Generate thumbnail for a single provided video url link
     will always generate a new set of thumbnails
 
-    the video_path should be a url path to the video file it should be in the static/videos or static/library folder
+    the video_path should be an url path to the video file it should be in the static/videos or static/library folder
     the url is used to determine the thumbnail path (library or videos)
 
     :param video_path: url part of the video file
