@@ -65,8 +65,7 @@ def home():
 def heresphere():
     logger.debug(f"HereSphere Request: {request.get_data()}")
     try:
-        server_path = f"{request.scheme}://{request.host}"
-        response = jsonify(generate_heresphere_json(server_path))
+        response = jsonify(generate_heresphere_json(request.root_url.rstrip('/')))
         response.headers['heresphere-json-version'] = '1'
         return response
     except Exception as e:
@@ -76,8 +75,7 @@ def heresphere():
 def heresphere_file(file_base64):
     logger.debug(f"HereSphere File Request: {request.get_data()}")
     try:
-        server_path = f"{request.scheme}://{request.host}"
-        return jsonify(generate_heresphere_json_item(server_path, file_base64))
+        return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

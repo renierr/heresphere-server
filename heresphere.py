@@ -1,5 +1,6 @@
 import base64
 import os
+import urllib.parse
 from api import list_files
 from globals import get_static_directory
 from thumbnail import get_thumbnail, ThumbnailFormat, get_thumbnails
@@ -60,12 +61,12 @@ def generate_heresphere_json_item(server_path, file_base64):
     thumbnail_url = thumbnails[ThumbnailFormat.JPG]
     if thumbnail_url is None:
         thumbnail_url = "/static/images/placeholder.png"
-    thumbnail = f"{server_path}{thumbnail_url}"
+    thumbnail = f"{server_path}{urllib.parse.quote(thumbnail_url)}"
 
     thumbnail_video_url = thumbnails[ThumbnailFormat.WEBM]
     if thumbnail_video_url is None:
         thumbnail_video_url = ''
-    thumbnail_video = f"{server_path}{thumbnail_video_url}"
+    thumbnail_video = f"{server_path}{urllib.parse.quote(thumbnail_video_url)}"
 
     result = {
         "title": os.path.splitext(base_name)[0],
@@ -90,7 +91,7 @@ def generate_heresphere_json_item(server_path, file_base64):
                         "height": "",
                         "width": "",
                         "size": os.path.getsize(real_path),
-                        "url": f"{server_path}{filename}",
+                        "url": f"{server_path}{urllib.parse.quote(filename)}",
                         "stream": ""
                     }
                 ]
