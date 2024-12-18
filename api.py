@@ -11,6 +11,12 @@ from globals import find_url_info, get_static_directory
 
 
 def get_file_size_formatted(filename):
+    """
+    Get the file size of a file in MB or GB
+
+    :param filename: relative or full path to file
+    :return: formatted file size string
+    """
     size_bytes = os.path.getsize(filename)
 
     size_mb = size_bytes / (1024 * 1024)
@@ -22,12 +28,25 @@ def get_file_size_formatted(filename):
         return f"{size_gb:.2f} GB"
 
 def format_duration(duration):
+    """
+    Format a duration in seconds to HH:MM:SS
+
+    :param duration: duration in seconds
+    :return: formatted duration string
+    """
     hours = int(duration // 3600)
     minutes = int((duration % 3600) // 60)
     seconds = int(duration % 60)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 def get_creation_date(filename):
+    """
+    Get creation date of a file
+    On Windows, use ctime, on other platforms use mtime
+
+    :param filename: relative or full path to file
+    :return: creation time in seconds
+    """
     if platform.system() == 'Windows':
         creation_time = os.path.getctime(filename)
     else:
@@ -37,6 +56,13 @@ def get_creation_date(filename):
     return creation_time
 
 def parse_youtube_filename(filename):
+    """
+    Parse a youtube filename into id and title
+    The stored filename is in the format: id___title.ext
+
+    :param filename: filename to parse
+    :return: id, title
+    """
     parts = filename.split('___')
     logger.debug(parts)
 
@@ -113,6 +139,13 @@ def list_files():
 
 
 def move_to_library(video_path):
+    """
+    Move a video file from the videos folder to the library folder
+    all thumbnails will be moved as well
+
+    :param video_path: full path to video file
+    :return: json object with success and library_path
+    """
     push_text_to_client(f"Move file to library: {video_path}")
     static_dir = get_static_directory()
     if '/static/videos/' in video_path:
