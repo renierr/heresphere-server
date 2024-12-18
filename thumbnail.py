@@ -1,15 +1,11 @@
 import os
 import subprocess
 import json
-import time
 from enum import Enum
 from loguru import logger
 from bus import push_text_to_client
+from cache import cache
 from globals import is_debug, get_static_directory
-
-# Global cache dictionary
-video_info_cache = {}
-CACHE_EXPIRATION_TIME = 3600
 
 class ThumbnailFormat(Enum):
     JPG = ("jpg", ".thumb.jpg")
@@ -21,6 +17,7 @@ class ThumbnailFormat(Enum):
         self.fmt = fmt
         self.extension = extension
 
+@cache(maxsize=512)
 def get_video_info(video_path):
     """
     (cached; max time in cache CACHE_EXPIRATION_TIME)
@@ -37,17 +34,6 @@ def get_video_info(video_path):
     :return: json object or None
     """
 
-    # Check if the video info is in the cache and not expired
-    current_time = time.time()
-    if video_path in video_info_cache:
-        cached_info, timestamp = video_info_cache[video_path]
-        if current_time - timestamp < CACHE_EXPIRATION_TIME:
-            logger.debug(f"Loading video info from cache for {video_path}")
-            return cached_info
-        else:
-            # Remove expired cache entry
-            del video_info_cache[video_path]
-
     try:
         # find the video json in .thumb folder first
         json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + '.thumb.json'
@@ -55,7 +41,6 @@ def get_video_info(video_path):
             with open(json_path, 'r', encoding='utf-8') as f:
                 logger.debug(f"Loading pre existing video info from {json_path}")
                 info = json.load(f)
-                video_info_cache[video_path] = (info, current_time)
                 return info
 
         logger.debug(f"Running ffprobe for {video_path}")
@@ -68,9 +53,6 @@ def get_video_info(video_path):
         # store json to .thumb folder
         with open(json_path, 'w', encoding='utf-8') as f:
             json.dump(info, f, indent=2, ensure_ascii=False)
-
-        # Cache the info
-        video_info_cache[video_path] = (info, current_time)
 
         return info
     except subprocess.CalledProcessError as e:
