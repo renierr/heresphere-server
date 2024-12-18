@@ -64,8 +64,6 @@ def parse_youtube_filename(filename):
     :return: id, title
     """
     parts = filename.split('___')
-    logger.debug(parts)
-
     id_part = parts[0]
     title_part = parts[1]
 
