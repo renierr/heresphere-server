@@ -89,6 +89,8 @@
                                 <div class="text-muted">
                                     <p>Size: {{ file.filesize }}</p>
                                     <p>Created: {{ formatDate(file.created) }}</p>
+                                    <p>Resolution: {{ file.width }}x{{ file.height}}</p>
+                                    <p>Duration: {{ formatDuration(file.duration) }}</p>
                                 </div>
                                 <button class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
                             </div>
