@@ -214,10 +214,11 @@ def download_progress(d):
         output = f"Download completed: {fname}"
     push_text_to_client(output)
 
-VideoInfo = namedtuple('VideoInfo', ['size', 'duration', 'width', 'height', 'resolution', 'stereo'])
+VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
 
 def get_basic_save_video_info(filename):
     size = os.path.getsize(filename)
+    created = os.path.getctime(filename)
     video_info = get_video_info(filename)
     if video_info is not None:
         duration = int(float(video_info['format'].get('duration', 0))) if 'format' in video_info else 0
@@ -231,4 +232,4 @@ def get_basic_save_video_info(filename):
         height = 0
         resolution = 0
         stereo = ''
-    return VideoInfo(size, duration, width, height, resolution, stereo)
+    return VideoInfo(created, size, duration, width, height, resolution, stereo)

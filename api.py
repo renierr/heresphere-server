@@ -1,3 +1,4 @@
+import math
 import os
 import shutil
 import platform
@@ -40,23 +41,21 @@ def mtl():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-
-def get_file_size_formatted(filename):
+def format_byte_size(size_bytes):
     """
-    Get the file size of a file in MB or GB
+    Format a byte size into a human-readable string.
 
-    :param filename: relative or full path to file
-    :return: formatted file size string
+    :param size_bytes: size in bytes
+    :return: formatted size string
     """
-    size_bytes = os.path.getsize(filename)
+    if size_bytes == 0:
+        return "0B"
 
-    size_mb = size_bytes / (1024 * 1024)
-
-    if size_mb < 1024:
-        return f"{size_mb:.2f} MB"
-    else:
-        size_gb = size_mb / 1024
-        return f"{size_gb:.2f} GB"
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    p = math.pow(1024, i)
+    s = round(size_bytes / p, 2)
+    return f"{s} {size_name[i]}"
 
 def format_duration(duration):
     """
@@ -69,21 +68,6 @@ def format_duration(duration):
     minutes = int((duration % 3600) // 60)
     seconds = int(duration % 60)
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
-
-def get_creation_date(filename):
-    """
-    Get creation date of a file
-    On Windows, use ctime, on other platforms use mtime
-
-    :param filename: relative or full path to file
-    :return: creation time in seconds
-    """
-    if platform.system() == 'Windows':
-        creation_time = os.path.getctime(filename)
-    else:
-        creation_time = os.path.getmtime(filename)
-
-    return creation_time
 
 def parse_youtube_filename(filename):
     """
@@ -109,8 +93,8 @@ def extract_file_details(root, filename, base_path):
         'title': os.path.splitext(filename)[0],
         'thumbnail': thumbnail,
         'filename': f"{base_path}/{filename}",
-        'created': get_creation_date(realfile),
-        'filesize': get_file_size_formatted(realfile),
+        'created': info.created,
+        'filesize': format_byte_size(info.size),
         'width': info.width,
         'height': info.height,
         'duration': info.duration,

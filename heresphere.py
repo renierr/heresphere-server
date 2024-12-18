@@ -92,7 +92,7 @@ def generate_heresphere_json_item(server_path, file_base64):
     # get video info from the file
     get_basic_save_video_info(real_path)
     info = get_basic_save_video_info(real_path)
-    date_added = datetime.fromtimestamp(os.path.getctime(real_path)).strftime('%Y-%m-%d')
+    date_added = datetime.fromtimestamp(info.created).strftime('%Y-%m-%d')
 
     result = {
         "title": os.path.splitext(base_name)[0],
@@ -101,7 +101,7 @@ def generate_heresphere_json_item(server_path, file_base64):
         "thumbnailVideo": f"{thumbnail_video}",
         "dateReleased": "",
         "dateAdded": date_added,
-        "duration": info.duration,
+        "duration": info.duration * 1000,
         "projection": "",
         "stereo": info.stereo,
         "isEyeSwapped": "",
