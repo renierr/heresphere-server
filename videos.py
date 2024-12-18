@@ -9,6 +9,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from loguru import logger
 from bus import push_text_to_client
+from cache import cache
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
     find_url_info, remove_ansi_codes
 from thumbnail import get_video_info
@@ -216,6 +217,7 @@ def download_progress(d):
 
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
 
+@cache(maxsize=512)
 def get_basic_save_video_info(filename):
     size = os.path.getsize(filename)
     created = os.path.getctime(filename)
