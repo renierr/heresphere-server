@@ -1,9 +1,12 @@
 import base64
+import datetime
 import os
 import urllib.parse
+from datetime import datetime
 from api import list_files
 from globals import get_static_directory
-from thumbnail import get_thumbnail, ThumbnailFormat, get_thumbnails
+from thumbnail import ThumbnailFormat, get_thumbnails, get_video_info
+
 
 def generate_heresphere_json(server_path):
     """
@@ -66,16 +69,33 @@ def generate_heresphere_json_item(server_path, file_base64):
         thumbnail_video_url = ''
     thumbnail_video = f"{server_path}{urllib.parse.quote(thumbnail_video_url)}"
 
+    # get video info from the file
+    video_info = get_video_info(real_path)
+    if video_info is not None:
+        duration = int(float(video_info['format'].get('duration', 0))) if 'format' in video_info else 0
+        width = video_info['streams'][0].get('width', 0) if 'streams' in video_info and len(video_info['streams']) > 0 else 0
+        height = video_info['streams'][0].get('height', 0) if 'streams' in video_info and len(video_info['streams']) > 0 else 0
+        resolution = max(width, height)
+        stereo = 'sbs' if width / height == 2 else ''
+    else:
+        duration = 0
+        width = 0
+        height = 0
+        resolution = 0
+        stereo = ''
+
+    date_added = datetime.fromtimestamp(os.path.getctime(real_path)).strftime('%Y-%m-%d')
+
     result = {
         "title": os.path.splitext(base_name)[0],
         "description": "",
         "thumbnailImage": f"{thumbnail}",
         "thumbnailVideo": f"{thumbnail_video}",
         "dateReleased": "",
-        "dateAdded": "",
-        "duration": "",
+        "dateAdded": date_added,
+        "duration": duration,
         "projection": "",
-        "stereo": "",
+        "stereo": stereo,
         "isEyeSwapped": "",
         "fov": "",
         "lens": "",
@@ -85,9 +105,9 @@ def generate_heresphere_json_item(server_path, file_base64):
                 "name": "Video",
                 "sources": [
                     {
-                        "resolution": "",
-                        "height": "",
-                        "width": "",
+                        "resolution": resolution,
+                        "height": height,
+                        "width": width,
                         "size": os.path.getsize(real_path),
                         "url": f"{server_path}{urllib.parse.quote(filename)}",
                         "stream": ""
