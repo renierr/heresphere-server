@@ -99,19 +99,33 @@ def generate_thumbnail(video_path, thumbnail_path):
 
         duration = float(video_info['format']['duration'])
         midpoint = duration / 2
-        segment_duration = 1
-        points = [duration * 0.1, duration * 0.5, duration * 0.9]
         logger.debug(f"Video duration: {duration} seconds - taking thumbnail at {midpoint} seconds")
+
+        # find aspect ratio
+        aspect_ratio = None
+        for stream in video_info['streams']:
+            if stream['codec_type'] == 'video':
+                aspect_ratio = stream['display_aspect_ratio']
+                break
+        # if 2:1 possible sbs stereo video
+        sbs_video = False
+        if aspect_ratio == '2:1':
+            sbs_video = True
+
+        # add vf crop for sbs video
+        crop_filter = ""
+        if sbs_video:
+            crop_filter = "crop=in_w/2:in_h:0:0,"
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
             logger.debug(f"Starting ffmpeg for webp")
             subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', 'select=\'eq(pict_type\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path
+                'ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path
             ], check=True, stdout=stdout, stderr=stdout)
             logger.debug(f"Starting ffmpeg for jpg")
             subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
+                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=stdout, stderr=stdout)
             logger.debug(f"Starting ffmpeg for webm")
             #subprocess.run([
@@ -120,7 +134,7 @@ def generate_thumbnail(video_path, thumbnail_path):
 
             # time period to take thumbnail
             command = [
-                'ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
+                'ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
             ]
 
 
