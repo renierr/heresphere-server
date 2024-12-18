@@ -97,11 +97,10 @@
                                 <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
                                 <div class="text-muted">
                                     <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
-                                    <p><i class="bi bi-arrows-fullscreen"></i> Size: {{ file.filesize }}</p>
-                                    <p><i class="bi bi-calendar"></i> Created: {{ formatDate(file.created) }}</p>
-                                    <p v-if="file.downloaded_date">Downloaded: {{ formatDate(file.downloaded_date) }}</p>
-                                    <p><i class="bi bi-aspect-ratio"></i> Resolution: {{ file.width }}x{{ file.height}}</p>
-                                    <p><i class="bi bi-clock"></i> Duration: {{ formatDuration(file.duration) }}</p>
+                                    <p><i class="bi bi-asterisk"></i> {{ file.filesize }} <i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}</p>
+                                    <p><i class="bi bi-calendar"></i> {{ formatDate(file.created) }} (Created)</p>
+                                    <p v-if="file.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(file.downloaded_date) }} (Downloaded)</p>
+                                    <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
                                 </div>
                                 <div v-if="getProgressForId(file.url_id) > 0" class="progress">
                                     <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>

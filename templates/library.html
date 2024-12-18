@@ -88,10 +88,9 @@
                             <div>
                                 <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
                                 <div class="text-muted">
-                                    <p><i class="bi bi-arrows-fullscreen"></i> Size: {{ file.filesize }}</p>
-                                    <p><i class="bi bi-calendar"></i> Created: {{ formatDate(file.created) }}</p>
-                                    <p><i class="bi bi-aspect-ratio"></i> Resolution: {{ file.width }}x{{ file.height}}</p>
-                                    <p><i class="bi bi-clock"></i> Duration: {{ formatDuration(file.duration) }}</p>
+                                    <p><i class="bi bi-asterisk"></i> {{ file.filesize }} <i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}</p>
+                                    <p><i class="bi bi-calendar"></i> {{ formatDate(file.created) }} (Created)</p>
+                                    <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
                                 </div>
                                 <button class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
                             </div>
