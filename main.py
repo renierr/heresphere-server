@@ -63,7 +63,6 @@ def home():
 
 @app.route('/heresphere', methods=['POST', 'GET'])
 def heresphere():
-    logger.debug(f"HereSphere Request: {request.get_data()}")
     try:
         response = jsonify(generate_heresphere_json(request.root_url.rstrip('/')))
         response.headers['heresphere-json-version'] = '1'
@@ -73,7 +72,6 @@ def heresphere():
 
 @app.route('/heresphere/<file_base64>', methods=['POST', 'GET'])
 def heresphere_file(file_base64):
-    logger.debug(f"HereSphere File Request: {request.get_data()}")
     try:
         return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
     except Exception as e:
