@@ -62,9 +62,15 @@
             <div v-else>
                 <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
                 <div v-if="totalPages > 1" class="pagination mb-4">
+                    <span class="p-2">Page {{ currentPage }} of {{ totalPages }}: </span>
+
                     <button @click="changePage(1)" :disabled="currentPage === 1" class="btn btn-link">First</button>
                     <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="btn btn-link">Previous</button>
-                    <span class="p-2">Page {{ currentPage }} of {{ totalPages }}</span>
+
+                    <span v-for="page in pagesToShow" :key="page">
+                        <button @click="changePage(page)" :disabled="currentPage === page" class="btn btn-link">{{ page }}</button>
+                    </span>
+
                     <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="btn btn-link">Next</button>
                     <button @click="changePage(totalPages)" :disabled="currentPage === totalPages" class="btn btn-link">Last</button>
                 </div>

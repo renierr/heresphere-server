@@ -110,4 +110,19 @@ export const computed = {
     totalPages: function () {
         return Math.ceil(this.files.length / this.pageSize);
     },
+    pagesToShow() {
+        const range = 5;
+        let start = Math.max(1, this.currentPage - Math.floor(range / 2));
+        let end = Math.min(this.totalPages, start + range - 1);
+
+        if (end - start < range - 1) {
+            start = Math.max(1, end - range + 1);
+        }
+
+        const pages = [];
+        for (let i = start; i <= end; i++) {
+            pages.push(i);
+        }
+        return pages;
+    },
 }
