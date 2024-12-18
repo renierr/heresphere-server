@@ -128,7 +128,21 @@ def move_to_library(video_path):
         if os.path.exists(library_path):
             return {"success": False, "error": f"Target exists in library: {base_name}"}
 
+        # Move the video file
         shutil.move(real_path, library_path)
+
+        # Move the thumbnails
+        thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
+        if os.path.exists(thumbnail_dir):
+            for ext in ['.thumb.webp', '.thumb.jpg', '.thumb.webm']:
+                thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{ext}")
+                if os.path.exists(thumbnail_path):
+                    library_thumbnail_dir = os.path.join(os.path.dirname(library_path), '.thumb')
+                    os.makedirs(library_thumbnail_dir, exist_ok=True)
+                    shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{ext}"))
+
+
+
         return {"success": True, "library_path": library_path}
     else:
         return {"success": False, "error": "Invalid video path"}
