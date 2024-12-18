@@ -107,7 +107,7 @@ def generate_thumbnail(video_path, thumbnail_path):
             stdout = None if is_debug() else devnull
             logger.debug(f"Starting ffmpeg for webp")
             subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-loop', '0', '-vf', 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '5', thumbnail_path
+                'ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', 'select=\'eq(pict_type\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path
             ], check=True, stdout=stdout, stderr=stdout)
             logger.debug(f"Starting ffmpeg for jpg")
             subprocess.run([
