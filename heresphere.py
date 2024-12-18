@@ -5,45 +5,43 @@ from api import list_files
 from globals import get_static_directory
 from thumbnail import get_thumbnail, ThumbnailFormat, get_thumbnails
 
-
 def generate_heresphere_json(server_path):
+    """
+    Generate the main JSON for the Heresphere VR player
+    To present the overview of the library and downloads
+
+    :param server_path: root path of the server
+    :return: json object in the Heresphere format
+    """
+
     result_json = {
         "access": 0,
         "library": [
-            {
-                "name": "Library",
-                "list": []
-            },
-            {
-                "name": "Downloads",
-                "list": []
-            }
+            {"name": "Library", "list": []},
+            {"name": "Downloads", "list": []}
         ]
     }
 
-    files = list_files('library')
-    url_list = []
-
-    for file in files:
-        filename = file['filename']
-        file_base64 = base64.urlsafe_b64encode(filename.encode()).decode()
-        url = f"{server_path}/heresphere/{file_base64}"
-        url_list.append(url)
-    result_json["library"][0]["list"] = url_list
-
-    files = list_files('videos')
-    url_list = []
-
-    for file in files:
-        filename = file['filename']
-        file_base64 = base64.urlsafe_b64encode(filename.encode()).decode()
-        url = f"{server_path}/heresphere/{file_base64}"
-        url_list.append(url)
-    result_json["library"][1]["list"] = url_list
+    for i, category in enumerate(['library', 'videos']):
+        files = list_files(category)
+        url_list = [
+            f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
+            for file in files
+        ]
+        result_json["library"][i]["list"] = url_list
 
     return result_json
 
 def generate_heresphere_json_item(server_path, file_base64):
+    """
+    Generate the JSON for a single item for the Heresphere VR player
+    Heresphere VR player will make a request for each item in the library
+
+    :param server_path: root path of the server
+    :param file_base64: base64 encoded filename which is the path to the video file
+    :return: json object in the Heresphere format for a single item
+    """
+
     filename = base64.urlsafe_b64decode(file_base64.encode()).decode()
     base_name = os.path.basename(filename)
     static_dir = get_static_directory()
