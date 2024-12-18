@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library</title>
     <link href="/static/bootstrap.min.css?v=5.3.3" rel="stylesheet">
+    <link href="/static/bootstrap-icons.min.css" rel="stylesheet">
     <link href="/static/styles.css" rel="stylesheet">
     <script src="/static/vue.min.js?v=2.6.14"></script>
 </head>
@@ -87,10 +88,10 @@
                             <div>
                                 <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
                                 <div class="text-muted">
-                                    <p>Size: {{ file.filesize }}</p>
-                                    <p>Created: {{ formatDate(file.created) }}</p>
-                                    <p>Resolution: {{ file.width }}x{{ file.height}}</p>
-                                    <p>Duration: {{ formatDuration(file.duration) }}</p>
+                                    <p><i class="bi bi-arrows-fullscreen"></i> Size: {{ file.filesize }}</p>
+                                    <p><i class="bi bi-calendar"></i> Created: {{ formatDate(file.created) }}</p>
+                                    <p><i class="bi bi-aspect-ratio"></i> Resolution: {{ file.width }}x{{ file.height}}</p>
+                                    <p><i class="bi bi-clock"></i> Duration: {{ formatDuration(file.duration) }}</p>
                                 </div>
                                 <button class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
                             </div>
