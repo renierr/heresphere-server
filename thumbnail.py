@@ -105,17 +105,18 @@ def generate_thumbnail(video_path, thumbnail_path):
         aspect_ratio = None
         for stream in video_info['streams']:
             if stream['codec_type'] == 'video':
-                aspect_ratio = stream['display_aspect_ratio']
+                if 'display_aspect_ratio' in stream:
+                    aspect_ratio = stream['display_aspect_ratio']
+                else:
+                    # try calc with width and heigth
+                    width = stream['width'] if 'width' in stream else 0
+                    height = stream['height'] if 'height' in stream else 0
+                    # check if 2:1 aspect ratio
+                    if width > 0 and height > 0 and width / height == 2:
+                        aspect_ratio = '2:1'
                 break
-        # if 2:1 possible sbs stereo video
-        sbs_video = False
-        if aspect_ratio == '2:1':
-            sbs_video = True
-
-        # add vf crop for sbs video
-        crop_filter = ""
-        if sbs_video:
-            crop_filter = "crop=in_w/2:in_h:0:0,"
+        sbs_video = True if aspect_ratio == '2:1' else False
+        crop_filter = "" if not sbs_video else "crop=in_w/2:in_h:0:0,"
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
