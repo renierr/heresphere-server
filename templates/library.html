@@ -55,16 +55,23 @@
                 <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
                 <div v-if="totalPages > 1" class="pagination mb-4">
                     <span class="p-2">Page {{ currentPage }} of {{ totalPages }}: </span>
-
-                    <button @click="changePage(1)" :disabled="currentPage === 1" class="btn btn-link">First</button>
-                    <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1" class="btn btn-link">Previous</button>
-
-                    <span v-for="page in pagesToShow" :key="page">
-                        <button @click="changePage(page)" :disabled="currentPage === page" class="btn btn-link">{{ page }}</button>
-                    </span>
-
-                    <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages" class="btn btn-link">Next</button>
-                    <button @click="changePage(totalPages)" :disabled="currentPage === totalPages" class="btn btn-link">Last</button>
+                    <ul class="pagination">
+                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                            <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+                        </li>
+                        <li v-for="page in pagesToShow" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                            <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
+                        </li>
+                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                            <a class="page-link" href="#" @click.prevent="changePage(totalPages)">Last</a>
+                        </li>
+                    </ul>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
