@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request
 from bus import push_text_to_client
 from thumbnail import get_thumbnail, ThumbnailFormat
 from globals import find_url_info, get_static_directory
+from videos import get_basic_save_video_info
 
 api_bp = Blueprint('api', __name__)
 
@@ -101,6 +102,8 @@ def parse_youtube_filename(filename):
 def extract_file_details(root, filename, base_path):
     realfile = os.path.join(root, filename)
     thumbnail = get_thumbnail(realfile, ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
+    info = get_basic_save_video_info(realfile)
+
     return {
         'yt_id': None,
         'title': os.path.splitext(filename)[0],
@@ -108,6 +111,11 @@ def extract_file_details(root, filename, base_path):
         'filename': f"{base_path}/{filename}",
         'created': get_creation_date(realfile),
         'filesize': get_file_size_formatted(realfile),
+        'width': info.width,
+        'height': info.height,
+        'duration': info.duration,
+        'resolution': info.resolution,
+        'stereo': info.stereo
     }
 
 def list_files(directory='videos'):

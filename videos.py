@@ -2,6 +2,8 @@ import os
 import re
 import threading
 import traceback
+from collections import namedtuple
+
 import yt_dlp
 from datetime import datetime
 from flask import Blueprint, request, jsonify
@@ -9,6 +11,7 @@ from loguru import logger
 from bus import push_text_to_client
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
     find_url_info, remove_ansi_codes
+from thumbnail import get_video_info
 
 root_path = os.path.dirname(os.path.abspath(__file__))
 is_windows = os.name == 'nt'
@@ -77,7 +80,7 @@ def is_youtube_url(url):
     pattern = r'^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
     return bool(re.match(pattern, url))
 
-def get_video_info(url):
+def get_yt_dl_video_info(url):
     with yt_dlp.YoutubeDL() as ydl:
         info_dict = ydl.extract_info(url, download=False)
         vid = info_dict.get('id', None)
@@ -86,7 +89,7 @@ def get_video_info(url):
         return vid, filename
 
 def download_yt(url, progress_function, url_id):
-  vid, filename = get_video_info(url)
+  vid, filename = get_yt_dl_video_info(url)
   filename = f"{vid}___{filename}"
   logger.debug(f"Downloading YouTube video {filename}")
   url_map = get_url_map()
@@ -150,7 +153,7 @@ def get_stream(url):
       return None, None
 
 def download_direct(url, progress_function, url_id):
-  _, filename = get_video_info(url)
+  _, filename = get_yt_dl_video_info(url)
 
   logger.debug(f"Downloading direct video {filename}")
   url_map = get_url_map()
@@ -211,3 +214,21 @@ def download_progress(d):
         output = f"Download completed: {fname}"
     push_text_to_client(output)
 
+VideoInfo = namedtuple('VideoInfo', ['size', 'duration', 'width', 'height', 'resolution', 'stereo'])
+
+def get_basic_save_video_info(filename):
+    size = os.path.getsize(filename)
+    video_info = get_video_info(filename)
+    if video_info is not None:
+        duration = int(float(video_info['format'].get('duration', 0))) if 'format' in video_info else 0
+        width = video_info['streams'][0].get('width', 0) if 'streams' in video_info and len(video_info['streams']) > 0 else 0
+        height = video_info['streams'][0].get('height', 0) if 'streams' in video_info and len(video_info['streams']) > 0 else 0
+        resolution = max(width, height)
+        stereo = 'sbs' if width / height == 2 else ''
+    else:
+        duration = 0
+        width = 0
+        height = 0
+        resolution = 0
+        stereo = ''
+    return VideoInfo(size, duration, width, height, resolution, stereo)
