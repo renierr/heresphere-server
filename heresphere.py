@@ -1,8 +1,8 @@
 import base64
 import os
-
 from api import list_files
 from globals import get_static_directory
+from thumbnail import get_thumbnail, ThumbnailFormat, get_thumbnails
 
 
 def generate_heresphere_json(server_path):
@@ -10,7 +10,11 @@ def generate_heresphere_json(server_path):
         "access": 0,
         "library": [
             {
-                "name": "Newest",
+                "name": "Library",
+                "list": []
+            },
+            {
+                "name": "Downloads",
                 "list": []
             }
         ]
@@ -25,28 +29,43 @@ def generate_heresphere_json(server_path):
         url = f"{server_path}/heresphere/{file_base64}"
         url_list.append(url)
     result_json["library"][0]["list"] = url_list
+
+    files = list_files('videos')
+    url_list = []
+
+    for file in files:
+        filename = file['filename']
+        file_base64 = base64.urlsafe_b64encode(filename.encode()).decode()
+        url = f"{server_path}/heresphere/{file_base64}"
+        url_list.append(url)
+    result_json["library"][1]["list"] = url_list
+
     return result_json
 
 def generate_heresphere_json_item(server_path, file_base64):
     filename = base64.urlsafe_b64decode(file_base64.encode()).decode()
     base_name = os.path.basename(filename)
     static_dir = get_static_directory()
-    real_path = os.path.join(static_dir, 'library', base_name)
+    if '/static/videos/' in filename:
+        relative_path = filename.replace('/static/videos/', '')
+        real_path = os.path.join(static_dir, 'videos', relative_path)
+    else:
+        relative_path = filename.replace('/static/library/', '')
+        real_path = os.path.join(static_dir, 'library', relative_path)
 
     if not os.path.exists(real_path):
         return {}
 
-    thumbnail_path = os.path.join(static_dir, 'library/.thumb', f"{base_name}.thumb.jpg")
-    if os.path.exists(thumbnail_path):
-        thumbnail = f"{server_path}/static/library/.thumb/{os.path.basename(thumbnail_path)}"
-    else:
-        thumbnail = f"{server_path}/static/images/placeholder.png"
+    thumbnails = get_thumbnails(real_path)
+    thumbnail_url = thumbnails[ThumbnailFormat.JPG]
+    if thumbnail_url is None:
+        thumbnail_url = "/static/images/placeholder.png"
+    thumbnail = f"{server_path}{thumbnail_url}"
 
-    thumbnail_video_path = os.path.join(static_dir, 'library/.thumb', f"{base_name}.thumb.webm")
-    if os.path.exists(thumbnail_video_path):
-        thumbnail_video = f"{server_path}/static/library/.thumb/{os.path.basename(thumbnail_video_path)}"
-    else:
-        thumbnail_video = ""
+    thumbnail_video_url = thumbnails[ThumbnailFormat.WEBM]
+    if thumbnail_video_url is None:
+        thumbnail_video_url = ''
+    thumbnail_video = f"{server_path}{thumbnail_video_url}"
 
     result = {
         "title": os.path.splitext(base_name)[0],

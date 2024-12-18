@@ -1,10 +1,21 @@
 import os
 import subprocess
 import json
+from enum import Enum
 from loguru import logger
 from bus import push_text_to_client
 from globals import is_debug, get_static_directory
 
+
+class ThumbnailFormat(Enum):
+    JPG = ("jpg", ".thumb.jpg")
+    WEBP = ("webp", ".thumb.webp")
+    WEBM = ("webm", ".thumb.webm")
+    JSON = ("json", ".thumb.json")
+
+    def __init__(self, fmt, extension):
+        self.fmt = fmt
+        self.extension = extension
 
 def get_video_info(video_path):
     """
@@ -120,26 +131,23 @@ def generate_thumbnail(video_path, thumbnail_path):
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
+
             logger.debug(f"Starting ffmpeg for webp")
             subprocess.run([
                 'ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path
             ], check=True, stdout=stdout, stderr=stdout)
+
             logger.debug(f"Starting ffmpeg for jpg")
             subprocess.run([
                 'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=stdout, stderr=stdout)
-            logger.debug(f"Starting ffmpeg for webm")
-            #subprocess.run([
-            #    'ffmpeg', '-ss', str(midpoint), '-y', '-i', video_path, '-vf', 'thumbnail,scale=w=380:h=240:force_original_aspect_ratio=decrease', '-frames:v', '5', os.path.splitext(thumbnail_path)[0] + '.webm'
-            #], check=True, stdout=stdout, stderr=stdout)
 
-            # time period to take thumbnail
+            logger.debug(f"Starting ffmpeg for webm")
             command = [
                 'ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
             ]
 
-
-            # complex filter to generate webm thumbnail
+            # complex filter to generate webm thumbnail example
             # filter_complex = ""
             # for i, point in enumerate(points):
             #     filter_complex += f"[0:v]trim=start={point}:duration={segment_duration},setpts=PTS-STARTPTS,scale=w=380:h=-1[v{i}];"
@@ -161,22 +169,39 @@ def generate_thumbnail(video_path, thumbnail_path):
         logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
         return False
 
-
-def get_thumbnail(filename):
+def get_thumbnail(filename, *formats):
     """
-    Get thumbnail path for video file
-    if thumbnail does not exist, return None
+    Get the thumbnail url for a video file in a specific format
 
     :param filename: full path to video file
-    :return: url path to thumbnail or None
+    :param formats: ThumbnailFormat objects ordered by priority on which to return the thumbnail
+    :return:
     """
-    static_path = 'videos' if 'videos' in filename else '.'
+    thumbs = get_thumbnails(filename)
+    for fmt in formats:
+        if thumbs[fmt]:
+            return thumbs[fmt]
+    return None
+
+
+def get_thumbnails(filename):
+    """
+    Get thumbnail object with all possible thumbnail formats as url paths for a video file
+    if thumbnail format does not exist, return None on this position
+
+    :param filename: full path to video file
+    :return: object with all thumbnail formats as url paths
+    """
+
     base_name = os.path.basename(filename)
-    thumbfile = os.path.join(os.path.dirname(filename), '.thumb', f"{base_name}.thumb.webp")
-    if not os.path.exists(thumbfile):
-        return None
-    relative_thumbfile = os.path.relpath(thumbfile, start=os.path.join(os.path.dirname(filename), '..')).replace('\\', '/')
-    return f"/static/{static_path}/{relative_thumbfile}"
+    thumbnail_directory = os.path.join(os.path.dirname(filename), '.thumb')
+    # check for all thumbnail formats if there exist here
+    result = {}
+    for fmt in ThumbnailFormat:
+        result[fmt] = None
+        if os.path.exists(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}")):
+            result[fmt] = f"/static/{os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')}/{base_name}{fmt.extension}"
+    return result
 
 
 def generate_thumbnail_for_path(video_path):

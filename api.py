@@ -6,7 +6,7 @@ import platform
 from loguru import logger
 
 from bus import push_text_to_client
-from thumbnail import get_thumbnail
+from thumbnail import get_thumbnail, ThumbnailFormat
 from globals import find_url_info, get_static_directory
 
 
@@ -73,7 +73,7 @@ def parse_youtube_filename(filename):
 
 def extract_file_details(root, filename, base_path):
     realfile = os.path.join(root, filename)
-    thumbnail = get_thumbnail(realfile)
+    thumbnail = get_thumbnail(realfile, ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
     return {
         'yt_id': None,
         'title': os.path.splitext(filename)[0],
