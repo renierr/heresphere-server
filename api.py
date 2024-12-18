@@ -3,11 +3,42 @@ import shutil
 import time
 import platform
 
-from loguru import logger
-
+from flask import Blueprint, jsonify, request
 from bus import push_text_to_client
 from thumbnail import get_thumbnail, ThumbnailFormat
 from globals import find_url_info, get_static_directory
+
+api_bp = Blueprint('api', __name__)
+
+@api_bp.route('/api/list')
+def get_files():
+    try:
+        return jsonify(list_files())
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_bp.route('/api/library/list')
+def get_library_files():
+    try:
+        return jsonify(list_files('library'))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@api_bp.route('/api/move_to_library', methods=['POST'])
+def mtl():
+    data = request.get_json()
+    video_path = data.get("video_path")
+
+    if not video_path:
+        return jsonify({"success": False, "error": "No video path provided"}), 400
+
+    try:
+        result = move_to_library(video_path)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 def get_file_size_formatted(filename):

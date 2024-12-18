@@ -1,7 +1,10 @@
 import os
 import subprocess
 import json
+import threading
 from enum import Enum
+
+from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
@@ -16,6 +19,39 @@ class ThumbnailFormat(Enum):
     def __init__(self, fmt, extension):
         self.fmt = fmt
         self.extension = extension
+
+
+thumbnail_bp = Blueprint('thumbnail', __name__)
+
+@thumbnail_bp.route('/api/library/generate_thumbnails', methods=['POST'])
+def glt():
+    return generate_thumbnails(library=True)
+
+@thumbnail_bp.route('/api/generate_thumbnails', methods=['POST'])
+def gts(library=False):
+    try:
+        thumbnail_thread = threading.Thread(target=generate_thumbnails, args=(library,))
+        thumbnail_thread.daemon = True
+        thumbnail_thread.start()
+
+        push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
+        return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@thumbnail_bp.route('/api/generate_thumbnail', methods=['POST'])
+def gt():
+    data = request.get_json()
+    video_path = data.get("video_path")
+
+    if not video_path:
+        return jsonify({"success": False, "error": "No video path provided"}), 400
+
+    try:
+        result = generate_thumbnail_for_path(video_path)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @cache(maxsize=512)
 def get_video_info(video_path):

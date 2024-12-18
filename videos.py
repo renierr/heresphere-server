@@ -1,17 +1,53 @@
 import os
 import re
+import threading
 import traceback
-from datetime import datetime
-
 import yt_dlp
+from datetime import datetime
+from flask import Blueprint, request, jsonify
 from loguru import logger
-
 from bus import push_text_to_client
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
     find_url_info, remove_ansi_codes
 
 root_path = os.path.dirname(os.path.abspath(__file__))
-is_windows = os.name == 'nt' # Anguish
+is_windows = os.name == 'nt'
+
+video_bp = Blueprint('video', __name__)
+
+@video_bp.route('/download', methods=['POST'])
+def download():
+    push_text_to_client(f"Download triggered")
+    data = request.get_json()
+    url = data.get("sourceUrl")
+
+    if not url:
+        logger.error("No direct video URL provided in the request")
+        return jsonify({"success": False, "error": "No URL provided"}), 400
+
+    # Start a new thread for the download process
+    download_thread = threading.Thread(target=download_video, args=(url,))
+    download_thread.daemon = True
+    download_thread.start()
+
+    push_text_to_client(f"Download started in the background")
+    return jsonify({"success": True, "message": "Download started in the background"})
+
+
+@video_bp.route('/stream', methods=['POST'])
+def request_stream():
+    data = request.get_json()
+    url = data.get("url")
+
+    if not url:
+        logger.error("No URL provided in the request")
+        return jsonify({"success": False, "error": "No URL provided"}), 400
+
+    video_url, audio_url = get_stream(url)
+    if video_url is None and audio_url is None:
+        return jsonify({"success": False, "error": "Failed to retrieve video and audio streams"}), 500
+    return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url})
+
 
 # Set the path to the static ffmpeg executable for Windows
 if is_windows:
@@ -174,3 +210,4 @@ def download_progress(d):
     elif d['status'] == 'finished':
         output = f"Download completed: {fname}"
     push_text_to_client(output)
+

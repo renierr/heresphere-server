@@ -1,19 +1,18 @@
 import atexit
-from flask import Flask, Response, render_template, request, jsonify
 import os
 import logging
 import sys
-from loguru import logger
-
-import thumbnail
 import cache
-from heresphere import generate_heresphere_json, generate_heresphere_json_item
-from videos import get_stream, download_video
 import api
 import argparse
+
+from loguru import logger
+from flask import Flask, Response, render_template, request, jsonify
+from heresphere import heresphere_bp
 from bus import event_bus, push_text_to_client
-import threading
 from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
+from thumbnail import thumbnail_bp
+from videos import video_bp
 
 parser = argparse.ArgumentParser(description='Start the server.')
 parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
@@ -40,11 +39,14 @@ app = Flask(__name__, static_folder=static_folder_path)
 if is_debug():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
-# app.config['MIMETYPE'] = {
-#     '.webp': 'image/webp'
-# }
 
+# Register blueprints
+app.register_blueprint(heresphere_bp)
+app.register_blueprint(api.api_bp)
+app.register_blueprint(video_bp)
+app.register_blueprint(thumbnail_bp)
 
+# debug purpose only
 # @app.before_request
 # def log_request_info():
 #     logger.info(f"Request: {request.method} {request.url}")
@@ -70,23 +72,6 @@ def library():
 def cache_stats():
     return cache.get_all_cache_stats()
 
-@app.route('/heresphere', methods=['POST', 'GET'])
-def heresphere():
-    try:
-        response = jsonify(generate_heresphere_json(request.root_url.rstrip('/')))
-        response.headers['heresphere-json-version'] = '1'
-        return response
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-@app.route('/heresphere/<file_base64>', methods=['POST', 'GET'])
-def heresphere_file(file_base64):
-    try:
-        return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-
 @app.route('/sse')
 def sse():
     def event_stream():
@@ -97,67 +82,6 @@ def sse():
     return Response(event_stream(), mimetype="text/event-stream")
 
 
-@app.route('/connection_test')
-def connection_test():
-    return jsonify({"success": True})
-
-@app.route('/api/library/list')
-def get_library_files():
-    try:
-        return jsonify(api.list_files('library'))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-@app.route('/api/list')
-def get_files():
-    try:
-        return jsonify(api.list_files())
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-@app.route('/api/library/generate_thumbnails', methods=['POST'])
-def generate_library_thumbnails():
-    return generate_thumbnails(library=True)
-
-@app.route('/api/generate_thumbnails', methods=['POST'])
-def generate_thumbnails(library=False):
-    try:
-        thumbnail_thread = threading.Thread(target=thumbnail.generate_thumbnails, args=(library,))
-        thumbnail_thread.daemon = True
-        thumbnail_thread.start()
-
-        push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
-        return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-@app.route('/api/generate_thumbnail', methods=['POST'])
-def generate_thumbnail():
-    data = request.get_json()
-    video_path = data.get("video_path")
-
-    if not video_path:
-        return jsonify({"success": False, "error": "No video path provided"}), 400
-
-    try:
-        result = thumbnail.generate_thumbnail_for_path(video_path)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
-
-@app.route('/api/move_to_library', methods=['POST'])
-def move_to_library():
-    data = request.get_json()
-    video_path = data.get("video_path")
-
-    if not video_path:
-        return jsonify({"success": False, "error": "No video path provided"}), 400
-
-    try:
-        result = api.move_to_library(video_path)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/cleanup')
 def cleanup_maps():
@@ -183,40 +107,6 @@ def cleanup_maps():
     save_url_map()
     return jsonify({"success": True, "removed": to_remove})
 
-
-@app.route('/download', methods=['POST'])
-def download():
-    push_text_to_client(f"Download triggered")
-    data = request.get_json()
-    url = data.get("sourceUrl")
-
-    if not url:
-        logger.error("No direct video URL provided in the request")
-        return jsonify({"success": False, "error": "No URL provided"}), 400
-
-
-    # Start a new thread for the download process
-    download_thread = threading.Thread(target=download_video, args=(url,))
-    download_thread.daemon = True
-    download_thread.start()
-
-    push_text_to_client(f"Download started in the background")
-
-    return jsonify({"success": True, "message": "Download started in the background"})
-
-@app.route('/stream', methods=['POST'])
-def request_stream():
-    data = request.get_json()
-    url = data.get("url")
-
-    if not url:
-        logger.error("No URL provided in the request")
-        return jsonify({"success": False, "error": "No URL provided"}), 400
-
-    video_url, audio_url = get_stream(url)
-    if video_url is None and audio_url is None:
-        return jsonify({"success": False, "error": "Failed to retrieve video and audio streams"}), 500
-    return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url})
 
 def start_server():
     # Load url_map on startup

@@ -3,9 +3,28 @@ import datetime
 import os
 import urllib.parse
 from datetime import datetime
+from flask import Blueprint, jsonify, request
 from api import list_files
 from globals import get_static_directory
 from thumbnail import ThumbnailFormat, get_thumbnails, get_video_info
+
+heresphere_bp = Blueprint('heresphere', __name__)
+
+@heresphere_bp.route('/heresphere', methods=['POST', 'GET'])
+def heresphere():
+    try:
+        response = jsonify(generate_heresphere_json(request.root_url.rstrip('/')))
+        response.headers['heresphere-json-version'] = '1'
+        return response
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@heresphere_bp.route('/heresphere/<file_base64>', methods=['POST', 'GET'])
+def heresphere_file(file_base64):
+    try:
+        return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 def generate_heresphere_json(server_path):
