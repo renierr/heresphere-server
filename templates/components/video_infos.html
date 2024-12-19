@@ -14,6 +14,7 @@
         <p v-if="file.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(file.downloaded_date) }} (Downloaded)</p>
         <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
     </div>
+    <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
     <button v-if="!file.partial" class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
     {% if option_download %}
     <button v-if="file.orig_link" class="btn btn-secondary btn-sm m-2" @click="redownload(file.orig_link)">Download again (id={{ file.url_id }})</button>
@@ -21,6 +22,5 @@
     {% if option_move %}
     <button v-if="!file.partial" class="btn btn-danger btn-sm m-2" @click="moveToLibrary(file.filename)">Move To Library</button>
     {% endif %}
-    <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
     <a v-if="file.orig_link" class="btn btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
 </div>

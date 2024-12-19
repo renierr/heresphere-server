@@ -25,9 +25,9 @@
                     {% with option_move = true, option_download = true %}
                     {% include "components/video_infos.html" %}
                     {% endwith %}
-                    <div v-if="getProgressForId(file.url_id) > 0" class="progress">
-                        <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100">Download Progress: {{ getProgressForId(file.url_id) }}%</div>
-                    </div>
+                </div>
+                <div v-if="getProgressForId(file.url_id) > 0" class="progress">
+                    <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100">{{ getProgressForId(file.url_id) }}%</div>
                 </div>
             </li>
         </ul>
