@@ -11,6 +11,8 @@ export const data = {
     currentThumbnail: null,
     currentPage: 1,
     pageSize: 10,
+    totalItems: 0,
+    totalSize: 0,
 };
 
 export const methods = {
@@ -21,6 +23,12 @@ export const methods = {
         const date = new Date(epochSeconds * 1000);
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
         return date.toLocaleDateString(undefined, options);
+    },
+    formatFileSize(bytes) {
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if (bytes === 0) return '0 Byte';
+        const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
     },
     formatDuration(seconds) {
         const hours = Math.floor(seconds / 3600);
@@ -117,10 +125,12 @@ export const computed = {
 
         const start = (this.currentPage - 1) * this.pageSize;
         const end = start + this.pageSize;
+        this.totalItems = filtered.length;
+        this.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
         return filtered.slice(start, end);
     },
     totalPages: function () {
-        return Math.ceil(this.files.length / this.pageSize);
+        return Math.ceil(this.totalItems / this.pageSize);
     },
     pagesToShow() {
         const range = 5;

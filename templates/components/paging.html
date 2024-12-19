@@ -1,6 +1,5 @@
-<div v-if="totalPages > 1" class="pagination mb-4">
-    <span class="p-2">Page {{ currentPage }} of {{ totalPages }}: </span>
-    <ul class="pagination">
+<div class="pagination mb-4 d-flex align-items-center justify-content-between">
+    <ul v-if="totalPages > 1" class="pagination">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
             <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
         </li>
@@ -23,4 +22,6 @@
             <a class="page-link" href="#" @click.prevent="changePage(totalPages)">Last</a>
         </li>
     </ul>
+    <span v-if="totalPages > 1" class="p-2">Page {{ currentPage }} / {{ totalPages }}</span>
+    <span class="p-2">Items in total {{ totalItems }} in size {{ formatFileSize(totalSize) }} </span>
 </div>

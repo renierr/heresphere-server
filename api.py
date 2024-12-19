@@ -94,7 +94,7 @@ def extract_file_details(root, filename, base_path):
         'thumbnail': thumbnail,
         'filename': f"{base_path}/{filename}",
         'created': info.created,
-        'filesize': format_byte_size(info.size),
+        'filesize': info.size,
         'width': info.width,
         'height': info.height,
         'duration': info.duration,
