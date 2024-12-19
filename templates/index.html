@@ -17,18 +17,16 @@
         </div>
     </div>
 
-    <div class="row mb-4">
-        {% include "components/filter.html" %}
-        {% include "components/server_info.html" %}
-        <div class="input-group mb-4">
-            <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..."
-                   class="form-control">
+    {% include "components/server_info.html" %}
+    <div class="row mb-1">
+        <div class="input-group mb-2">
+            <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..." class="form-control">
             <div class="input-group-append">
                 <button @click="postVideoUrl" class="btn btn-primary">Download</button>
             </div>
         </div>
-
     </div>
+    {% include "components/filter.html" %}
 
     <div>
         {% include "components/loading.html" %}
