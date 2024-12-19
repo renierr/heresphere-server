@@ -7,3 +7,8 @@
 [v-cloak] {
     display: none;
 }
+.video-link {
+    word-wrap: break-word;
+    white-space: normal;
+    word-break: break-all;
+}
