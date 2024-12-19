@@ -14,10 +14,18 @@ from globals import get_url_map, find_url_id, get_url_counter, increment_url_cou
     find_url_info, remove_ansi_codes
 from thumbnail import get_video_info, generate_thumbnail_for_path
 
+VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
+
 root_path = os.path.dirname(os.path.abspath(__file__))
 is_windows = os.name == 'nt'
+if is_windows:
+    ffmpeg_path = os.path.join(get_application_path(), 'ffmpeg_x64', 'ffmpeg.exe')
+    logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
+else:
+    ffmpeg_path = None
 
 video_bp = Blueprint('video', __name__)
+
 
 @video_bp.route('/download', methods=['POST'])
 def download():
@@ -53,13 +61,6 @@ def request_stream():
     return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url})
 
 
-# Set the path to the static ffmpeg executable for Windows
-if is_windows:
-    ffmpeg_path = os.path.join(get_application_path(), 'ffmpeg_x64', 'ffmpeg.exe')
-    logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
-else:
-    ffmpeg_path = None
-
 def filename_with_ext(filename, youtube=True):
     path = os.path.join(root_path, 'static', 'videos', 'youtube')
     if not youtube: path = os.path.join(root_path, 'static', 'videos', 'direct')
@@ -76,10 +77,12 @@ def filename_with_ext(filename, youtube=True):
 
     return None
 
+
 def is_youtube_url(url):
     """Check if the provided URL is a valid YouTube URL."""
     pattern = r'^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
     return bool(re.match(pattern, url))
+
 
 def get_yt_dl_video_info(url):
     with yt_dlp.YoutubeDL() as ydl:
@@ -89,40 +92,13 @@ def get_yt_dl_video_info(url):
         filename = re.sub(r'\W+', '_', video_title)
         return vid, filename
 
-def download_yt(url, progress_function, url_id):
-  vid, filename = get_yt_dl_video_info(url)
-  filename = f"{vid}___{filename}"
-  logger.debug(f"Downloading YouTube video {filename}")
-  url_map = get_url_map()
-  url_map[url_id]['filename'] = filename
-
-  ydl_opts = {
-      'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
-      'outtmpl': os.path.join('static', 'videos', 'youtube', filename) + '.%(ext)s',
-      'progress_hooks': [progress_function],
-      'nocolor': True,
-      'updatetime': False,
-  }
-
-  if is_windows:
-      logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
-      ydl_opts['ffmpeg_location'] = ffmpeg_path
-
-  try:
-      with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-          ydl.download([url])
-      logger.debug(f"Downloaded YouTube video {filename}")
-  except Exception as e:
-      logger.error(f"Error downloading YouTube video: {e}")
-      return None
-  return f"/static/videos/youtube/{filename_with_ext(filename)}"
 
 def get_stream(url):
     ydl_opts = {
         'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
         'quiet': True,  # Suppresses most of the console output
         'simulate': True,  # Do not download the video
-        'geturl': True, # Output only the urls
+        'geturl': True,  # Output only the urls
     }
 
     if is_windows:
@@ -130,55 +106,85 @@ def get_stream(url):
         ydl_opts['ffmpeg_location'] = ffmpeg_path
 
     try:
-      with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        video_url = audio_url = None
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            video_url = audio_url = None
 
-        if is_youtube_url(url):
-            if 'requested_formats' in info:
-                video_url = info['requested_formats'][0]['url']
-                audio_url = info['requested_formats'][1]['url']
-            if not video_url and not audio_url:
-                raise Exception("Could not retrieve both video and audio URLs")
+            if is_youtube_url(url):
+                if 'requested_formats' in info:
+                    video_url = info['requested_formats'][0]['url']
+                    audio_url = info['requested_formats'][1]['url']
+                if not video_url and not audio_url:
+                    raise Exception("Could not retrieve both video and audio URLs")
 
-        else:
-            if 'url' not in info:
-                raise Exception("Could not retrieve video URL")
+            else:
+                if 'url' not in info:
+                    raise Exception("Could not retrieve video URL")
 
-            video_url = info['url']
-            audio_url = None
+                video_url = info['url']
+                audio_url = None
 
-        return video_url, audio_url
+            return video_url, audio_url
     except Exception as e:
-      logger.error(f"Error retrieving video and audio streams: {e}")
-      return None, None
+        logger.error(f"Error retrieving video and audio streams: {e}")
+        return None, None
+
+
+def download_yt(url, progress_function, url_id):
+    vid, filename = get_yt_dl_video_info(url)
+    filename = f"{vid}___{filename}"
+    logger.debug(f"Downloading YouTube video {filename}")
+    url_map = get_url_map()
+    url_map[url_id]['filename'] = filename
+
+    ydl_opts = {
+        'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
+        'outtmpl': os.path.join('static', 'videos', 'youtube', filename) + '.%(ext)s',
+        'progress_hooks': [progress_function],
+        'nocolor': True,
+        'updatetime': False,
+    }
+
+    if is_windows:
+        logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
+        ydl_opts['ffmpeg_location'] = ffmpeg_path
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        logger.debug(f"Downloaded YouTube video {filename}")
+    except Exception as e:
+        logger.error(f"Error downloading YouTube video: {e}")
+        return None
+    return f"/static/videos/youtube/{filename_with_ext(filename)}"
+
 
 def download_direct(url, progress_function, url_id):
-  _, filename = get_yt_dl_video_info(url)
+    _, filename = get_yt_dl_video_info(url)
 
-  logger.debug(f"Downloading direct video {filename}")
-  url_map = get_url_map()
-  url_map[url_id]['filename'] = filename
+    logger.debug(f"Downloading direct video {filename}")
+    url_map = get_url_map()
+    url_map[url_id]['filename'] = filename
 
-  ydl_opts = {
-      'outtmpl': os.path.join('static', 'videos', 'direct', filename) + '.%(ext)s',
-      'progress_hooks': [progress_function],
-      'nocolor': True,
-      'updatetime': False,
-  }
+    ydl_opts = {
+        'outtmpl': os.path.join('static', 'videos', 'direct', filename) + '.%(ext)s',
+        'progress_hooks': [progress_function],
+        'nocolor': True,
+        'updatetime': False,
+    }
 
-  if is_windows:
-      logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
-      ydl_opts['ffmpeg_location'] = ffmpeg_path
+    if is_windows:
+        logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
+        ydl_opts['ffmpeg_location'] = ffmpeg_path
 
-  try:
-      with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-          ydl.download([url])
-      logger.debug(f"Downloaded direct video {filename}")
-  except Exception as e:
-      logger.error(f"Error downloading direct video: {e}")
-      return None
-  return f"/static/videos/direct/{filename_with_ext(filename, False)}"
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        logger.debug(f"Downloaded direct video {filename}")
+    except Exception as e:
+        logger.error(f"Error downloading direct video: {e}")
+        return None
+    return f"/static/videos/direct/{filename_with_ext(filename, False)}"
 
 
 def download_video(url):
@@ -187,7 +193,8 @@ def download_video(url):
     if url_id is None:
         url_id = get_url_counter()
         increment_url_counter()
-        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'downloaded_date': int(datetime.now().timestamp())}
+        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None,
+                           'downloaded_date': int(datetime.now().timestamp())}
     else:
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
@@ -217,7 +224,6 @@ def download_progress(d):
         output = f"Download completed: {fname}"
     push_text_to_client(output)
 
-VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
 
 @cache(maxsize=512)
 def get_basic_save_video_info(filename):
@@ -226,8 +232,10 @@ def get_basic_save_video_info(filename):
     video_info = get_video_info(filename)
     if video_info is not None:
         duration = int(float(video_info['format'].get('duration', 0))) if 'format' in video_info else 0
-        width = video_info['streams'][0].get('width', 0) if 'streams' in video_info and len(video_info['streams']) > 0 else 0
-        height = video_info['streams'][0].get('height', 0) if 'streams' in video_info and len(video_info['streams']) > 0 else 0
+        width = video_info['streams'][0].get('width', 0) if 'streams' in video_info and len(
+            video_info['streams']) > 0 else 0
+        height = video_info['streams'][0].get('height', 0) if 'streams' in video_info and len(
+            video_info['streams']) > 0 else 0
         resolution = max(width, height)
         stereo = 'sbs' if width / height == 2 else ''
     else:
