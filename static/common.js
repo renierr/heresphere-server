@@ -28,7 +28,7 @@ export const methods = {
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         if (bytes === 0) return '0 Byte';
         const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-        return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+        return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
     },
     formatDuration(seconds) {
         const hours = Math.floor(seconds / 3600);
@@ -146,5 +146,8 @@ export const computed = {
             pages.push(i);
         }
         return pages;
+    },
+    formattedTotalSize() {
+        return this.formatFileSize(this.totalSize);
     },
 }
