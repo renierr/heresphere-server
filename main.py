@@ -132,10 +132,7 @@ def start_server():
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
 
-    logger.info(f"""
-Serving most likely on: http://localhost:{UI_PORT}
-    """)
-
+    logger.info(f"Serving most likely on: http://localhost:{UI_PORT}")
     app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':
