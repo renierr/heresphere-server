@@ -2,13 +2,16 @@ import atexit
 import os
 import logging
 import sys
+from queue import Queue
+from threading import Event
+
 import cache
 import argparse
 
 from loguru import logger
 from flask import Flask, Response, render_template, jsonify
 from heresphere import heresphere_bp
-from bus import event_bus
+from bus import client_remove, client_add, event_stream
 from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
 from thumbnail import thumbnail_bp
 from videos import video_bp
@@ -74,13 +77,16 @@ def cache_stats():
 
 @app.route('/sse')
 def sse():
-    def event_stream():
-        while True:
-            # Wait for a message from the event bus
-            message = event_bus.get()
-            yield f'data: {message}\n\n'
-    return Response(event_stream(), mimetype="text/event-stream")
+    client_queue = Queue()
+    stop_event = Event()
+    client_add(client_queue, stop_event)
 
+    def cleanup():
+        client_remove(client_queue, stop_event)
+
+    response = Response(event_stream(client_queue, stop_event), mimetype="text/event-stream")
+    response.call_on_close(cleanup)
+    return response
 
 
 @app.route('/cleanup')
