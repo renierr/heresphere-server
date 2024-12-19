@@ -42,6 +42,11 @@ new Vue({
                 console.error('Failed to copy: ', err);
             });
         },
+        confirmMoveToLibrary(filename) {
+            if (confirm("Are you sure you want to move this file to the library?")) {
+                this.moveToLibrary(filename);
+            }
+        },
         moveToLibrary(file) {
             fetch('/api/move_to_library', {
                 method: 'POST',
