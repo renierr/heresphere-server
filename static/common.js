@@ -104,6 +104,29 @@ export const methods = {
                 this.serverResult = 'Error generating thumbnails';
             });
     },
+    cleanup() { // Add this method
+        fetch('/cleanup')
+            .then(response => response.json())
+            .then(data => {
+                this.serverResult = data;
+                this.fetchFiles();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.serverResult = 'Error occurred during cleanup';
+            });
+    },
+    cacheClear: function () {
+        fetch('/cache/clear')
+            .then(response => response.json())
+            .then(data => {
+                this.serverResult = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.serverResult = 'Error clearing cache';
+            });
+    }
 
 
 };

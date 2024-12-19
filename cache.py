@@ -55,3 +55,12 @@ def cache(maxsize=128, ttl=None):
 def get_all_cache_stats():
     stats = {func.__name__: func.cache__stats() for func in cache_registry}
     return stats
+
+
+def clear_caches():
+    cleared = {}
+    for func in cache_registry:
+        func.cache__clear()
+        cleared[func.__name__] = 'cleared'
+    return cleared
+

@@ -42,18 +42,6 @@ new Vue({
                 console.error('Failed to copy: ', err);
             });
         },
-        cleanup() { // Add this method
-            fetch('/cleanup')
-                .then(response => response.json())
-                .then(data => {
-                    this.serverResult = data;
-                    this.fetchFiles();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    this.serverResult = 'Error occurred during cleanup';
-                });
-        },
         moveToLibrary(file) {
             fetch('/api/move_to_library', {
                 method: 'POST',

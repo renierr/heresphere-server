@@ -79,6 +79,10 @@ def library():
 def cache_stats():
     return cache.get_all_cache_stats()
 
+@app.route('/cache/clear')
+def cache_clear():
+    return cache.clear_caches()
+
 @app.route('/sse')
 def sse():
     client_queue = Queue()
@@ -91,7 +95,6 @@ def sse():
     response = Response(event_stream(client_queue, stop_event), mimetype="text/event-stream")
     response.call_on_close(cleanup)
     return response
-
 
 @app.route('/cleanup')
 def cleanup_maps():
