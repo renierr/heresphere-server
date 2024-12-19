@@ -126,7 +126,7 @@ def generate_thumbnails(library=False):
                     if success:
                         generated_thumbnails.append(thumbnail_path)
 
-    push_text_to_client(f"Generated thumbnails finished with {len(generated_thumbnails)} thumbnails")
+    push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails")
     return {"success": True, "generated_thumbnails": generated_thumbnails}
 
 
@@ -204,7 +204,6 @@ def generate_thumbnail(video_path, thumbnail_path):
             logger.debug(f"Running command: {' '.join(command)}")
             subprocess.run(command, check=True, stdout=stdout, stderr=stdout)
 
-        logger.debug(f"Generating thumbnail for {video_path} finished.")
         return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
@@ -274,9 +273,9 @@ def generate_thumbnail_for_path(video_path):
     if not os.path.exists(real_path):
         return {"success": False, "error": "Video file does not exist"}
 
-    logger.debug(f"Generating thumbnail for {real_path}")
     success = generate_thumbnail(real_path, thumbnail_path)
+    push_text_to_client(f"Generate thumbnails finished for {base_name}")
     if success:
-        return {"success": True, "message": "generate thumbnail finished" }
+        return {"success": True, "message": f"Generate thumbnails finished for {base_name}" }
     else:
         return {"success": False, "error": "Failed to generate thumbnail"}

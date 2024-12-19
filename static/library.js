@@ -24,7 +24,7 @@ new Vue({
                 serverOutput.shift();
             }
             this.serverOutput = serverOutput.slice().reverse().join('\n');
-            if (event.data.includes('Generated thumbnails finished')) {
+            if (event.data.includes('Generate thumbnails finished')) {
                 this.fetchFiles(true);
             }
         };

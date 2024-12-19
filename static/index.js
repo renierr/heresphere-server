@@ -96,7 +96,7 @@ new Vue({
             }
             this.serverOutput = serverOutput.slice().reverse().join('\n');
             if (event.data.includes('Download finished') ||
-                event.data.includes('Generated thumbnails finished') ||
+                event.data.includes('Generate thumbnails finished') ||
                 event.data.includes(' 0.0% complete')) {
                 this.fetchFiles();
             }
