@@ -1,0 +1,7 @@
+<div class="text-center mt-4">
+    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <a href="#" @click.prevent="cleanup" class="btn btn-warning">Cleanup Server tracked Map</a>
+        <a href="#" @click.prevent="generateThumbnails([[ library_mode | default(false) | tojson ]])" class="btn btn-secondary ms-2">Generate Thumbnails</a>
+        <a href="#" @click.prevent="fetchFiles([[ library_mode | default(false) | tojson ]])" class="btn btn-secondary ms-2">Reload files</a>
+    </div>
+</div>

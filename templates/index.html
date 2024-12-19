@@ -32,11 +32,7 @@
             </li>
         </ul>
     </div>
-    <div class="text-center mt-4">
-        <a href="#" @click.prevent="cleanup" class="btn btn-warning">Cleanup Server tracked Map</a>
-        <a href="#" @click.prevent="generateThumbnails()" class="btn btn-secondary ms-2">Generate Thumbnails</a>
-        <a href="#" @click.prevent="fetchFiles()" class="btn btn-secondary ms-2">Reload files</a>
-    </div>
+    {% include "components/page_functions.html" %}
     {% include "components/server_result.html" %}
 
     <script type="module" src="/static/index.js"></script>
