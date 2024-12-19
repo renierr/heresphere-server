@@ -18,62 +18,23 @@
     </div>
 
     <div class="row mb-4">
-        <div class="col">
-            <input type="text" v-model="filter" placeholder="Filter files..."
-                class="mb-4 form-control">
-
-            <div class="input-group mb-4">
-                <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..."
-                    class="form-control">
-                <div class="input-group-append">
-                    <button @click="postVideoUrl" class="btn btn-primary">Download</button>
-                </div>
+        {% include "components/filter.html" %}
+        {% include "components/server_info.html" %}
+        <div class="input-group mb-4">
+            <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..."
+                   class="form-control">
+            <div class="input-group-append">
+                <button @click="postVideoUrl" class="btn btn-primary">Download</button>
             </div>
         </div>
 
-        <div class="col p-2">
-            <h2 class="h6">Server Information</h2>
-            <div v-text="serverOutput" class="form-control" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
-        </div>
     </div>
 
     <div>
-        <div v-if="loading" class="card-body text-center">
-            Loading...
-            <div class="d-flex justify-content-center align-items-center" style="min-height: 140px;">
-                <div class="spinner-border text-secondary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
-        </div>
+        {% include "components/loading.html" %}
         <div v-else>
             <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
-            <div v-if="totalPages > 1" class="pagination mb-4">
-                <span class="p-2">Page {{ currentPage }} of {{ totalPages }}: </span>
-                <ul class="pagination">
-                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                        <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                        <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
-                    </li>
-                    <li v-if="pagesToShow[0] > 1" class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                    <li v-for="page in pagesToShow" :key="page" class="page-item" :class="{ active: currentPage === page }">
-                        <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
-                    </li>
-                    <li v-if="pagesToShow[pagesToShow.length - 1] < totalPages" class="page-item disabled">
-                        <span class="page-link">...</span>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                        <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
-                    </li>
-                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                        <a class="page-link" href="#" @click.prevent="changePage(totalPages)">Last</a>
-                    </li>
-                </ul>
-            </div>
+            {% include "components/paging.html" %}
             <ul class="list-group list-group-flush">
                 <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
                     <div class="d-flex align-items-center">
