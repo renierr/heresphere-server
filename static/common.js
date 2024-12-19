@@ -135,7 +135,11 @@ export const methods = {
         const toastMessage = document.getElementById('serverResultMessage');
         let message;
         try {
-            message = JSON.stringify(input);
+            if (input !== null && typeof input === 'object') {
+                message = input.message || JSON.stringify(input);
+            } else {
+                message = input;
+            }
         } catch (e) {
             message = input;
         }
