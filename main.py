@@ -43,6 +43,10 @@ if is_debug():
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
 
+# avoid jinja template directive conflict
+app.jinja_env.variable_start_string = '[['
+app.jinja_env.variable_end_string = ']]'
+
 # Register blueprints
 app.register_blueprint(heresphere_bp)
 app.register_blueprint(api_bp)

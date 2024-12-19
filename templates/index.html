@@ -1,140 +1,122 @@
-{% raw %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HSServer</title>
-    <link href="/static/bootstrap.min.css?v=5.3.3" rel="stylesheet">
-    <link href="/static/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="/static/styles.css" rel="stylesheet">
-    <script src="/static/vue.min.js?v=2.6.14"></script>
-</head>
+{% block title %}HSServer - Home{% endblock %}
 
-<body class="bg-light p-2">
-    <div id="app" v-cloak class="container">
-        <div class="modal fade" id="thumbnailModal" tabindex="-1" aria-labelledby="thumbnailModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="thumbnailModalLabel">Thumbnail</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <img :src="currentThumbnail" alt="Thumbnail" class="img-fluid">
-                    </div>
+{% block content %}
+    <div class="modal fade" id="thumbnailModal" tabindex="-1" aria-labelledby="thumbnailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thumbnailModalLabel">Thumbnail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col">
-                <div class="input-group mb-2">
-                    <a href="/library">Go to Library</a>
-                </div>
-                <input type="text" v-model="filter" placeholder="Filter files..."
-                    class="mb-4 form-control">
-
-                <div class="input-group mb-4">
-                    <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..."
-                        class="form-control">
-                    <div class="input-group-append">
-                        <button @click="postVideoUrl" class="btn btn-primary">Download</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col p-2">
-                <h2 class="h6">Server Information</h2>
-                <div v-text="serverOutput" class="form-control" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
-            </div>
-        </div>
-
-        <div>
-            <div v-if="loading" class="card-body text-center">
-                Loading...
-                <div class="d-flex justify-content-center align-items-center" style="min-height: 140px;">
-                    <div class="spinner-border text-secondary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            <div v-else>
-                <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
-                <div v-if="totalPages > 1" class="pagination mb-4">
-                    <span class="p-2">Page {{ currentPage }} of {{ totalPages }}: </span>
-                    <ul class="pagination">
-                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                            <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
-                        </li>
-                        <li class="page-item" :class="{ disabled: currentPage === 1 }">
-                            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
-                        </li>
-                        <li v-if="pagesToShow[0] > 1" class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                        <li v-for="page in pagesToShow" :key="page" class="page-item" :class="{ active: currentPage === page }">
-                            <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
-                        </li>
-                        <li v-if="pagesToShow[pagesToShow.length - 1] < totalPages" class="page-item disabled">
-                            <span class="page-link">...</span>
-                        </li>
-                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                            <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
-                        </li>
-                        <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-                            <a class="page-link" href="#" @click.prevent="changePage(totalPages)">Last</a>
-                        </li>
-                    </ul>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
-                        <div class="d-flex align-items-center">
-                            <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px" @click="openThumbnail(file.thumbnail)">
-                            <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="me-3" style="width: 100px; height: auto; max-height: 200px">
-                            <div>
-                                <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
-                                <div class="text-muted">
-                                    <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
-                                    <p>
-                                        <i class="bi bi-asterisk"></i> {{ file.filesize }} <i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}
-                                        <span v-if="file.width > 1900 || file.height > 1900"><i class="bi bi-badge-hd-fill"></i></span>
-                                        <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
-                                    </p>
-                                    <p><i class="bi bi-calendar"></i> {{ formatDate(file.created) }} (Created)</p>
-                                    <p v-if="file.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(file.downloaded_date) }} (Downloaded)</p>
-                                    <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
-                                </div>
-                                <div v-if="getProgressForId(file.url_id) > 0" class="progress">
-                                    <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
-                                    <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <button v-if="!file.partial" class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
-                                <button v-if="!file.partial" class="btn btn-danger btn-sm m-2" @click="moveToLibrary(file.filename)">Move To Library</button>
-                                <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
-                                <button v-if="file.orig_link" class="btn btn-primary btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
-                                <a v-if="file.orig_link" class="btn-secondary btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <div class="text-center mt-4">
-                <a href="#" @click.prevent="cleanup" class="btn btn-danger">Cleanup Server tracked internal Map</a>
-                <a href="#" @click.prevent="generateThumbnails()" class="btn btn-primary ms-2">Generate Thumbnails</a>
-                <a href="#" @click.prevent="fetchFiles()" class="btn btn-primary ms-2">Reload files</a>
-
-                <div v-if="serverResult" class="mt-2">
-                    <p>Server Result: {{ serverResult }}</p>
+                <div class="modal-body text-center">
+                    <img :src="currentThumbnail" alt="Thumbnail" class="img-fluid">
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module" src="/static/index.js?v=1.0.0"></script>
-    <script src="/static/bootstrap.bundle.min.js?v=5.3.3"></script>
-</body>
+    <div class="row mb-4">
+        <div class="col">
+            <input type="text" v-model="filter" placeholder="Filter files..."
+                class="mb-4 form-control">
 
-</html>
-{% endraw %}
+            <div class="input-group mb-4">
+                <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..."
+                    class="form-control">
+                <div class="input-group-append">
+                    <button @click="postVideoUrl" class="btn btn-primary">Download</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col p-2">
+            <h2 class="h6">Server Information</h2>
+            <div v-text="serverOutput" class="form-control" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
+        </div>
+    </div>
+
+    <div>
+        <div v-if="loading" class="card-body text-center">
+            Loading...
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 140px;">
+                <div class="spinner-border text-secondary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
+            <div v-if="totalPages > 1" class="pagination mb-4">
+                <span class="p-2">Page {{ currentPage }} of {{ totalPages }}: </span>
+                <ul class="pagination">
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                        <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                        <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+                    </li>
+                    <li v-if="pagesToShow[0] > 1" class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    <li v-for="page in pagesToShow" :key="page" class="page-item" :class="{ active: currentPage === page }">
+                        <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                    </li>
+                    <li v-if="pagesToShow[pagesToShow.length - 1] < totalPages" class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                        <a class="page-link" href="#" @click.prevent="changePage(currentPage + 1)">Next</a>
+                    </li>
+                    <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                        <a class="page-link" href="#" @click.prevent="changePage(totalPages)">Last</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1">
+                    <div class="d-flex align-items-center">
+                        <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px" @click="openThumbnail(file.thumbnail)">
+                        <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="me-3" style="width: 100px; height: auto; max-height: 200px">
+                        <div>
+                            <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
+                            <div class="text-muted">
+                                <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
+                                <p>
+                                    <i class="bi bi-asterisk"></i> {{ file.filesize }} <i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}
+                                    <span v-if="file.width > 1900 || file.height > 1900"><i class="bi bi-badge-hd-fill"></i></span>
+                                    <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
+                                </p>
+                                <p><i class="bi bi-calendar"></i> {{ formatDate(file.created) }} (Created)</p>
+                                <p v-if="file.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(file.downloaded_date) }} (Downloaded)</p>
+                                <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
+                            </div>
+                            <div v-if="getProgressForId(file.url_id) > 0" class="progress">
+                                <p>Download Progress: {{ getProgressForId(file.url_id) }}%</p>
+                                <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <button v-if="!file.partial" class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
+                            <button v-if="!file.partial" class="btn btn-danger btn-sm m-2" @click="moveToLibrary(file.filename)">Move To Library</button>
+                            <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
+                            <button v-if="file.orig_link" class="btn btn-primary btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
+                            <a v-if="file.orig_link" class="btn-secondary btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="text-center mt-4">
+            <a href="#" @click.prevent="cleanup" class="btn btn-danger">Cleanup Server tracked internal Map</a>
+            <a href="#" @click.prevent="generateThumbnails()" class="btn btn-primary ms-2">Generate Thumbnails</a>
+            <a href="#" @click.prevent="fetchFiles()" class="btn btn-primary ms-2">Reload files</a>
+
+            <div v-if="serverResult" class="mt-2">
+                <p>Server Result: {{ serverResult }}</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/static/index.js"></script>
+
+{% endblock %}
