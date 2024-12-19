@@ -1,4 +1,4 @@
-import { data, methods, computed } from './common.js';
+import { data, methods, computed, watch } from './common.js';
 
 new Vue({
     el: '#app',
@@ -10,6 +10,9 @@ new Vue({
     },
     computed: {
         ...computed,
+    },
+    watch: {
+        ...watch,
     },
     mounted: function () {
         this.fetchFiles(true);

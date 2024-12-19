@@ -150,4 +150,10 @@ export const computed = {
     formattedTotalSize() {
         return this.formatFileSize(this.totalSize);
     },
-}
+};
+
+export const watch = {
+    filter: function (newFilter, oldFilter) {
+        this.currentPage = 1;
+    }
+};

@@ -1,4 +1,4 @@
-import { data, methods, computed } from './common.js';
+import { data, methods, computed, watch } from './common.js';
 
 new Vue({
     el: '#app',
@@ -83,6 +83,9 @@ new Vue({
             };
         },
     },
+    watch: {
+        ...watch,
+    },
     mounted: function () {
         this.fetchFiles();
         const eventSource = new EventSource('/sse');
@@ -105,5 +108,5 @@ new Vue({
                 this.fetchFiles();
             }
         };
-    }
+    },
 });
