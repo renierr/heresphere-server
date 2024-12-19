@@ -129,8 +129,20 @@ export const methods = {
                 console.error('Error:', error);
                 this.serverResult = 'Error clearing cache';
             });
-    }
-
+    },
+    showMessage: function (input) {
+        const toastElement = document.getElementById('serverResultToast');
+        const toastMessage = document.getElementById('serverResultMessage');
+        let message;
+        try {
+            message = JSON.stringify(input);
+        } catch (e) {
+            message = input;
+        }
+        toastMessage.textContent = message;
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    },
 
 };
 
@@ -181,5 +193,11 @@ export const computed = {
 export const watch = {
     filter: function (newFilter, oldFilter) {
         this.currentPage = 1;
-    }
+    },
+    serverResult: function (newResult) {
+        if (newResult) {
+            this.showMessage(newResult);
+            this.serverResult = null;
+        }
+    },
 };

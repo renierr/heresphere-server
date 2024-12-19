@@ -14,7 +14,7 @@ new Vue({
         },
         postVideoUrl() {
             if (this.videoUrl.trim() === '') {
-                alert('Please enter a video URL');
+                this.serverResult = 'Please enter a URL';
                 return;
             }
             fetch('/download', {
