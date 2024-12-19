@@ -1,0 +1,25 @@
+<img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="me-3" style="width: 100px; height: auto; max-height: 200px" @click="openThumbnail(file.thumbnail)">
+<img v-else src="/static/images/placeholder.png" alt="Placeholder" class="me-3" style="width: 100px; height: auto; max-height: 200px">
+<div>
+    <div class="fw-bold h5"><a class="text-primary" :href="file.filename">{{ file.title }}</a></div>
+    <div class="text-muted">
+        <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
+        <p>
+            <i class="bi bi-asterisk"></i> {{ file.filesize }} <i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}
+            <span v-if="file.width > 1900 || file.height > 1900"><i class="bi bi-badge-hd-fill"></i></span>
+            <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
+        </p>
+        <p><i class="bi bi-calendar"></i> {{ formatDate(file.created) }} (Created)</p>
+        <p v-if="file.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(file.downloaded_date) }} (Downloaded)</p>
+        <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
+    </div>
+    <button v-if="!file.partial" class="btn btn-secondary btn-sm m-2" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
+    {% if option_move %}
+    <button v-if="!file.partial" class="btn btn-danger btn-sm m-2" @click="moveToLibrary(file.filename)">Move To Library</button>
+    {% endif %}
+    <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
+    {% if option_download %}
+    <button v-if="file.orig_link" class="btn btn-link btn-sm m-2" @click="redownload(file.orig_link)">{{ file.url_id }}. Trigger Download again</button>
+    {% endif %}
+    <a v-if="file.orig_link" class="btn-sm m-2" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
+</div>
