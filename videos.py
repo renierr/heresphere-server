@@ -12,7 +12,7 @@ from bus import push_text_to_client
 from cache import cache
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
     find_url_info, remove_ansi_codes
-from thumbnail import get_video_info
+from thumbnail import get_video_info, generate_thumbnail_for_path
 
 root_path = os.path.dirname(os.path.abspath(__file__))
 is_windows = os.name == 'nt'
@@ -30,11 +30,11 @@ def download():
         return jsonify({"success": False, "error": "No URL provided"}), 400
 
     # Start a new thread for the download process
+    push_text_to_client(f"Starting download in background")
     download_thread = threading.Thread(target=download_video, args=(url,))
     download_thread.daemon = True
     download_thread.start()
 
-    push_text_to_client(f"Download started in the background")
     return jsonify({"success": True, "message": "Download started in the background"})
 
 
@@ -192,12 +192,14 @@ def download_video(url):
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
 
+    push_text_to_client(f"Downloading video {url_id}...")
     try:
         if is_youtube_url(url):
             video_url = download_yt(url, download_progress, url_id)
         else:
             video_url = download_direct(url, download_progress, url_id)
         url_map[url_id]['video_url'] = video_url
+        generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"

@@ -141,6 +141,7 @@ def generate_thumbnail(video_path, thumbnail_path):
     """
     try:
         push_text_to_client(f"Generating thumbnail and info for {os.path.basename(video_path)}")
+        logger.debug(f"Evict cache for {video_path}")
         get_thumbnails.cache__evict(video_path)   # evict cache for thumbnails
 
         video_info = get_video_info(video_path)
@@ -264,6 +265,7 @@ def generate_thumbnail_for_path(video_path):
         relative_path = video_path.replace('/static/videos/', '')
         real_path = os.path.join(static_dir, 'videos', relative_path)
 
+    real_path = os.path.normpath(real_path)
     base_name = os.path.basename(real_path)
     thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
     os.makedirs(thumbnail_dir, exist_ok=True)
@@ -272,6 +274,7 @@ def generate_thumbnail_for_path(video_path):
     if not os.path.exists(real_path):
         return {"success": False, "error": "Video file does not exist"}
 
+    logger.debug(f"Generating thumbnail for {real_path}")
     success = generate_thumbnail(real_path, thumbnail_path)
     if success:
         return {"success": True, "message": "generate thumbnail finished" }
