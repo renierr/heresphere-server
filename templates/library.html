@@ -49,10 +49,7 @@
     <div class="text-center mt-4">
         <a href="#" @click.prevent="generateThumbnails(true)" class="btn btn-secondary ms-2">Generate Thumbnails</a>
         <a href="#" @click.prevent="fetchFiles(true)" class="btn btn-secondary ms-2">Reload files</a>
-
-        <div v-if="serverResult" class="mt-2">
-            <p>Server Result: {{ serverResult }}</p>
-        </div>
     </div>
+    {% include "components/server_result.html" %}
     <script type="module" src="/static/library.js"></script>
 {% endblock %}

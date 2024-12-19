@@ -11,7 +11,7 @@ import argparse
 from loguru import logger
 from flask import Flask, Response, render_template, jsonify
 from heresphere import heresphere_bp
-from bus import client_remove, client_add, event_stream
+from bus import client_remove, client_add, event_stream, push_text_to_client
 from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
 from thumbnail import thumbnail_bp
 from videos import video_bp
@@ -115,7 +115,8 @@ def cleanup_maps():
         del url_map[url_id]
 
     save_url_map()
-    return jsonify({"success": True, "removed": to_remove})
+    push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
+    return jsonify({"success": True, "message": "Cleanup tracking map finished"})
 
 
 def start_server():
