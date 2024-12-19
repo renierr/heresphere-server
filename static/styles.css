@@ -4,9 +4,6 @@
 .list-group-item {
     margin-bottom: 1rem;
 }
-.modal-dialog {
-    max-width: 90vw;
-}
 [v-cloak] {
     display: none;
 }
