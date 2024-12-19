@@ -1,13 +1,13 @@
 import atexit
 import os
 import logging
+import socket
 import sys
-from queue import Queue
-from threading import Event
-
 import cache
 import argparse
 
+from queue import Queue
+from threading import Event
 from loguru import logger
 from flask import Flask, Response, render_template, jsonify
 from heresphere import heresphere_bp
@@ -132,7 +132,10 @@ def start_server():
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
 
-    logger.info(f"Serving most likely on: http://localhost:{UI_PORT}")
+    # Get the server's IP address
+    hostname = socket.gethostname()
+    server_ip = socket.gethostbyname(hostname)
+    logger.info(f"Serving most likely on: http://{hostname}:{UI_PORT} or http://{server_ip}:{UI_PORT}")
     app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':

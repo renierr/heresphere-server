@@ -69,6 +69,7 @@ export const methods = {
 
     },
     fetchFiles: function (library=false) {
+        const scrollPosition = window.scrollY;
         this.loading = true;
         const url = library ? '/api/library/list' : '/api/list';
         fetch(url)
@@ -81,6 +82,7 @@ export const methods = {
             .then(data => {
                 this.files = data;
                 this.loading = false;
+                setTimeout(() => window.scrollTo(0, scrollPosition));
             })
             .catch(error => {
                 console.error('There was an error fetching the files:', error);
@@ -121,6 +123,7 @@ export const methods = {
             .then(response => response.json())
             .then(data => {
                 this.serverResult = data;
+                this.fetchFiles();
             })
             .catch(error => {
                 console.error('Error:', error);
