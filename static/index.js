@@ -12,32 +12,52 @@ new Vue({
             this.videoUrl = url;
             this.postVideoUrl();
         },
-        postVideoUrl() {
+        postVideoUrl(stream=false) {
             if (this.videoUrl.trim() === '') {
                 this.serverResult = 'Please enter a URL';
                 return;
             }
-            fetch('/download', {
+            fetch(stream ? '/stream' : '/download', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ sourceUrl: this.videoUrl })
+                body: JSON.stringify({ sourceUrl: this.videoUrl, url: this.videoUrl })
             })
                 .then(response => response.json())
                 .then(data => {
-                    this.serverOutput += new Date().toLocaleTimeString() + ': Starting download of ' + this.videoUrl + '\n';
+                    this.serverResult = data;
+                    if (stream) {
+                        const url_to_play = data.videoUrl.replace(/\/$/, '');
+                        this.serverResult = 'Stream file at: ' + url_to_play;
+                        window.open('', '_blank').document.write(`
+                            <html>
+                                <head>
+                                    <title>Video Player</title>
+                                </head>
+                                <body>
+                                    <p>If the video does not start, <a href="${url_to_play}">click here</a>.</p>
+                                    <video controls autoplay style="width: 100%; height: 100%;">
+                                        <source src="${url_to_play}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </body>
+                            </html>
+                        `);
+                    } else {
+                        this.serverResult = data;
+                    }
                     this.videoUrl = '';
                 })
                 .catch(error => {
-                    this.serverOutput += new Date().toLocaleTimeString() + ': Error for download of ' + this.videoUrl + ' - ' + error + '\n';
+                    this.serverResult = 'Error download/stream file: ' + error;
                     console.error('Error:', error);
                 });
         },
         copyToClipboard: function (event, text) {
             event.preventDefault();
             navigator.clipboard.writeText(text).then(() => {
-                alert('Link copied to clipboard');
+                this.showMessage('Copied to clipboard');
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
