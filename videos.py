@@ -90,7 +90,7 @@ def get_yt_dl_video_info(url):
         vid = info_dict.get('id', None)
         video_title = info_dict.get('title', vid)
         filename = re.sub(r'\W+', '_', video_title)
-        return vid, filename
+        return vid, filename, video_title
 
 
 def get_stream(url):
@@ -131,11 +131,12 @@ def get_stream(url):
 
 
 def download_yt(url, progress_function, url_id):
-    vid, filename = get_yt_dl_video_info(url)
+    vid, filename, title = get_yt_dl_video_info(url)
     filename = f"{vid}___{filename}"
     logger.debug(f"Downloading YouTube video {filename}")
     url_map = get_url_map()
     url_map[url_id]['filename'] = filename
+    url_map[url_id]['title'] = title
 
     ydl_opts = {
         'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
@@ -160,11 +161,12 @@ def download_yt(url, progress_function, url_id):
 
 
 def download_direct(url, progress_function, url_id):
-    _, filename = get_yt_dl_video_info(url)
+    _, filename, title = get_yt_dl_video_info(url)
 
     logger.debug(f"Downloading direct video {filename}")
     url_map = get_url_map()
     url_map[url_id]['filename'] = filename
+    url_map[url_id]['title'] = title
 
     ydl_opts = {
         'outtmpl': os.path.join('static', 'videos', 'direct', filename) + '.%(ext)s',
