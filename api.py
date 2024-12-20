@@ -138,6 +138,7 @@ def list_files(directory='videos'):
                     })
             extracted_details.append(common_details)
 
+    extracted_details.sort(key=lambda x: x['created'], reverse=True)
     return extracted_details
 
 
