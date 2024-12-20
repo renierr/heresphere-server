@@ -15,6 +15,20 @@ export const data = {
     totalSize: 0,
 };
 
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        const later = () => {
+            timeout = null;
+        };
+        const callNow = !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+}
+
 export const methods = {
     formatDate(epochSeconds) {
         if (epochSeconds < 1) {
@@ -68,27 +82,28 @@ export const methods = {
             });
 
     },
-    fetchFiles: function (library=false) {
-        const scrollPosition = window.scrollY;
-        this.loading = true;
-        const url = library ? '/api/library/list' : '/api/list';
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                this.files = data;
-                this.loading = false;
-                setTimeout(() => window.scrollTo(0, scrollPosition));
-            })
-            .catch(error => {
-                console.error('There was an error fetching the files:', error);
-                this.loading = false;
-            });
-    },
+    fetchFiles: debounce(function (library=false) {
+            console.log('Fetching files');
+            const scrollPosition = window.scrollY;
+            this.loading = true;
+            const url = library ? '/api/library/list' : '/api/list';
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.files = data;
+                    this.loading = false;
+                    setTimeout(() => window.scrollTo(0, scrollPosition));
+                })
+                .catch(error => {
+                    console.error('There was an error fetching the files:', error);
+                    this.loading = false;
+                })
+        }, 3000),
     generateThumbnails(library=false) {
         const url = library ? '/api/library/generate_thumbnails' : '/api/generate_thumbnails';
         fetch(url, {
