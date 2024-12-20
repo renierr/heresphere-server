@@ -9,7 +9,7 @@
         <div class="input-group mb-2">
             <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..." class="form-control">
             <div class="input-group-append">
-                <button @click="postVideoUrl" class="btn btn-primary">Download</button>
+                <button @click="postVideoUrl(false)" class="btn btn-primary">Download</button>
                 <button @click="postVideoUrl(true)" class="btn btn-primary">Stream</button>
             </div>
         </div>
