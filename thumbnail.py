@@ -71,6 +71,10 @@ def get_video_info(video_path):
     """
 
     try:
+        # exclude file with '.part' extension
+        if video_path.endswith('.part'):
+            return None
+
         # find the video json in .thumb folder first
         json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + '.thumb.json'
         if os.path.exists(json_path):
@@ -140,6 +144,10 @@ def generate_thumbnail(video_path, thumbnail_path):
     :return: true if success, false if failed
     """
     try:
+        # exclude file with '.part' extension
+        if video_path.endswith('.part'):
+            return None
+
         push_text_to_client(f"Generating thumbnail and info for {os.path.basename(video_path)}")
         logger.debug(f"Evict cache for {video_path}")
         get_thumbnails.cache__evict(video_path)   # evict cache for thumbnails
