@@ -264,6 +264,10 @@ def generate_thumbnail_for_path(video_path):
     :param video_path: url part of the video file
     :return: json object with success and message
     """
+
+    if not video_path:
+        return {}
+        
     static_dir = get_static_directory()
     if '/static/library/' in video_path:
         relative_path = video_path.replace('/static/library/', '')
