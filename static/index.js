@@ -39,21 +39,9 @@ new Vue({
                                 <source src="${video_url}" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
-                            ${audio_url ? `<audio id="audioElement" src="${audio_url}" type="audio/mp3"></audio>` : ''}
-
                         `;
                         const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                         videoModal.show();
-
-                        const videoElement = document.getElementById('videoElement');
-                        const audioElement = document.getElementById('audioElement');
-
-                        if (audioElement) {
-                            videoElement.addEventListener('play', () => audioElement.play());
-                            videoElement.addEventListener('pause', () => audioElement.pause());
-                            videoElement.addEventListener('seeking', () => audioElement.currentTime = videoElement.currentTime);
-                            videoElement.addEventListener('ratechange', () => audioElement.playbackRate = videoElement.playbackRate);
-                        }
                     } else {
                         this.serverResult = data;
                     }
