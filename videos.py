@@ -31,7 +31,12 @@ video_bp = Blueprint('video', __name__)
 def download():
     push_text_to_client(f"Download triggered")
     data = request.get_json()
-    url = data.get("sourceUrl")
+    # first try to get from videoUrl then sourceUrl
+    url = data.get("videoUrl")
+    if not url:
+        url = data.get("sourceUrl")
+
+    title = data.get("title")
 
     if not url:
         logger.error("No direct video URL provided in the request")
@@ -39,7 +44,7 @@ def download():
 
     # Start a new thread for the download process
     push_text_to_client(f"Starting download in background")
-    download_thread = threading.Thread(target=download_video, args=(url,))
+    download_thread = threading.Thread(target=download_video, args=(url, title,))
     download_thread.daemon = True
     download_thread.start()
 
@@ -163,10 +168,13 @@ def download_yt(url, progress_function, url_id):
     return f"/static/videos/youtube/{filename_with_ext(filename)}"
 
 
-def download_direct(url, progress_function, url_id):
-    _, filename, title = get_yt_dl_video_info(url)
+def download_direct(url, progress_function, url_id, title):
+    _, filename, extract_title = get_yt_dl_video_info(url)
 
-    logger.debug(f"Downloading direct video {filename}")
+    if title:
+        filename = re.sub(r'\W+', '_', title)
+
+    logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
     url_map = get_url_map()
     url_map[url_id]['filename'] = filename
     url_map[url_id]['title'] = title
@@ -192,13 +200,14 @@ def download_direct(url, progress_function, url_id):
     return f"/static/videos/direct/{filename_with_ext(filename, False)}"
 
 
-def download_video(url):
+def download_video(url, title):
     url_map = get_url_map()
     url_id = find_url_id(url)
     if url_id is None:
         url_id = get_url_counter()
         increment_url_counter()
         url_map[url_id] = {'url': url, 'filename': None, 'video_url': None,
+                           'title': title,
                            'downloaded_date': int(datetime.now().timestamp())}
     else:
         url_map[url_id]['url'] = url
@@ -209,7 +218,7 @@ def download_video(url):
         if is_youtube_url(url):
             video_url = download_yt(url, download_progress, url_id)
         else:
-            video_url = download_direct(url, download_progress, url_id)
+            video_url = download_direct(url, download_progress, url_id, title)
         url_map[url_id]['video_url'] = video_url
         generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
