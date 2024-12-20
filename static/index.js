@@ -28,22 +28,32 @@ new Vue({
                 .then(data => {
                     this.serverResult = data;
                     if (stream) {
-                        const url_to_play = data.videoUrl.replace(/\/$/, '');
-                        this.serverResult = 'Stream file at: ' + url_to_play;
-                        window.open('', '_blank').document.write(`
-                            <html>
-                                <head>
-                                    <title>Video Player</title>
-                                </head>
-                                <body>
-                                    <p>If the video does not start, <a href="${url_to_play}">click here</a>.</p>
-                                    <video controls autoplay style="width: 100%; height: 100%;">
-                                        <source src="${url_to_play}" type="video/mp4">
-                                        Your browser does not support the video tag.
-                                    </video>
-                                </body>
-                            </html>
-                        `);
+                        const video_url = data.videoUrl;
+                        const audio_url = data.audioUrl;
+
+                        this.serverResult = 'Stream file video: ' + video_url + ' and audio: ' + audio_url;
+                        const modalBody = document.getElementById('videoModalBody');
+                        modalBody.innerHTML = `
+                            <p>If the video does not start, <a href="${video_url}">click here</a>.</p>
+                            <video id="videoElement" controls referrerpolicy="no-referrer">
+                                <source src="${video_url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            ${audio_url ? `<audio id="audioElement" src="${audio_url}" type="audio/mp3"></audio>` : ''}
+
+                        `;
+                        const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+                        videoModal.show();
+
+                        const videoElement = document.getElementById('videoElement');
+                        const audioElement = document.getElementById('audioElement');
+
+                        if (audioElement) {
+                            videoElement.addEventListener('play', () => audioElement.play());
+                            videoElement.addEventListener('pause', () => audioElement.pause());
+                            videoElement.addEventListener('seeking', () => audioElement.currentTime = videoElement.currentTime);
+                            videoElement.addEventListener('ratechange', () => audioElement.playbackRate = videoElement.playbackRate);
+                        }
                     } else {
                         this.serverResult = data;
                     }
