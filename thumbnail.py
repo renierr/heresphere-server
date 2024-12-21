@@ -194,7 +194,7 @@ def generate_thumbnail(video_path, thumbnail_path):
                 return False
 
             logger.debug(f"Starting ffmpeg for jpg")
-            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg']
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-update', '1', os.path.splitext(thumbnail_path)[0] + '.jpg']
             logger.debug(f"Running command: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
