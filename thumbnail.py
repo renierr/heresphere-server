@@ -198,20 +198,6 @@ def generate_thumbnail(video_path, thumbnail_path):
             command = [
                 'ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
             ]
-
-            # complex filter to generate webm thumbnail example
-            # filter_complex = ""
-            # for i, point in enumerate(points):
-            #     filter_complex += f"[0:v]trim=start={point}:duration={segment_duration},setpts=PTS-STARTPTS,scale=w=380:h=-1[v{i}];"
-            #     filter_complex += f"[0:a]atrim=start={point}:duration={segment_duration},asetpts=PTS-STARTPTS[a{i}];"
-            #
-            # filter_complex += "".join([f"[v{i}][a{i}]" for i in range(len(points))])
-            # filter_complex += f"concat=n={len(points)}:v=1:a=1[v][a]"
-            # command = [
-            #     'ffmpeg', '-y', '-i', video_path, '-filter_complex', filter_complex,
-            #     '-map', '[v]', '-map', '[a]', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
-            # ]
-
             logger.debug(f"Running command: {' '.join(command)}")
             subprocess.run(command, check=True, stdout=stdout, stderr=stdout)
 
