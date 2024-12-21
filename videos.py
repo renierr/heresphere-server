@@ -31,10 +31,10 @@ video_bp = Blueprint('video', __name__)
 def download():
     push_text_to_client(f"Download triggered")
     data = request.get_json()
-    # first try to get from videoUrl then sourceUrl
-    url = data.get("videoUrl")
-    if not url:
-        url = data.get("sourceUrl")
+    # use sourceUrl except if heresphere is in name
+    url = data.get("sourceUrl")
+    if 'heresphere' in url:
+        url = data.get("videoUrl")
 
     title = data.get("title")
 
