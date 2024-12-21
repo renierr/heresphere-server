@@ -3,7 +3,6 @@ import subprocess
 import json
 import threading
 from enum import Enum
-
 from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
@@ -183,23 +182,34 @@ def generate_thumbnail(video_path, thumbnail_path):
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
+            execution_timelimit = 120
 
             logger.debug(f"Starting ffmpeg for webp")
-            subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path
-            ], check=True, stdout=stdout, stderr=stdout)
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path]
+            logger.debug(f"Running command: {' '.join(cmd)}")
+            try:
+                subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
+            except subprocess.TimeoutExpired:
+                logger.error(f"Failed to generate thumbnail for webp (timeout): {video_path}")
+                return False
 
             logger.debug(f"Starting ffmpeg for jpg")
-            subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
-            ], check=True, stdout=stdout, stderr=stdout)
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg']
+            logger.debug(f"Running command: {' '.join(cmd)}")
+            try:
+                subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
+            except subprocess.TimeoutExpired:
+                logger.error(f"Failed to generate thumbnail for jpg (timeout): {video_path}")
+                return False
 
             logger.debug(f"Starting ffmpeg for webm")
-            command = [
-                'ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm'
-            ]
-            logger.debug(f"Running command: {' '.join(command)}")
-            subprocess.run(command, check=True, stdout=stdout, stderr=stdout)
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm']
+            logger.debug(f"Running command: {' '.join(cmd)}")
+            try:
+                subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
+            except subprocess.TimeoutExpired:
+                logger.error(f"Failed to generate thumbnail for webm (timeout): {video_path}")
+                return False
 
         return True
     except Exception as e:
