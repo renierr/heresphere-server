@@ -109,6 +109,7 @@ def generate_thumbnails(library=False):
     static_dir = get_static_directory()
     video_dir = os.path.join(static_dir, 'videos' if not library else 'library')
     generated_thumbnails = []
+    thumbnail_errors = []
     logger.debug(f"Generating thumbnails for {video_dir}")
     push_text_to_client(f"Generating thumbnails for {'library' if library else 'videos'}")
 
@@ -129,8 +130,10 @@ def generate_thumbnails(library=False):
                     success = generate_thumbnail(video_path, thumbnail_path)
                     if success:
                         generated_thumbnails.append(thumbnail_path)
+                    else:
+                        thumbnail_errors.append(video_path)
 
-    push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails")
+    push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails {'(' + str(len(thumbnail_errors)) + ' failed)' if thumbnail_errors else ''}")
     return {"success": True, "generated_thumbnails": generated_thumbnails}
 
 
@@ -188,7 +191,7 @@ def generate_thumbnail(video_path, thumbnail_path):
 
             logger.debug(f"Starting ffmpeg for jpg")
             subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-pix_fmt', 'yuv420p', os.path.splitext(thumbnail_path)[0] + '.jpg'
+                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=stdout, stderr=stdout)
 
             logger.debug(f"Starting ffmpeg for webm")
@@ -286,7 +289,7 @@ def generate_thumbnail_for_path(video_path):
         return {"success": False, "error": "Video file does not exist"}
 
     success = generate_thumbnail(real_path, thumbnail_path)
-    push_text_to_client(f"Generate thumbnails finished for {base_name}")
+    push_text_to_client(f"Generate thumbnails finished for {base_name} with {'success' if success else 'failure'}")
     if success:
         return {"success": True, "message": f"Generate thumbnails finished for {base_name}" }
     else:
