@@ -188,7 +188,7 @@ def generate_thumbnail(video_path, thumbnail_path):
 
             logger.debug(f"Starting ffmpeg for jpg")
             subprocess.run([
-                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', os.path.splitext(thumbnail_path)[0] + '.jpg'
+                'ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'thumbnail,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-pix_fmt', 'yuv420p', os.path.splitext(thumbnail_path)[0] + '.jpg'
             ], check=True, stdout=stdout, stderr=stdout)
 
             logger.debug(f"Starting ffmpeg for webm")
@@ -213,7 +213,7 @@ def generate_thumbnail(video_path, thumbnail_path):
             subprocess.run(command, check=True, stdout=stdout, stderr=stdout)
 
         return True
-    except subprocess.CalledProcessError as e:
+    except Exception as e:
         logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
         return False
 
