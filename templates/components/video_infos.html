@@ -7,7 +7,8 @@
         <p>
             <i class="bi bi-asterisk"></i> {{ formatFileSize(file.filesize) }} <i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}
             <span v-if="file.width > 1900 || file.height > 1900"><i class="bi bi-badge-hd-fill"></i></span>
-            <span v-if="file.width > 3800 || file.height > 3800"><i class="bi bi-badge-4k-fill"></i></span>
+            <span v-if="file.width > 8000 || file.height > 8000"><i class="bi bi-badge-8k-fill"></i></span>
+            <span v-else-if="file.width > 3800 || file.height > 3800"><i class="bi bi-badge-4k-fill"></i></span>
             <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
         </p>
         <p><i class="bi bi-calendar"></i> {{ formatDate(file.created) }} (Created)</p>
