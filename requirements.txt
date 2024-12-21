@@ -1,3 +1,4 @@
 flask
 loguru
 yt_dlp
+waitress

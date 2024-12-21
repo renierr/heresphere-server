@@ -6,6 +6,7 @@ import sys
 import cache
 import argparse
 
+from waitress import serve
 from queue import Queue
 from threading import Event
 from loguru import logger
@@ -40,6 +41,7 @@ logger.debug(f"Static Folder Path: {static_folder_path}")
 
 app = Flask(__name__, static_folder=static_folder_path)
 if is_debug():
+    app.config['DEBUG'] = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.logger.setLevel(logging.WARNING)
 
@@ -136,7 +138,8 @@ def start_server():
     hostname = socket.gethostname()
     server_ip = socket.gethostbyname(hostname)
     logger.info(f"Serving most likely on: http://{hostname}:{UI_PORT} or http://{server_ip}:{UI_PORT}")
-    app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0', threaded=True)
+    #app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0', threaded=True)
+    serve(app, host='0.0.0.0', port=UI_PORT)
 
 if __name__ == '__main__':
     start_server()
