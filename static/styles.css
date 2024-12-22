@@ -12,3 +12,12 @@
     white-space: normal;
     word-break: break-all;
 }
+img.thumbnail {
+    align-self: self-start;
+    max-height: 300px;
+}
+@media (min-width: 768px) {
+    img.thumbnail {
+        max-width: 200px;
+    }
+}
