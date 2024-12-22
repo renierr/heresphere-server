@@ -33,15 +33,27 @@ new Vue({
                         const audio_url = data.audioUrl;
                         const modalBody = document.getElementById('videoModalBody');
                         if (modalBody && video_url) {
+                            const video_cookies = data.cookies;
+                            if (video_cookies) {
+                                console.log('Setting cookies:', video_cookies);
+                                document.cookie = video_cookies;
+                            }
                             modalBody.innerHTML = `
                                 <p>If the video does not start, <a href="${video_url}">here is the link from source</a>.</p>
-                                <video id="videoElement" class="w-100" controls>
-                                    <source src="${video_url}" type="video/mp4">
+                                <video id="videoElement" class="w-100" controls src="${video_url}">
                                     Your browser does not support the video tag.
                                 </video>
                             `;
                             const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                             videoModal.show();
+                            document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+                                const videoElement = document.getElementById('videoElement');
+                                if (videoElement) {
+                                    videoElement.pause();
+                                    videoElement.currentTime = 0;
+                                    videoElement.src = '';
+                                }
+                            });
                         }
                         this.serverResult = 'Stream file video: ' + video_url + ' and audio: ' + audio_url;
                     } else {

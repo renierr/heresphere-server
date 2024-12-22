@@ -63,10 +63,10 @@ def request_stream():
         logger.error("No URL provided in the request")
         return jsonify({"success": False, "error": "No URL provided"}), 400
 
-    video_url, audio_url = get_stream(url)
+    video_url, audio_url, cookies = get_stream(url)
     if video_url is None and audio_url is None:
         return jsonify({"success": False, "error": "Failed to retrieve video and audio streams"}), 500
-    return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url})
+    return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url, "cookies": cookies })
 
 
 def filename_with_ext(filename, youtube=True):
@@ -122,7 +122,7 @@ def get_stream(url):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
-            video_url = audio_url = None
+            video_url = audio_url = cookies = None
 
             if is_youtube_url(url):
                 if 'requested_formats' in info:
@@ -140,11 +140,12 @@ def get_stream(url):
 
                 video_url = info['url']
                 audio_url = None
+                cookies = info.get('cookies', None)
 
-            return video_url, audio_url
+            return video_url, audio_url, cookies
     except Exception as e:
         logger.error(f"Error retrieving video and audio streams: {e}")
-        return None, None
+        return None, None, None
 
 
 def download_yt(url, progress_function, url_id):
