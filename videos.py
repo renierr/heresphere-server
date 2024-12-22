@@ -173,8 +173,7 @@ def download_direct(url, progress_function, url_id, title):
 
     if title:
         filename = re.sub(r'\W+', '_', title)
-
-    if extract_title:
+    elif extract_title:
         filename = re.sub(r'\W+', '_', extract_title)
 
     logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
