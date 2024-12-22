@@ -31,18 +31,19 @@ new Vue({
                     if (stream) {
                         const video_url = data.videoUrl;
                         const audio_url = data.audioUrl;
-
-                        this.serverResult = 'Stream file video: ' + video_url + ' and audio: ' + audio_url;
                         const modalBody = document.getElementById('videoModalBody');
-                        modalBody.innerHTML = `
-                            <p>If the video does not start, <a href="${video_url}">click here</a>.</p>
-                            <video id="videoElement" controls referrerpolicy="no-referrer">
-                                <source src="${video_url}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        `;
-                        const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
-                        videoModal.show();
+                        if (modalBody && video_url) {
+                            modalBody.innerHTML = `
+                                <p>If the video does not start, <a href="${video_url}">here is the link from source</a>.</p>
+                                <video id="videoElement" class="w-100" controls>
+                                    <source src="${video_url}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            `;
+                            const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+                            videoModal.show();
+                        }
+                        this.serverResult = 'Stream file video: ' + video_url + ' and audio: ' + audio_url;
                     } else {
                         this.serverResult = data;
                     }
