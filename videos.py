@@ -243,7 +243,7 @@ def download_progress(d):
         idnr, _ = find_url_info(fname)
         output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
     elif d['status'] == 'finished':
-        output = f"Download 100.0% complete: {fname}"
+        output = f"Downloading...[{idnr}] - 100.0% complete: {fname}"
     push_text_to_client(output)
 
 
