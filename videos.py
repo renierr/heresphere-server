@@ -9,6 +9,8 @@ import yt_dlp
 from datetime import datetime
 from flask import Blueprint, request, jsonify
 from loguru import logger
+from yt_dlp import ImpersonateTarget
+
 from bus import push_text_to_client
 from cache import cache
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
@@ -91,7 +93,13 @@ def is_youtube_url(url):
 
 
 def get_yt_dl_video_info(url):
-    with yt_dlp.YoutubeDL() as ydl:
+    ydl_opts = {
+        'quiet': True,
+        'simulate': True,
+        'download': False,
+        'impersonate': ImpersonateTarget('chrome'),
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info_dict = ydl.extract_info(url, download=False)
         vid = info_dict.get('id', None)
         video_title = info_dict.get('title', vid)
@@ -105,6 +113,7 @@ def get_stream(url):
         'quiet': True,  # Suppresses most of the console output
         'simulate': True,  # Do not download the video
         'geturl': True,  # Output only the urls
+        'impersonate': ImpersonateTarget('chrome'),
     }
 
     if is_windows:
@@ -185,6 +194,7 @@ def download_direct(url, progress_function, url_id, title):
         'progress_hooks': [progress_function],
         'nocolor': True,
         'updatetime': False,
+        'impersonate': ImpersonateTarget('chrome'),
     }
 
     if is_windows:

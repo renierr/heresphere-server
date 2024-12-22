@@ -1,7 +1,6 @@
 import math
 import os
 import shutil
-import platform
 
 from flask import Blueprint, jsonify, request
 from bus import push_text_to_client
