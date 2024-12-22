@@ -107,7 +107,6 @@ def get_stream(url):
     }
 
     if is_windows:
-        logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
         ydl_opts['ffmpeg_location'] = ffmpeg_path
 
     try:
@@ -155,7 +154,6 @@ def download_yt(url, progress_function, url_id):
     }
 
     if is_windows:
-        logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
         ydl_opts['ffmpeg_location'] = ffmpeg_path
 
     try:
@@ -189,7 +187,6 @@ def download_direct(url, progress_function, url_id, title):
     }
 
     if is_windows:
-        logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
         ydl_opts['ffmpeg_location'] = ffmpeg_path
 
     try:
