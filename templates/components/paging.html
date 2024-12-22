@@ -1,4 +1,4 @@
-<div class="pagination mb-4 d-flex align-items-center justify-content-between">
+<div class="pagination mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between">
     <ul v-if="totalPages > 1" class="pagination mb-0">
         <li class="page-item" :class="{ disabled: currentPage === 1 }">
             <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
