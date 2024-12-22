@@ -1,7 +1,7 @@
-<div class="d-flex align-items-center flex-column flex-md-row">
-    <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail img-fluid p-2 me-3" @click="openThumbnail(file.thumbnail)">
-    <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="thumbnail img-fluid p-2 me-3">
-    <div>
+<div class="d-flex align-items-start flex-column flex-md-row p-2">
+    <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail img-fluid me-3 mb-1" @click="openThumbnail(file.thumbnail)">
+    <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="thumbnail img-fluid me-3 mb-1">
+    <div class="w-100 d-flex flex-column align-items-start">
         <div class="fw-bold h5"><a class="video-link text-decoration-none" :href="file.filename"> <i class="bi bi-link-45deg"></i> {{ file.title }}</a></div>
         <div class="text-muted">
             <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
@@ -16,14 +16,16 @@
             <p v-if="file.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(file.downloaded_date) }} (Downloaded)</p>
             <p><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
         </div>
-        <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
-        <button v-if="!file.partial" class="btn btn-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
-        {% if option_download %}
-        <button v-if="file.orig_link" class="btn btn-secondary btn-sm m-1" @click="redownload(file.orig_link)">Download again (id={{ file.url_id }})</button>
-        {% endif %}
-        {% if option_move %}
-        <button v-if="!file.partial" class="btn btn-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
-        {% endif %}
-        <a v-if="file.orig_link" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
+        <div class="item-function align-self-end">
+            <div v-if="file.partial" class="partial bg-danger text-white d-inline-block p-2 mt-2">partial</div>
+            <button v-if="!file.partial" class="btn btn-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
+            {% if option_download %}
+            <button v-if="file.orig_link" class="btn btn-secondary btn-sm m-1" @click="redownload(file.orig_link)">Download again (id={{ file.url_id }})</button>
+            {% endif %}
+            {% if option_move %}
+            <button v-if="!file.partial" class="btn btn-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
+            {% endif %}
+            <a v-if="file.orig_link" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
+        </div>
     </div>
 </div>
