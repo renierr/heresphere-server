@@ -5,6 +5,7 @@ new Vue({
     data: {
         ...data,
         downloadProgress: {},
+        currentFileMove: null,
     },
     methods: {
         ...methods,
@@ -55,17 +56,19 @@ new Vue({
         copyToClipboard: function (event, text) {
             event.preventDefault();
             navigator.clipboard.writeText(text).then(() => {
-                this.showMessage('Copied to clipboard');
+                this.showMessage(`Copied '${text}' to clipboard`);
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
         },
         confirmMoveToLibrary(filename) {
-            if (confirm("Are you sure you want to move this file to the library?")) {
-                this.moveToLibrary(filename);
-            }
+            this.currentFileMove = filename;
+            const modal = new bootstrap.Modal(document.getElementById('moveLibraryConfirmModal'));
+            modal.show();
         },
         moveToLibrary(file) {
+            this.currentFileMove = null;
+            if (!file) return;
             fetch('/api/move_to_library', {
                 method: 'POST',
                 body: JSON.stringify({ video_path: file }),
