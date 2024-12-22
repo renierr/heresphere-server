@@ -11,6 +11,7 @@
     word-wrap: break-word;
     white-space: normal;
     word-break: break-all;
+    /* color: inherit; */
 }
 img.thumbnail {
     align-self: self-start;
