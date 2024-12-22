@@ -236,11 +236,11 @@ def download_progress(d):
 
     output = ''
     fname = os.path.splitext(os.path.basename(d['filename']))[0]
+    idnr, _ = find_url_info(fname)
     if d['status'] == 'downloading':
         if current_time - last_call_time < throttle_delay:
             return
         last_call_time = current_time
-        idnr, _ = find_url_info(fname)
         output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
     elif d['status'] == 'finished':
         output = f"Downloading...[{idnr}] - 100.0% complete: {fname}"
