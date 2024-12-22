@@ -12,7 +12,7 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
-    find_url_info, remove_ansi_codes
+    find_url_info, remove_ansi_codes, save_url_map
 from thumbnail import get_video_info, generate_thumbnail_for_path
 
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
@@ -220,6 +220,7 @@ def download_video(url, title):
         else:
             video_url = download_direct(url, download_progress, url_id, title)
         url_map[url_id]['video_url'] = video_url
+        save_url_map()
         generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
