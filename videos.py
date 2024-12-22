@@ -1,6 +1,7 @@
 import os
 import re
 import threading
+import time
 import traceback
 from collections import namedtuple
 
@@ -226,15 +227,23 @@ def download_video(url, title):
         logger.error(error_message)
         push_text_to_client(f"Download failed: {e}")
 
-
+last_call_time = 0
+throttle_delay = 1
 def download_progress(d):
+
+    global last_call_time
+    current_time = time.time()
+
     output = ''
     fname = os.path.splitext(os.path.basename(d['filename']))[0]
     if d['status'] == 'downloading':
+        if current_time - last_call_time < throttle_delay:
+            return
+        last_call_time = current_time
         idnr, _ = find_url_info(fname)
         output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
     elif d['status'] == 'finished':
-        output = f"Download completed: {fname}"
+        output = f"Download 100.0% complete: {fname}"
     push_text_to_client(output)
 
 
