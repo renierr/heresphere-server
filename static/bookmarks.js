@@ -4,11 +4,67 @@ new Vue({
     el: '#app',
     data: {
         bookmarks: [],
+        newBookmarkTitle: '',
+        newBookmarkUrl: '',
         serverOutput: '',
         loading: false,
     },
     methods: {
-        ...methods.showMessage,
+        showMessage: methods.showMessage,
+        fetchBookmarks() {
+            this.loading = true;
+            fetch('/api/bookmarks')
+                .then(response => response.json())
+                .then(data => {
+                    this.bookmarks = data;
+                    this.loading = false;
+                })
+                .catch(error => {
+                    this.showMessage('Error fetching bookmarks');
+                    console.error('There was an error fetching the bookmarks:', error);
+                    this.loading = false;
+                });
+        },
+        addBookmark() {
+            if (!this.newBookmarkTitle || !this.newBookmarkUrl) {
+                this.showMessage('Both title and URL are required.');
+                return;
+            }
+
+            const newBookmark = {
+                title: this.newBookmarkTitle,
+                url: this.newBookmarkUrl,
+            };
+            fetch('/api/bookmarks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newBookmark),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    this.newBookmarkTitle = '';
+                    this.newBookmarkUrl = '';
+                    this.fetchBookmarks();
+                })
+                .catch(error => {
+                    this.showMessage('Error adding bookmark');
+                    console.error('Error adding bookmark:', error);
+                });
+        },
+        deleteBookmark(url) {
+            fetch(`/api/bookmarks?url=${encodeURIComponent(url)}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(() => {
+                    this.bookmarks = this.bookmarks.filter(bookmark => bookmark.url !== url);
+                })
+                .catch(error => {
+                    console.error('Error deleting bookmark:', error);
+                });
+        },
     },
     computed: {
     },
@@ -16,17 +72,7 @@ new Vue({
     },
     mounted: function () {
         // fetch bookmarks
-        this.loading = true;
-        fetch('/api/bookmarks')
-            .then(response => response.json())
-            .then(data => {
-                this.bookmarks = data;
-                this.loading = false;
-            })
-            .catch(error => {
-                console.error('There was an error fetching the files:', error);
-                this.loading = false;
-            });
+        this.fetchBookmarks();
 
         const eventSource = new EventSource('/sse');
         const serverOutput = [];
