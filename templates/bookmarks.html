@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}HSServer - Library{% endblock %}
+
+{% block content %}
+    <h1>A List of Bookmarks</h1>
+    {% include "components/server_info.html" %}
+
+    <script type="module" src="/static/bookmarks.js"></script>
+{% endblock %}

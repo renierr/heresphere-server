@@ -77,6 +77,11 @@ def home():
 def library():
     return render_template('library.html')
 
+@app.route('/bookmarks')
+def bookmarks():
+    return render_template('bookmarks.html')
+
+
 @app.route('/cache')
 def cache_stats():
     return cache.get_all_cache_stats()
