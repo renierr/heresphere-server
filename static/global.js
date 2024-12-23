@@ -3,7 +3,6 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-bs-theme', theme);
 }
 
-// Load the stored theme on page load
 document.addEventListener('DOMContentLoaded', () => {
     const storedTheme = localStorage.getItem('theme');
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -19,6 +18,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTheme = themeToggle.checked ? 'dark' : 'light';
         applyTheme(newTheme);
         localStorage.setItem('theme', newTheme);
+    });
+
+    // scroll back to top button
+    const scrollButton = document.getElementById('scroll-to-top');
+    scrollButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            scrollButton.classList.remove('d-none');
+        } else {
+            scrollButton.classList.add('d-none');
+        }
     });
 });
 
