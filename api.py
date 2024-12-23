@@ -84,22 +84,35 @@ def parse_youtube_filename(filename):
 
 def extract_file_details(root, filename, base_path):
     realfile = os.path.join(root, filename)
-    thumbnail = get_thumbnail(realfile, ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
-    info = get_basic_save_video_info(realfile)
 
-    return {
+    if not os.path.exists(realfile):
+        return None
+
+    partial = filename.endswith('.part')
+    result = {
+        'partial': partial,
         'yt_id': None,
         'title': os.path.splitext(filename)[0],
-        'thumbnail': thumbnail,
         'filename': f"{base_path}/{filename}",
-        'created': info.created,
-        'filesize': info.size,
-        'width': info.width,
-        'height': info.height,
-        'duration': info.duration,
-        'resolution': info.resolution,
-        'stereo': info.stereo
     }
+    if partial:
+        result.update({
+            'created': os.path.getctime(realfile),
+        })
+    else:
+        thumbnail = get_thumbnail(realfile, ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
+        info = get_basic_save_video_info(realfile)
+        result.update({
+            'thumbnail': thumbnail,
+            'created': info.created,
+            'filesize': info.size,
+            'width': info.width,
+            'height': info.height,
+            'duration': info.duration,
+            'resolution': info.resolution,
+            'stereo': info.stereo
+        })
+    return result
 
 def list_files(directory='videos'):
     extracted_details = []
@@ -110,14 +123,16 @@ def list_files(directory='videos'):
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
         for filename in files:
+            # ignore part-Frag and ytdl files
+            if 'part-Frag' in filename or filename.endswith('.ytdl'):
+                continue
+
             common_details = extract_file_details(root, filename, base_path)
 
             # only for videos directory
             if directory == 'videos':
-                partial = filename.endswith('.part')
                 url_id, url_info = find_url_info(filename)
                 common_details.update({
-                    'partial': partial,
                     'url_id': url_id,
                     'orig_link': url_info['url'] if url_info and 'url' in url_info else None,
                     'video_url': url_info['video_url'] if url_info and 'video_url' in url_info else None,
