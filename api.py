@@ -1,3 +1,4 @@
+import json
 import math
 import os
 import shutil
@@ -39,6 +40,14 @@ def mtl():
         return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@api_bp.route('/api/bookmarks')
+def get_bookmarks():
+    try:
+        return jsonify(list_bookmarks())
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 def format_byte_size(size_bytes):
     """
@@ -198,3 +207,11 @@ def move_to_library(video_path):
     else:
         return {"success": False, "error": "Invalid video path"}
 
+
+def list_bookmarks():
+    bookmarks = []
+    bookmarks_file = os.path.join(get_static_directory(), 'bookmarks.json')
+    if os.path.exists(bookmarks_file):
+        with open(bookmarks_file, 'r') as f:
+            bookmarks = json.load(f)
+    return bookmarks

@@ -6,5 +6,23 @@
     <h1>A List of Bookmarks</h1>
     {% include "components/server_info.html" %}
 
+    {% include "components/loading.html" %}
+    <div v-else>
+        <div v-if="bookmarks.length === 0" class="card-body text-center">No Bookmarks present</div>
+        <ul class="list-group list-group-flush">
+            <li v-for="bookmark in bookmarks" :key="bookmark.url" class="list-group-item mb-2 border-1 p-1">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <a :href="bookmark.url" target="_blank">{{ bookmark.title }}</a>
+                        <p class="mb-0">{{ bookmark.url }}</p>
+                    </div>
+                    <div>
+                        <button @click="deleteBookmark(bookmark.url)" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
     <script type="module" src="/static/bookmarks.js"></script>
 {% endblock %}
