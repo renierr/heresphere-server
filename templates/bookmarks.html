@@ -7,11 +7,10 @@
     {% include "components/server_info.html" %}
 
     <div class="input-group mb-3">
-        <input type="text" v-model="newBookmarkTitle" placeholder="Enter bookmark title..." class="form-control">
-        <input type="text" v-model="newBookmarkUrl" placeholder="Enter bookmark URL..." class="form-control">
+        <input type="text" v-model="newBookmarkUrl" placeholder="Enter bookmark URL..." class="form-control me-2">
+        <input type="text" v-model="newBookmarkTitle" placeholder="Enter bookmark title..." class="form-control me-2">
         <div class="input-group-append">
-            <button @click="addBookmark" class="btn btn-primary">Add Bookmark</button>
-            <a href="/static/bookmarks.json" download="bookmarks.json" class="btn btn-secondary">Download All Bookmarks</a>
+            <button @click="saveBookmark" class="btn btn-primary">Save Bookmark</button>
         </div>
     </div>
 
@@ -25,12 +24,20 @@
                         <a :href="bookmark.url" target="_blank">{{ bookmark.title }}</a>
                         <p class="mb-0">{{ bookmark.url }}</p>
                     </div>
-                    <div>
-                        <button @click="deleteBookmark(bookmark.url)" class="btn btn-danger">Delete</button>
+                    <div class="ml-auto">
+                        <button @click="editBookmark(bookmark)" class="btn btn-secondary btn-sm m-1">Edit</button>
+                        <button @click="deleteBookmark(bookmark.url)" class="btn btn-danger btn-sm m-1">Delete</button>
                     </div>
                 </div>
             </li>
         </ul>
+    </div>
+
+    <div class="text-center mt-4">
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="#" @click.prevent="cacheClear" class="btn btn-warning">Clear all Caches</a>
+            <a href="/static/bookmarks.json" download="bookmarks.json" class="btn btn-secondary">Download All Bookmarks</a>
+        </div>
     </div>
 
     <script type="module" src="/static/bookmarks.js"></script>

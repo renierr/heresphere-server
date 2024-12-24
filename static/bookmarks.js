@@ -25,7 +25,11 @@ new Vue({
                     this.loading = false;
                 });
         },
-        addBookmark() {
+        editBookmark(bookmark) {
+            this.newBookmarkTitle = bookmark.title;
+            this.newBookmarkUrl = bookmark.url;
+        },
+        saveBookmark() {
             if (!this.newBookmarkTitle || !this.newBookmarkUrl) {
                 this.showMessage('Both title and URL are required.');
                 return;
