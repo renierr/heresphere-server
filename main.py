@@ -139,6 +139,13 @@ def start_server():
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
 
+    # we need ffmpeg and ffprobe check if it is available in path
+    logger.info("Checking for ffmpeg and ffprobe")
+    if os.system("ffmpeg -version") != 0 or os.system("ffprobe -version") != 0:
+        logger.error("ffmpeg or ffprobe is not available in path, can not run server")
+        return "ffmpeg is not available in path"
+
+
     static_dir = get_static_directory()
     if not os.path.exists(static_dir):
         logger.error("Static directory does not exist, can not run server")
