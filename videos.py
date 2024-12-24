@@ -20,15 +20,7 @@ from thumbnail import get_video_info, generate_thumbnail_for_path
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
 
 root_path = get_application_path()
-is_windows = os.name == 'nt'
-if is_windows:
-    ffmpeg_path = os.path.join(get_application_path(), 'ffmpeg_x64', 'ffmpeg.exe')
-    logger.debug(f"Windows detected, using ffmpeg binary from {ffmpeg_path}")
-else:
-    ffmpeg_path = None
-
 video_bp = Blueprint('video', __name__)
-
 
 @video_bp.route('/download', methods=['POST'])
 def download():
@@ -73,11 +65,6 @@ def filename_with_ext(filename, youtube=True):
     path = os.path.join(root_path, 'static', 'videos', 'youtube')
     if not youtube: path = os.path.join(root_path, 'static', 'videos', 'direct')
 
-    # Fix path for Windows Pyinstaller directory
-    if is_windows and '_internal' in root_path:
-        path = os.path.join(os.path.dirname(root_path), 'static', 'videos', 'youtube')
-        if not youtube: os.path.join(os.path.dirname(root_path), 'static', 'videos', 'direct')
-
     for file in os.listdir(path):
         basename, _ = os.path.splitext(file)
         if basename == filename:
@@ -115,9 +102,6 @@ def get_stream(url):
         'geturl': True,  # Output only the urls
         'impersonate': ImpersonateTarget('chrome'),
     }
-
-    if is_windows:
-        ydl_opts['ffmpeg_location'] = ffmpeg_path
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -164,9 +148,6 @@ def download_yt(url, progress_function, url_id):
         'updatetime': False,
     }
 
-    if is_windows:
-        ydl_opts['ffmpeg_location'] = ffmpeg_path
-
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
@@ -197,9 +178,6 @@ def download_direct(url, progress_function, url_id, title):
         'updatetime': False,
         'impersonate': ImpersonateTarget('chrome'),
     }
-
-    if is_windows:
-        ydl_opts['ffmpeg_location'] = ffmpeg_path
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
