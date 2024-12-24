@@ -233,7 +233,7 @@ def list_bookmarks():
     if os.path.exists(bookmarks_file):
         with open(bookmarks_file, 'r') as f:
             bookmarks = json.load(f)
-    return bookmarks
+    return sorted(bookmarks, key=lambda x: x['title'])
 
 def write_bookmarks(bookmarks):
     bookmarks_file = os.path.join(get_static_directory(), 'bookmarks.json')
