@@ -31,13 +31,15 @@ log_level = 'DEBUG' if is_debug() else 'INFO'
 logger.remove()
 logger.add(sys.stdout, level=log_level)
 
+# Global variables to store ffmpeg and ffprobe version information
+ffmpeg_version_info = None
+ffprobe_version_info = None
 
 # Hide Flask debug banner
 cli = sys.modules['flask.cli']
 cli.show_server_banner = lambda *x: None
 
 static_folder_path = get_static_directory()
-
 logger.debug(f"Static Folder Path: {static_folder_path}")
 
 app = Flask(__name__, static_folder=static_folder_path)
@@ -131,6 +133,8 @@ def cleanup_maps():
 
 
 def start_server():
+    global ffmpeg_version_info, ffprobe_version_info
+
     # Load url_map on startup
     load_url_map()
 
@@ -143,10 +147,10 @@ def start_server():
     # we need ffmpeg and ffprobe check if it is available in path
     logger.info("Checking for ffmpeg and ffprobe")
     try:
-        ffmpeg_output = subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
-        ffprobe_output = subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
-        logger.info(f"found ffmpeg: {ffmpeg_output}")
-        logger.info(f"found ffprobe: {ffprobe_output}")
+        ffmpeg_version_info = subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
+        ffprobe_version_info = subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
+        logger.info(f"found ffmpeg: {ffmpeg_version_info}")
+        logger.info(f"found ffprobe: {ffprobe_version_info}")
     except subprocess.CalledProcessError as e:
         logger.error(f"ffmpeg or ffprobe is not available in path, can not run server. Output: {e.output.decode()}")
         return "ffmpeg is not available in path"
