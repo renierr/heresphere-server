@@ -211,7 +211,6 @@ def move_to_library(video_path):
             return {"success": False, "error": f"Target exists in library: {base_name}"}
 
         # Move the video file
-        os.makedirs(os.path.dirname(library_path), exist_ok=True)
         shutil.move(real_path, library_path)
 
         # Move the thumbnails

@@ -139,6 +139,26 @@ def start_server():
     sys.stdout = open(os.devnull, 'w')
     sys.stderr = open(os.devnull, 'w')
 
+    static_dir = get_static_directory()
+    if not os.path.exists(static_dir):
+        logger.error("Static directory does not exist, can not run server")
+        return "Static directory does not exist"
+
+    # make sure library and video directory exists and if not create them
+    library_dir = os.path.join(static_dir, 'library')
+    if not os.path.exists(library_dir):
+        os.makedirs(library_dir, exist_ok=True)
+    video_dir = os.path.join(static_dir, 'videos')
+    if not os.path.exists(video_dir):
+        os.makedirs(video_dir, exist_ok=True)
+    # inside videos directory there should be a direct and a youtube directory
+    direct_dir = os.path.join(video_dir, 'direct')
+    if not os.path.exists(direct_dir):
+        os.makedirs(direct_dir, exist_ok=True)
+    youtube_dir = os.path.join(video_dir, 'youtube')
+    if not os.path.exists(youtube_dir):
+        os.makedirs(youtube_dir, exist_ok=True)
+
     # Get the server's IP address
     hostname = socket.gethostname()
     server_ip = socket.gethostbyname(hostname)
