@@ -11,6 +11,7 @@
         <input type="text" v-model="newBookmarkUrl" placeholder="Enter bookmark URL..." class="form-control">
         <div class="input-group-append">
             <button @click="addBookmark" class="btn btn-primary">Add Bookmark</button>
+            <a href="/static/bookmarks.json" download="bookmarks.json" class="btn btn-secondary">Download All Bookmarks</a>
         </div>
     </div>
 
