@@ -6,7 +6,6 @@ ffmpeg_x64
 dist
 build
 venv
-main.spec
 .venv
 .vscode
 .history
