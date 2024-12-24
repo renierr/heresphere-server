@@ -19,7 +19,7 @@ from thumbnail import get_video_info, generate_thumbnail_for_path
 
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
 
-root_path = os.path.dirname(os.path.abspath(__file__))
+root_path = get_application_path()
 is_windows = os.name == 'nt'
 if is_windows:
     ffmpeg_path = os.path.join(get_application_path(), 'ffmpeg_x64', 'ffmpeg.exe')
