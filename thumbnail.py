@@ -180,13 +180,16 @@ def generate_thumbnail(video_path, thumbnail_path):
                 break
         sbs_video = True if aspect_ratio == '2:1' else False
         crop_filter = "" if not sbs_video else "crop=in_w/2:in_h:0:0,"
+        clip_duration = 8
+        if midpoint + clip_duration > duration:
+            clip_duration = int((duration - midpoint - 1) if duration - midpoint - 1 > 0 else 1)
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
             execution_timelimit = 120
 
             logger.debug(f"Starting ffmpeg for webp")
-            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', '8', '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path]
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', str(clip_duration), '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'select=\'eq(pict_type\\,I)\',scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path]
             logger.debug(f"Running command: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
@@ -204,7 +207,7 @@ def generate_thumbnail(video_path, thumbnail_path):
                 return False
 
             logger.debug(f"Starting ffmpeg for webm")
-            cmd = ['ffmpeg', '-ss', str(midpoint), '-t', '8', '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm']
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-t', str(clip_duration), '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm']
             logger.debug(f"Running command: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
