@@ -13,3 +13,4 @@ main.spec
 *.tar
 .idea
 /url_map.json
+/static/bookmarks.json

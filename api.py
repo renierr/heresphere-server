@@ -5,6 +5,7 @@ import shutil
 
 from flask import Blueprint, jsonify, request
 from bus import push_text_to_client
+from cache import cache
 from thumbnail import get_thumbnail, ThumbnailFormat
 from globals import find_url_info, get_static_directory
 from videos import get_basic_save_video_info
@@ -41,12 +42,30 @@ def mtl():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@api_bp.route('/api/bookmarks')
-def get_bookmarks():
+@api_bp.route('/api/bookmarks', methods=['GET'])
+def gb():
     try:
         return jsonify(list_bookmarks())
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@api_bp.route('/api/bookmarks', methods=['POST'])
+def ab():
+    try:
+        data = request.get_json()
+        title = data.get("title")
+        url = data.get("url")
+        return jsonify(add_bookmark(data.get("title"),  data.get("url")))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@api_bp.route('/api/bookmarks', methods=['DELETE'])
+def db():
+    try:
+        return jsonify(delete_bookmark(request.args.get('url')))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 
 
 def format_byte_size(size_bytes):
@@ -207,7 +226,7 @@ def move_to_library(video_path):
     else:
         return {"success": False, "error": "Invalid video path"}
 
-
+@cache(maxsize=128, ttl=3600)
 def list_bookmarks():
     bookmarks = []
     bookmarks_file = os.path.join(get_static_directory(), 'bookmarks.json')
@@ -215,3 +234,31 @@ def list_bookmarks():
         with open(bookmarks_file, 'r') as f:
             bookmarks = json.load(f)
     return bookmarks
+
+def write_bookmarks(bookmarks):
+    bookmarks_file = os.path.join(get_static_directory(), 'bookmarks.json')
+    with open(bookmarks_file, 'w') as f:
+        json.dump(bookmarks, f)
+    list_bookmarks.cache__clear()
+
+def add_bookmark(title, url):#
+    if not title or not url:
+        return {"success": False, "error": "Title or URL missing"}
+
+    bookmarks = list_bookmarks()
+    bookmarks.append({"title": title, "url": url})
+    write_bookmarks(bookmarks)
+    return {"success": True, "message": "Bookmark added"}
+
+def delete_bookmark(url):
+    if not url:
+        return {"success": False, "error": "URL missing"}
+
+    bookmarks = list_bookmarks()
+    bookmarks = [b for b in bookmarks if b['url'] != url]
+    if len(bookmarks) == len(list_bookmarks()):
+        return {"success": False, "error": "Bookmark not found"}
+    else:
+        write_bookmarks(bookmarks)
+
+    return {"success": True, "message": "Bookmark deleted"}

@@ -36,5 +36,7 @@ README.md
 **/*.tar
 **/*.bat
 **/ffmpeg_x64
+**/url_map.json
+**/static/bookmarks.json
 
 
