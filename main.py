@@ -143,13 +143,15 @@ def start_server():
     # we need ffmpeg and ffprobe check if it is available in path
     logger.info("Checking for ffmpeg and ffprobe")
     try:
-        ffmpeg_output = subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT)
-        ffprobe_output = subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT)
-        logger.info(f"found ffmpeg: {ffmpeg_output.decode().split(r'\n')[0]}")
-        logger.info(f"found ffprobe: {ffprobe_output.decode().split(r'\n')[0]}")
+        ffmpeg_output = subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
+        ffprobe_output = subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
+        logger.info(f"found ffmpeg: {ffmpeg_output}")
+        logger.info(f"found ffprobe: {ffprobe_output}")
     except subprocess.CalledProcessError as e:
         logger.error(f"ffmpeg or ffprobe is not available in path, can not run server. Output: {e.output.decode()}")
         return "ffmpeg is not available in path"
+    except IndexError:
+        logger.error("Unexpected output format from ffmpeg or ffprobe.")
 
     static_dir = get_static_directory()
     if not os.path.exists(static_dir):
