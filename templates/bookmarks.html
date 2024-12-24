@@ -7,8 +7,14 @@
     {% include "components/server_info.html" %}
 
     <div class="input-group mb-3">
-        <input type="text" v-model="newBookmarkUrl" placeholder="Enter bookmark URL..." class="form-control me-2">
-        <input type="text" v-model="newBookmarkTitle" placeholder="Enter bookmark title..." class="form-control me-2">
+        <div class="form-floating mb-3">
+            <input type="text" v-model="newBookmarkUrl" class="form-control" id="floatingUrl" placeholder=" ">
+            <label for="floatingUrl" class="text-muted">Enter bookmark URL...</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" v-model="newBookmarkTitle" class="form-control" id="floatingTitle" placeholder=" ">
+            <label for="floatingTitle" class="text-muted">Enter bookmark title...</label>
+        </div>
         <div class="input-group-append">
             <button @click="saveBookmark" class="btn btn-primary">Save Bookmark</button>
         </div>

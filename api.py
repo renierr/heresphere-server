@@ -1,3 +1,4 @@
+import base64
 import json
 import math
 import os
@@ -50,19 +51,21 @@ def gb():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @api_bp.route('/api/bookmarks', methods=['POST'])
-def ab():
+def sb():
     try:
         data = request.get_json()
         title = data.get("title")
         url = data.get("url")
-        return jsonify(add_bookmark(data.get("title"),  data.get("url")))
+        return jsonify(save_bookmark(data.get("title"),  data.get("url")))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
 @api_bp.route('/api/bookmarks', methods=['DELETE'])
 def db():
     try:
-        return jsonify(delete_bookmark(request.args.get('url')))
+        encoded_url = request.args.get('url')
+        decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
+        return jsonify(delete_bookmark(decoded_url))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -241,12 +244,18 @@ def write_bookmarks(bookmarks):
         json.dump(bookmarks, f)
     list_bookmarks.cache__clear()
 
-def add_bookmark(title, url):#
+def save_bookmark(title, url):#
     if not title or not url:
         return {"success": False, "error": "Title or URL missing"}
 
     bookmarks = list_bookmarks()
-    bookmarks.append({"title": title, "url": url})
+    bookmark = next((b for b in bookmarks if b['url'] == url), None)
+
+    if bookmark:
+        bookmark['title'] = title
+    else:
+        bookmarks.append({"title": title, "url": url})
+
     write_bookmarks(bookmarks)
     return {"success": True, "message": "Bookmark added"}
 
@@ -254,9 +263,9 @@ def delete_bookmark(url):
     if not url:
         return {"success": False, "error": "URL missing"}
 
-    bookmarks = list_bookmarks()
-    bookmarks = [b for b in bookmarks if b['url'] != url]
-    if len(bookmarks) == len(list_bookmarks()):
+    bookmarks_before = list_bookmarks()
+    bookmarks = [b for b in bookmarks_before if b['url'] != url]
+    if len(bookmarks) == len(bookmarks_before):
         return {"success": False, "error": "Bookmark not found"}
     else:
         write_bookmarks(bookmarks)

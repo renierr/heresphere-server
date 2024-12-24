@@ -58,7 +58,12 @@ new Vue({
                 });
         },
         deleteBookmark(url) {
-            fetch(`/api/bookmarks?url=${encodeURIComponent(url)}`, {
+            if (!url) {
+                this.showMessage('URL is required.');
+                return;
+            }
+            const encodedUrl = btoa(url);
+            fetch(`/api/bookmarks?url=${encodeURIComponent(encodedUrl)}`, {
                 method: 'DELETE',
             })
                 .then(response => response.json())
