@@ -13,7 +13,7 @@ from waitress import serve
 from queue import Queue
 from threading import Event
 from loguru import logger
-from flask import Flask, Response, render_template, jsonify
+from flask import Flask, Response, render_template, jsonify, send_from_directory
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client
 from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
@@ -73,6 +73,10 @@ app.register_blueprint(thumbnail_bp)
 #     logger.info(f"Headers: {response.headers}")
 #     logger.info(f"Body: {response.get_data()}")
 #     return response
+
+@app.route('/favicon.png')
+def favicon():
+    return send_from_directory(app.static_folder, 'favicon.png', mimetype='image/png')
 
 @app.route('/')
 def home():
