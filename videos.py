@@ -218,6 +218,7 @@ def download_video(url, title):
                 push_text_to_client(f"File {fname} may already exists in library")
                 break
         save_url_map()
+        list_files.cache_clear()
         generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:

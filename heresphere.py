@@ -89,7 +89,6 @@ def generate_heresphere_json_item(server_path, file_base64):
     thumbnail_video = f"{server_path}{urllib.parse.quote(thumbnail_video_url)}"
 
     # get video info from the file
-    get_basic_save_video_info(real_path)
     info = get_basic_save_video_info(real_path)
     date_added = datetime.fromtimestamp(info.created).strftime('%Y-%m-%d')
 
