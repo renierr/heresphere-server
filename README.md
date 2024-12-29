@@ -10,6 +10,9 @@ Not officially endorsed by or affiliated with HereSphere.
 * Mac Users - Follow the instructions below on running the Python server from source.
 * Linux Users - Follow the instructions below on running the Python server from source.
 
+### pre requirements 
+You need to have ffmpeg and ffprobe installed and callable via path.
+
 # User Guide
 
 ## Step 1 - Setting the Link Server address
