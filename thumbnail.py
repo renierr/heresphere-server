@@ -7,7 +7,6 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from files import list_files
 from globals import is_debug, get_static_directory, get_real_path_from_url
 
 
@@ -135,7 +134,6 @@ def generate_thumbnails(library=False):
                     else:
                         thumbnail_errors.append(video_path)
 
-    list_files.cache_clear()
     push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails {'(' + str(len(thumbnail_errors)) + ' failed)' if thumbnail_errors else ''}")
     return {"success": True, "generated_thumbnails": generated_thumbnails}
 
@@ -284,7 +282,6 @@ def generate_thumbnail_for_path(video_path):
         return {"success": False, "error": "Video file does not exist"}
 
     success = generate_thumbnail(real_path, thumbnail_path)
-    list_files.cache_clear()
     push_text_to_client(f"Generate thumbnails finished for {base_name} with {'success' if success else 'failure'}")
     if success:
         return {"success": True, "message": f"Generate thumbnails finished for {base_name}" }
