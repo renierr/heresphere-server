@@ -247,6 +247,7 @@ def download_progress(d):
             if last_zero_percent == message:
                 return
             last_zero_percent = message
+            list_files.cache_clear()
         elif current_time - last_call_time < throttle_delay:
             return
         last_call_time = current_time
