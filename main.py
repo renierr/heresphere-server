@@ -109,12 +109,12 @@ def sse():
         client_remove(client_queue, stop_event)
 
     # send server time on first request
-    client_queue.put(f"data: SSE Connection to Server established: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}\n\n")
+    client_queue.put(f"SSE Connection to Server established at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}\n\n")
 
     # Send ffmpeg and ffprobe version information on first request
     if ffmpeg_version_info and ffprobe_version_info:
-        client_queue.put(f"data: Server uses ffmpeg: {ffmpeg_version_info}\n\n")
-        client_queue.put(f"data: Server uses ffprobe: {ffprobe_version_info}\n\n")
+        client_queue.put(f"Server uses ffmpeg: {ffmpeg_version_info}\n\n")
+        client_queue.put(f"Server uses ffprobe: {ffprobe_version_info}\n\n")
 
     response = Response(event_stream(client_queue, stop_event), mimetype="text/event-stream")
     response.call_on_close(cleanup)
