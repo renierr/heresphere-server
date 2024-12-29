@@ -6,7 +6,7 @@ Not officially endorsed by or affiliated with HereSphere.
 
 # Installation
 
-* Windows Users - Build a windows executable with the build_executable.py script. The generated files will be generated inside the dist folder.
+* Windows Users - Build a windows executable with the build_executable.py script. Follow the instructions below.
 * Mac Users - Follow the instructions below on running the Python server from source.
 * Linux Users - Follow the instructions below on running the Python server from source.
 
@@ -28,7 +28,9 @@ _Example LAN IP:_ `http://192.168.x.x:5000`
 
 ## Step 2 - Verifying Connectivity
 
-If you visit the link server URL in your browser, you should see an interface that lists all of the videos you have downloaded to the server directory. This list contains direct links and a filter option for easy browsing.
+If you visit the link server URL in your browser, you should see an interface that lists all of the videos you have downloaded to the server directory.    
+This list contains direct links and a filter option for easy browsing.    
+And alot more....
 
 ## Step 3 - Streaming & Downloading
 
@@ -41,20 +43,25 @@ Internally the tool uses yt-dlp, so [any site that is supported by yt-dlp](https
 
 ### Streaming
 
-Inside the internal web Browser in HereSphere go to the Video you like to watch. Normally the place where the Browser player wants to start the Video.
-Click in the link server Symbol (first icon on the left from the browser URL)
+Inside the internal web Browser in HereSphere go to the Video you like to watch.     
+Normally the place where the Browser player wants to start the Video.
 
-HereSphere will conntact the link server with the current URL and the server will figure out the stream URL and send it back to HereSphere to play the stream.
-If all goes right, the video should start playing. If nothing happens either the link server is not running or misconfigured or the URL ist not supported.
+Click the link server Symbol (first icon on the left from the browser URL)
 
+HereSphere will conntact the link server with the current URL.    
+The server will figure out the stream URL and send it back to HereSphere for playback.
+
+If all goes right, the video should start playing.     
+If nothing happens either the link server is not running or misconfigured or the URL ist not supported.
 
 
 ### Downloading
 
-You can try to download the current playing video by pressing the download button in the HereSphere UI.
-B pressing download in HereSpher UI, the current playing URL is send to the link server for download in the background.
+You can try to download the current playing video by pressing the download button from the HereSphere UI.
 
-You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000`.
+By pressing download in HereSpher UI, the current playing URL is send to the link server for download in the background.
+
+You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000`.     
 Or see the progress of the download.
 
 # Running from source
@@ -248,4 +255,28 @@ Response:
     "url": "/static/videos/youtube/zd7UqsWydaM___360_Shark_Megalodon_Bites_The_Ship_The_Largest_Shark_In_The_World_Vr_360_Video___3840x2160.webm"
 }
 ```
-All this can also be done in the Server interface.
+
+## Server Interface 
+
+is reachable on the URL provided during startup of the server.    
+typically http://127.0.0.1:5000
+
+All the mentioned curl commands can also be done in the Server interface.
+
+And a lot more.
+* thumbnails with small previews
+* Video file information
+* delete downloads
+* move to library (separat folder on Server)
+* Server information with current download progress
+* .....
+
+## optimized view for HereSphere
+
+HereSphere has a nice own API and optimized UI for browsing the Videos from a Server, like this one.
+
+By navigating to the Server inside the HereSphere browser and pressing the link server icon.      
+The server will provide a special JSON for HereSphere to visualize the files on the server.
+
+the endpoint is http://127.0.0.1:5000/heresphere
+
