@@ -20,17 +20,12 @@ For Steam users, this will be the localhost URL, `http://localhost:5000`.
 
 For Quest users, this will be the LAN IP of your device. The server will attempt to find the LAN IP of your device and present you with a URL.
 
-It will also list every network adapter found on the device and provide a URL for each one.
-
-Typically the wireless or ethernet adapter will be listed first and will be the correct choice.
-
+On Server start you get an information where your Server is listening.
 _Example LAN IP:_ `http://192.168.x.x:5000`
 
 ## Step 2 - Verifying Connectivity
 
 If you visit the link server URL in your browser, you should see an interface that lists all of the videos you have downloaded to the server directory. This list contains direct links and a filter option for easy browsing.
-
-This will later be improved to integrate the HereSphere API as well as a proper queueing system for downloads.
 
 ## Step 3 - Streaming & Downloading
 
@@ -42,10 +37,11 @@ Internally the tool uses yt-dlp, so [any site that is supported by yt-dlp](https
 
 
 ### Streaming
-Inside the internal web Browser in HereSphere go to the Video you like to watch. Normally the place where to player wants to start the Video.
+
+Inside the internal web Browser in HereSphere go to the Video you like to watch. Normally the place where the Browser player wants to start the Video.
 Click in the link server Symbol (first icon on the left from the browser URL)
 
-HereSphere will conntact the link server with the current URL and the server will figure lut the stream URL and send it back to HereSphere to play the stream.
+HereSphere will conntact the link server with the current URL and the server will figure out the stream URL and send it back to HereSphere to play the stream.
 If all goes right, the video should start playing. If nothing happens either the link server is not running or misconfigured or the URL ist not supported.
 
 
@@ -53,7 +49,7 @@ If all goes right, the video should start playing. If nothing happens either the
 ### Downloading
 
 You can try to download the current playing video by pressing the download button in the HereSphere UI.
-The current playing URL is send to the link server for download in the background.
+B pressing download in HereSpher UI, the current playing URL is send to the link server for download in the background.
 
 You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000`.
 Or see the progress of the download.
