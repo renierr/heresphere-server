@@ -34,27 +34,29 @@ This will later be improved to integrate the HereSphere API as well as a proper 
 
 ## Step 3 - Streaming & Downloading
 
-There are two options available with the server, you must set the link server address to reflect which option you want to use.
+You must set the link server address to use the stream or download options provided by HereSpherere.
 
-The options are `http://<Link Server Address>:5000/stream` and `http://<Link Server Address>:5000/download`.
+Set the link server in the HereSphere UI to your server and port `http://<Link Server Address>:5000`.
 
 Internally the tool uses yt-dlp, so [any site that is supported by yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) will work for streaming and downloading.
 
+
 ### Streaming
+Inside the internal web Browser in HereSphere go to the Video you like to watch. Normally the place where to player wants to start the Video.
+Click in the link server Symbol (first icon on the left from the browser URL)
 
-Set the link server address to `http://<Link Server Address>:5000/stream`.
+HereSphere will conntact the link server with the current URL and the server will figure lut the stream URL and send it back to HereSphere to play the stream.
+If all goes right, the video should start playing. If nothing happens either the link server is not running or misconfigured or the URL ist not supported.
 
-If the link server is set to download, the server will first download the video to your local machine, and once complete return a stream URL to HereSphere.
 
-Depending on the size of the video, this may take a few seconds or minutes. You can monitor the download progress in the server console.
-
-You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000`.
 
 ### Downloading
 
-Set the link server address to `http://<Link Server Address>:5000/download`.
+You can try to download the current playing video by pressing the download button in the HereSphere UI.
+The current playing URL is send to the link server for download in the background.
 
 You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000`.
+Or see the progress of the download.
 
 # Running from source
 
