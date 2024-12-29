@@ -218,6 +218,7 @@ def download_video(url, title):
         push_text_to_client(f"Download failed: {e}")
 
 last_call_time = 0
+last_zero_percent = ''
 throttle_delay = 1
 def download_progress(d):
 
@@ -228,10 +229,19 @@ def download_progress(d):
     fname = os.path.splitext(os.path.basename(d['filename']))[0]
     idnr, _ = find_url_info(fname)
     if d['status'] == 'downloading':
-        if current_time - last_call_time < throttle_delay:
+        # Throttle the output to prevent spamming the client - let 0.0% through to indicate new file download
+        percent = remove_ansi_codes(d.get('_percent_str', ''))
+        message = f"Downloading...[{idnr}] - {percent} complete"
+        logger.debug(message)
+        if ' 0.0%' in percent:
+            global last_zero_percent
+            if last_zero_percent == message:
+                return
+            last_zero_percent = message
+        elif current_time - last_call_time < throttle_delay:
             return
         last_call_time = current_time
-        output = f"Downloading...[{idnr}] - {remove_ansi_codes(d['_percent_str'])} complete at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
+        output = f"{message} at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
     elif d['status'] == 'finished':
         output = f"Downloading...[{idnr}] - 100.0% complete: {fname}"
     push_text_to_client(output)
