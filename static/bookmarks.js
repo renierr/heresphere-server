@@ -63,7 +63,8 @@ new Vue({
                 this.showMessage('URL is required.');
                 return;
             }
-            const encodedUrl = btoa(url);
+            const utf8Bytes = new TextEncoder().encode(file);
+            const encodedUrl = btoa(String.fromCharCode(...utf8Bytes));
             fetch(`/api/bookmarks?url=${encodeURIComponent(encodedUrl)}`, {
                 method: 'DELETE',
             })

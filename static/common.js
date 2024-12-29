@@ -180,13 +180,14 @@ export const methods = {
             return;
         }
         const file = confData.file;
-        const encodedUrl = btoa(file);
+        const utf8Bytes = new TextEncoder().encode(file);
+        const encodedUrl = btoa(String.fromCharCode(...utf8Bytes));
         this.confirmData = {};
         fetch(`/api/files?url=${encodeURIComponent(encodedUrl)}`, {
             method: 'DELETE',
         })
             .then(response => response.json())
-            .then(() => {
+            .then((data) => {
                 this.serverResult = data;
                 this.fetchFiles();
             })
