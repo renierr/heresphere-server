@@ -129,132 +129,31 @@ Run the server
 python3 main.py
 ```
 
-## Building Windows binary
 
-The Windows distributable is built with Pyinstaller.
+## Building Windows Binary
 
-1. Install Pyinstaller:
+To build the Windows distributable with PyInstaller:
 
-```bash
-pip install pyinstaller
-```
+1. Install PyInstaller:
 
-2. Run the helper python script:
+    ```bash
+    pip install pyinstaller
+    ```
 
-```bash
- python3 .\build_executable.py
- ```
+2. Run the helper script:
 
-3. Generated binary and needed files are located inside the ./dist folder.
+    ```bash
+    python3 .\build_executable.py
+    ```
 
-
-
-### Connection Test
-
-Used to verify that the HereSphere client can reach the server
-
-```bash
-curl --location 'localhost:5000/connection_test'
-```
-
-Response:
-
-```json
-{
-    "success": true
-}
-```
-
-### Get stream URL:
-
-**Youtube Streams**
-
-Youtube videos will return both a `videoUrl` and an `audioUrl`
-
-```bash
-curl --location 'localhost:5000/stream' \
---header 'Content-Type: application/json' \
---data '{
-    "url": "https://www.youtube.com/watch?v=zd7UqsWydaM",
-}'
-```
-
-Response:
-
-**Other Sites**
-
-Any site that is in the [yt-dlp supported sites list](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) will be accepted.
-
-Most other sites will only return a `videoUrl``
-
-```bash
-curl --location 'localhost:5000/stream' \
---header 'Content-Type: application/json' \
---data '{
-    "url": "https://www.adultswim.com/videos/dr-stone/last-man-standing"
-}'
-````
-
-```json
-{
-    "audioUrl": null,
-    "success": true,
-    "videoUrl": "https://tve-vod-aka.warnermediacdn.com/adultswim/3cbf4094adea04217dd1750ab1101604/layer7/layer7_bk.m3u8?hdntl=exp=1707221031~acl=%2fadultswim%2f3cbf4094adea04217dd1750ab1101604%2f*~hmac=0cd211dfc01f28416fc97b50aec0f79aff4e8c4890a295ba0ed22799a429be3b"
-}
-```
-
-### Download video
-
-Passing a `url` parameter will download the video and provide a local URL.
-
-If the URL is not a direct link to a video file, it must be a site that is in the [yt-dlp supported sites list](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md).
-
-**Downloading a direct video link**
-
-```bash
-curl --location 'localhost:5000/download' \
---header 'Content-Type: application/json' \
---data '{
-    "url": "https://f005.backblazeb2.com/file/zetaphor-vr-content/test_video.webm"
-}'
-```
-
-Response:
-
-```json
-{
-    "videoUrl": "http://<local ip>:5000/static/videos/direct/test_video___test_video.webm",
-    "success": true,
-    "url": "/static/videos/direct/test_video___test_video.webm"
-}
-```
-
-**Downloading a Youtube video**
-
-```bash
-curl --location 'localhost:5000/download' \
---header 'Content-Type: application/json' \
---data '{
-    "url": "https://www.youtube.com/watch?v=zd7UqsWydaM"
-}'
-```
-
-Response:
-
-```json
-{
-    "videoUrl": "http://<local ip>:5000/static/videos/youtube/zd7UqsWydaM___360_Shark_Megalodon_Bites_The_Ship_The_Largest_Shark_In_The_World_Vr_360_Video___3840x2160.webm",
-    "success": true,
-    "url": "/static/videos/youtube/zd7UqsWydaM___360_Shark_Megalodon_Bites_The_Ship_The_Largest_Shark_In_The_World_Vr_360_Video___3840x2160.webm"
-}
-```
+3. The generated binary and necessary files will be located in the `./dist` folder.
 
 
 ## Server Interface
 
 The server interface is reachable on the URL provided during startup of the server, typically `http://127.0.0.1:5000`.
 
-All the mentioned `curl` commands can also be executed in the server interface.
+Here you can Browse and Download videos from the server.
 
 Additionally, the server interface provides:
 * Thumbnails with small previews
