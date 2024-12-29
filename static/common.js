@@ -13,7 +13,6 @@ export const data = {
     pageSize: 10,
     totalItems: 0,
     totalSize: 0,
-    currentFile: null,
     confirmData: {},
 };
 
@@ -165,7 +164,6 @@ export const methods = {
         toast.show();
     },
     confirmDeleteFile(filename) {
-        this.currentFile = filename;
         this.confirmData = {
             title: 'Delete file',
             message: `Are you sure you want to delete the following file?`,
