@@ -85,7 +85,6 @@ export const methods = {
     },
     fetchFiles: debounce(function (library=false) {
             console.log('Fetching files');
-            const scrollPosition = window.scrollY;
             this.loading = true;
             const url = library ? '/api/library/list' : '/api/list';
             fetch(url)
@@ -98,7 +97,6 @@ export const methods = {
                 .then(data => {
                     this.files = data;
                     this.loading = false;
-                    setTimeout(() => window.scrollTo(0, scrollPosition));
                 })
                 .catch(error => {
                     console.error('There was an error fetching the files:', error);
