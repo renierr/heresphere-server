@@ -1,68 +1,61 @@
 # HereSphere Server
 
-A server to allow HereSphere to view YouTube videos and [any other site supported by yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md). Also supports downloading any viewed videos yt-dlp supported links or direct video file links.
+A server to allow HereSphere to view YouTube videos and [any other site supported by yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md). Also supports downloading any viewed videos from yt-dlp supported links or direct video file links.
 
-Not officially endorsed by or affiliated with HereSphere.
+_Not officially endorsed by or affiliated with HereSphere._
 
-# Installation
+## Installation
 
-* Windows Users - Build a windows executable with the build_executable.py script. Follow the instructions below.
-* Mac Users - Follow the instructions below on running the Python server from source.
-* Linux Users - Follow the instructions below on running the Python server from source.
+- **Windows Users**: Build a Windows executable with the `build_executable.py` script. Follow the instructions below.
+- **Mac Users**: Follow the instructions below on running the Python server from source.
+- **Linux Users**: Follow the instructions below on running the Python server from source.
 
-### pre requirements 
-You need to have ffmpeg and ffprobe installed and callable via path.
+### Pre-requirements
 
-# User Guide
+You need to have `ffmpeg` and `ffprobe` installed and callable via path.
 
-## Step 1 - Setting the Link Server address
+## User Guide
+
+### Step 1 - Setting the Link Server Address
 
 Start the server. Load the HereSphere web browser and click the cog wheel to open the settings. In the `Link Server` field, enter the URL you were given from the server window.
 
-For Steam users, this will be the localhost URL, `http://localhost:5000`.
+- For Steam users, this will be the localhost URL: `http://localhost:5000`.
+- For Quest users, this will be the LAN IP of your device. The server will attempt to find the LAN IP of your device and present you with a URL.
 
-For Quest users, this will be the LAN IP of your device. The server will attempt to find the LAN IP of your device and present you with a URL.
-
-On Server start you get an information where your Server is listening.
+On server start, you get information on where your server is listening.
 _Example LAN IP:_ `http://192.168.x.x:5000`
 
-## Step 2 - Verifying Connectivity
+### Step 2 - Verifying Connectivity
 
-If you visit the link server URL in your browser, you should see an interface that lists all of the videos you have downloaded to the server directory.    
-This list contains direct links and a filter option for easy browsing.    
-And alot more....
+If you visit the link server URL in your browser, you should see an interface that lists all of the videos you have downloaded to the server directory. This list contains direct links and a filter option for easy browsing.
 
-## Step 3 - Streaming & Downloading
+### Step 3 - Streaming & Downloading
 
-You must set the link server address to use the stream or download options provided by HereSpherere.
+You must set the link server address to use the stream or download options provided by HereSphere.
 
-Set the link server in the HereSphere UI to your server and port `http://<Link Server Address>:5000`.
+Set the link server in the HereSphere UI to your server and port: `http://<Link Server Address>:5000`.
 
-Internally the tool uses yt-dlp, so [any site that is supported by yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) will work for streaming and downloading.
+Internally, the tool uses yt-dlp, so [any site that is supported by yt-dlp](https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md) will work for streaming and downloading.
 
+#### Streaming
 
-### Streaming
+Inside the internal web browser in HereSphere, go to the video you want to watch. Normally, the place where the browser player wants to start the video.
 
-Inside the internal web Browser in HereSphere go to the Video you like to watch.     
-Normally the place where the Browser player wants to start the Video.
+Click the link server symbol (first icon on the left from the browser URL).
 
-Click the link server Symbol (first icon on the left from the browser URL)
+HereSphere will contact the link server with the current URL. The server will figure out the stream URL and send it back to HereSphere for playback.
 
-HereSphere will conntact the link server with the current URL.    
-The server will figure out the stream URL and send it back to HereSphere for playback.
+If all goes right, the video should start playing. If nothing happens, either the link server is not running or misconfigured, or the URL is not supported.
 
-If all goes right, the video should start playing.     
-If nothing happens either the link server is not running or misconfigured or the URL ist not supported.
-
-
-### Downloading
+#### Downloading
 
 You can try to download the current playing video by pressing the download button from the HereSphere UI.
 
-By pressing download in HereSpher UI, the current playing URL is send to the link server for download in the background.
+By pressing download in the HereSphere UI, the current playing URL is sent to the link server for download in the background.
 
-You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000`.     
-Or see the progress of the download.
+You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000` or see the progress of the download.
+
 
 # Running from source
 
@@ -154,7 +147,7 @@ pip install pyinstaller
 
 3. Generated binary and needed files are located inside the ./dist folder.
 
-   
+
 
 ### Connection Test
 
@@ -256,27 +249,25 @@ Response:
 }
 ```
 
-## Server Interface 
 
-is reachable on the URL provided during startup of the server.    
-typically http://127.0.0.1:5000
+## Server Interface
 
-All the mentioned curl commands can also be done in the Server interface.
+The server interface is reachable on the URL provided during startup of the server, typically `http://127.0.0.1:5000`.
 
-And a lot more.
-* thumbnails with small previews
+All the mentioned `curl` commands can also be executed in the server interface.
+
+Additionally, the server interface provides:
+* Thumbnails with small previews
 * Video file information
-* delete downloads
-* move to library (separat folder on Server)
+* Delete downloads
+* Move to library (separate folder on the server)
 * Server information with current download progress
-* .....
+* And more...
 
-## optimized view for HereSphere
+## Optimized View for HereSphere
 
-HereSphere has a nice own API and optimized UI for browsing the Videos from a Server, like this one.
+HereSphere has its own API and optimized UI for browsing the videos from a server like this one.
 
-By navigating to the Server inside the HereSphere browser and pressing the link server icon.      
-The server will provide a special JSON for HereSphere to visualize the files on the server.
+By navigating to the server inside the HereSphere browser and pressing the link server icon, the server will provide a special JSON for HereSphere to visualize the files on the server.
 
-the endpoint is http://127.0.0.1:5000/heresphere
-
+The endpoint is `http://127.0.0.1:5000/heresphere`.
