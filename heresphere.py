@@ -4,10 +4,9 @@ import os
 import urllib.parse
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from api import list_files
+from files import list_files, get_basic_save_video_info
 from globals import get_static_directory
 from thumbnail import ThumbnailFormat, get_thumbnails
-from videos import get_basic_save_video_info
 
 heresphere_bp = Blueprint('heresphere', __name__)
 

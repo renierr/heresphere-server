@@ -3,7 +3,6 @@ import re
 import threading
 import time
 import traceback
-from collections import namedtuple
 
 import yt_dlp
 from datetime import datetime
@@ -11,13 +10,11 @@ from flask import Blueprint, request, jsonify
 from loguru import logger
 from yt_dlp import ImpersonateTarget
 
+from files import list_files
 from bus import push_text_to_client
-from cache import cache
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
     find_url_info, remove_ansi_codes, save_url_map
-from thumbnail import get_video_info, generate_thumbnail_for_path
-
-VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
+from thumbnail import generate_thumbnail_for_path
 
 root_path = get_application_path()
 video_bp = Blueprint('video', __name__)
@@ -195,7 +192,7 @@ def download_video(url, title):
     if url_id is None:
         url_id = get_url_counter()
         increment_url_counter()
-        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None,
+        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'may_exist': False,
                            'title': title,
                            'downloaded_date': int(datetime.now().timestamp())}
     else:
@@ -211,6 +208,15 @@ def download_video(url, title):
         url_map[url_id]['video_url'] = video_url
         save_url_map()
         generate_thumbnail_for_path(video_url)
+        # try to figure out if file was already downloaded and filename is in library
+        files = list_files(directory='library')
+        url_info = url_map[url_id]
+        for file in files:
+            fname = file.get('filename')
+            if fname and fname in url_info.get('filename'):
+                url_info.update({'may_exist': True})
+                logger.info(f"File {fname} may already exists in library")
+                break
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
@@ -246,25 +252,4 @@ def download_progress(d):
         output = f"Downloading...[{idnr}] - 100.0% complete: {fname}"
     push_text_to_client(output)
 
-
-@cache(maxsize=512)
-def get_basic_save_video_info(filename):
-    size = os.path.getsize(filename)
-    created = os.path.getctime(filename)
-    video_info = get_video_info(filename)
-    if video_info is not None:
-        duration = int(float(video_info['format'].get('duration', 0))) if 'format' in video_info else 0
-        width = video_info['streams'][0].get('width', 0) if 'streams' in video_info and len(
-            video_info['streams']) > 0 else 0
-        height = video_info['streams'][0].get('height', 0) if 'streams' in video_info and len(
-            video_info['streams']) > 0 else 0
-        resolution = max(width, height)
-        stereo = 'sbs' if width / height == 2 else ''
-    else:
-        duration = 0
-        width = 0
-        height = 0
-        resolution = 0
-        stereo = ''
-    return VideoInfo(created, size, duration, width, height, resolution, stereo)
 
