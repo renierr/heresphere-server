@@ -17,6 +17,7 @@
             <p v-if="file.duration"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
         </div>
         <div class="item-function align-self-end w-100 text-end">
+            <div v-if="file.may_exist" class="partial bg-warning d-inline-block p-2 mt-2 w-100 text-center rounded">File with similar Name already found in library</div>
             <div v-if="file.partial" class="partial bg-danger d-inline-block p-2 mt-2 w-100 text-center rounded">Partial file - download maybe in progress</div>
             <a v-if="file.orig_link" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
             {% if option_download %}
