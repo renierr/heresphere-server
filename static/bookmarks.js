@@ -8,6 +8,7 @@ new Vue({
         newBookmarkUrl: '',
         serverOutput: '',
         loading: false,
+        confirmData: {},
     },
     methods: {
         showMessage: methods.showMessage,
