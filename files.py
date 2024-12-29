@@ -154,7 +154,7 @@ def move_to_library(video_path):
                     shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
 
 
-        list_files.cache_clear()
+        list_files.cache__clear()
         push_text_to_client(f"File moved to library: {base_name}")
         return {"success": True, "library_path": library_path}
     else:
@@ -182,6 +182,6 @@ def delete_file(url):
             if os.path.exists(thumbnail_path):
                 os.remove(thumbnail_path)
     os.remove(real_path)
-    list_files.cache_clear()
+    list_files.cache__clear()
     push_text_to_client(f"File deleted: {base_name}")
     return {"success": True, "message": f"File {base_name} deleted"}
