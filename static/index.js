@@ -5,7 +5,6 @@ new Vue({
     data: {
         ...data,
         downloadProgress: {},
-        currentFileMove: null,
     },
     methods: {
         ...methods,
@@ -75,13 +74,24 @@ new Vue({
             });
         },
         confirmMoveToLibrary(filename) {
-            this.currentFileMove = filename;
-            const modal = new bootstrap.Modal(document.getElementById('moveLibraryConfirmModal'));
+            this.currentFile = filename;
+            this.confirmData = {
+                title: 'Move file',
+                message: `Are you sure you want to move the following file?`,
+                file: filename,
+                submit: 'Move',
+                action: this.moveToLibrary,
+            }
+            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
             modal.show();
         },
-        moveToLibrary(file) {
-            this.currentFileMove = null;
-            if (!file) return;
+        moveToLibrary(confData) {
+            if (!confData && !confData.file) {
+                this.showMessage('Wrong number of parameters for deleteFile');
+                return;
+            }
+            const file = confData.file;
+            this.confirmData = {};
             fetch('/api/move_to_library', {
                 method: 'POST',
                 body: JSON.stringify({ video_path: file }),

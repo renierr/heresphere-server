@@ -257,3 +257,4 @@ def get_basic_save_video_info(filename):
         resolution = 0
         stereo = ''
     return VideoInfo(created, size, duration, width, height, resolution, stereo)
+

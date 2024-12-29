@@ -25,7 +25,9 @@
             <button v-if="!file.partial" class="btn btn-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
             {% if option_move %}
             <button v-if="!file.partial" class="btn btn-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
+            <button @click="confirmDeleteFile(file.filename)" class="btn btn-danger btn-sm m-1">Delete</button>
             {% endif %}
+
         </div>
     </div>
 </div>

@@ -13,6 +13,8 @@ export const data = {
     pageSize: 10,
     totalItems: 0,
     totalSize: 0,
+    currentFile: null,
+    confirmData: {},
 };
 
 function debounce(func, wait) {
@@ -161,6 +163,38 @@ export const methods = {
         toastMessage.textContent = message;
         const toast = new bootstrap.Toast(toastElement);
         toast.show();
+    },
+    confirmDeleteFile(filename) {
+        this.currentFile = filename;
+        this.confirmData = {
+            title: 'Delete file',
+            message: `Are you sure you want to delete the following file?`,
+            file: filename,
+            submit: 'Delete',
+            action: this.deleteFile,
+        }
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+    },
+    deleteFile(confData) {
+        if (!confData && !confData.file) {
+            this.showMessage('Wrong number of parameters for deleteFile');
+            return;
+        }
+        const file = confData.file;
+        const encodedUrl = btoa(file);
+        this.confirmData = {};
+        fetch(`/api/files?url=${encodeURIComponent(encodedUrl)}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(() => {
+                this.serverResult = data;
+                this.fetchFiles();
+            })
+            .catch(error => {
+                console.error('Error deleting bookmark:', error);
+            });
     },
 
 };

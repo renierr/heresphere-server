@@ -73,3 +73,21 @@ def get_static_directory():
 def remove_ansi_codes(text):
     ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', text)
+
+def get_real_path_from_url(url):
+    if not url:
+        return None
+
+    static_dir = get_static_directory()
+    if '/static/library/' in url:
+        relative_path = url.replace('/static/library/', '')
+        real_path = os.path.join(static_dir, 'library', relative_path)
+    else:
+        relative_path = url.replace('/static/videos/', '')
+        real_path = os.path.join(static_dir, 'videos', relative_path)
+
+    real_path = os.path.normpath(real_path)
+    if not os.path.exists(real_path):
+        return None
+
+    return real_path

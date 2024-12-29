@@ -8,7 +8,7 @@ from flask import Blueprint, jsonify, request
 from bus import push_text_to_client
 from cache import cache
 from thumbnail import get_thumbnail, ThumbnailFormat
-from globals import find_url_info, get_static_directory
+from globals import find_url_info, get_static_directory, get_real_path_from_url
 from videos import get_basic_save_video_info
 
 api_bp = Blueprint('api', __name__)
@@ -69,6 +69,14 @@ def db():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
+@api_bp.route('/api/files', methods=['DELETE'])
+def df():
+    try:
+        encoded_url = request.args.get('url')
+        decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
+        return jsonify(delete_file(decoded_url))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 def format_byte_size(size_bytes):
@@ -216,15 +224,15 @@ def move_to_library(video_path):
         # Move the thumbnails
         thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
         if os.path.exists(thumbnail_dir):
-            for ext in ['.thumb.webp', '.thumb.jpg', '.thumb.webm']:
-                thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{ext}")
+            for fmt in ThumbnailFormat:
+                thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
                 if os.path.exists(thumbnail_path):
                     library_thumbnail_dir = os.path.join(os.path.dirname(library_path), '.thumb')
                     os.makedirs(library_thumbnail_dir, exist_ok=True)
-                    shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{ext}"))
+                    shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
 
 
-
+        push_text_to_client(f"File moved to library: {base_name}")
         return {"success": True, "library_path": library_path}
     else:
         return {"success": False, "error": "Invalid video path"}
@@ -271,3 +279,27 @@ def delete_bookmark(url):
         write_bookmarks(bookmarks)
 
     return {"success": True, "message": "Bookmark deleted"}
+
+def delete_file(url):
+    if not url:
+        return {"success": False, "error": "URL missing"}
+
+    # only allow delete from videos directory
+    if not '/static/videos/' in url:
+        return {"success": False, "error": "Invalid URL"}
+
+    real_path = get_real_path_from_url(url)
+    if not real_path:
+        return {"success": False, "error": "File not found"}
+
+    # delete the file and thumbnails
+    base_name = os.path.basename(real_path)
+    thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
+    if os.path.exists(thumbnail_dir):
+        for fmt in ThumbnailFormat:
+            thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
+            if os.path.exists(thumbnail_path):
+                os.remove(thumbnail_path)
+    os.remove(real_path)
+    push_text_to_client(f"File deleted: {base_name}")
+    return {"success": True, "message": f"File {base_name} deleted"}
