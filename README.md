@@ -139,13 +139,15 @@ The Windows distributable is built with Pyinstaller.
 pip install pyinstaller
 ```
 
-2. Run Pyinstaller, making sure to keep the .env file separated:
+2. Run the helper python script:
 
 ```bash
- pyinstaller .\main.py
+ python3 .\build_executable.py
  ```
 
-3. Copy the [ffmpeg binaries](https://github.com/yt-dlp/FFmpeg-Builds#ffmpeg-static-auto-builds) to `C:\Users\zetap\Code\heresphere-server\dist\main\_internal\ffmpeg_x64`.
+3. Generated binary and needed files are located inside the ./dist folder.
+
+   
 
 ### Connection Test
 
@@ -246,3 +248,4 @@ Response:
     "url": "/static/videos/youtube/zd7UqsWydaM___360_Shark_Megalodon_Bites_The_Ship_The_Largest_Shark_In_The_World_Vr_360_Video___3840x2160.webm"
 }
 ```
+All this can also be done in the Server interface.
