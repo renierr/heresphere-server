@@ -6,7 +6,7 @@ Not officially endorsed by or affiliated with HereSphere.
 
 # Installation
 
-* Windows Users - Download the latest release from [the releases page](https://github.com/Zetaphor/heresphere-server/releases).
+* Windows Users - Build a windows executable with the build_executable.py script. The generated files will be generated inside the dist folder.
 * Mac Users - Follow the instructions below on running the Python server from source.
 * Linux Users - Follow the instructions below on running the Python server from source.
 
