@@ -207,8 +207,6 @@ def download_video(url, title):
             video_url = download_direct(url, download_progress, url_id, title)
         url_info = url_map[url_id]
         url_info['video_url'] = video_url
-        save_url_map()
-        generate_thumbnail_for_path(video_url)
         # try to figure out if file was already downloaded and filename is in library
         files = list_files(directory='library')
         for file in files:
@@ -219,6 +217,8 @@ def download_video(url, title):
                 logger.info(f"File {fname} may already exists in library")
                 push_text_to_client(f"File {fname} may already exists in library")
                 break
+        save_url_map()
+        generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"

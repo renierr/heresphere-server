@@ -17,11 +17,11 @@
             <p v-if="file.duration"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</p>
         </div>
         <div class="item-function align-self-end w-100 text-end">
-            <div v-if="file.may_exist" class="partial bg-warning d-inline-block p-2 mt-2 w-100 text-center rounded">File with similar Name already found in library</div>
-            <div v-if="file.partial" class="partial bg-danger d-inline-block p-2 mt-2 w-100 text-center rounded">Partial file - download maybe in progress</div>
-            <a v-if="file.orig_link" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.orig_link); return false;">Copy Original Link</a>
+            <div v-if="file.may_exist" class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded">File with similar Name already found in library</div>
+            <div v-if="file.partial" class="partial d-inline-block p-2 mt-2 w-100 text-center text-bg-danger rounded">Partial file - download maybe in progress</div>
+            <a v-if="file.url" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.url); return false;">Copy Original Link</a>
             {% if option_download %}
-            <button v-if="file.orig_link" class="btn btn-secondary btn-sm m-1" @click="redownload(file.orig_link)">Download again (id={{ file.url_id }})</button>
+            <button v-if="file.url" class="btn btn-secondary btn-sm m-1" @click="redownload(file.url)">Download again (id={{ file.url_id }})</button>
             {% endif %}
             <button v-if="!file.partial" class="btn btn-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
             {% if option_move %}
