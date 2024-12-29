@@ -34,7 +34,8 @@ def find_url_id(url):
 def find_url_info(filename):
     for idnr, url_info in url_map.items():
         filename_check = os.path.splitext(filename.rstrip('.part'))[0]
-        if filename and url_info['filename'] and filename_check.startswith(url_info['filename']):
+        filename_info = url_info.get('filename', None)
+        if filename and filename_info and filename_check.startswith(filename_info):
             return idnr, url_info
     return None, None
 
