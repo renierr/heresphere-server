@@ -39,20 +39,14 @@ new Vue({
                             }
                             modalBody.innerHTML = `
                                 <p>If the video does not start, <a href="${video_url}">here is the link from source</a>.</p>
-                                <video id="videoElement" class="w-100" controls src="${video_url}">
-                                    Your browser does not support the video tag.
-                                </video>
+                                <video-js id="videoPlayer" class="vjs-default-skin w-100" controls>
+                                    <source src="${video_url}">
+                                </video-js>
                             `;
+                            videojs('videoPlayer');
                             const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                             videoModal.show();
-                            document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
-                                const videoElement = document.getElementById('videoElement');
-                                if (videoElement) {
-                                    videoElement.pause();
-                                    videoElement.currentTime = 0;
-                                    videoElement.src = '';
-                                }
-                            });
+
                         }
                         this.serverResult = 'Stream file video: ' + video_url + ' and audio: ' + audio_url;
                     } else {

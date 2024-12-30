@@ -193,7 +193,17 @@ export const methods = {
                 console.error('Error deleting bookmark:', error);
             });
     },
-
+    playVideo(filename) {
+        const videoModalBody = document.getElementById('videoModalBody');
+        videoModalBody.innerHTML = `
+            <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
+                <source src="${filename}" type="video/mp4">
+            </video-js>
+        `;
+        videojs('videoPlayer');
+        const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+        videoModal.show();
+    }
 };
 
 export const computed = {

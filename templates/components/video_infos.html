@@ -2,7 +2,14 @@
     <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail img-fluid me-3 mb-1" @click="openThumbnail(file.thumbnail)">
     <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="thumbnail img-fluid me-3 mb-1">
     <div class="w-100 d-flex flex-column align-items-start">
-        <div class="fw-bold h5"><a class="video-link text-decoration-none" :href="file.filename"> <i class="bi bi-link-45deg"></i> {{ file.title }}</a></div>
+        <div class="fw-bold h5">
+            <button class="btn btn-primary btn-sm ms-2" @click="playVideo(file.filename)">
+                <i class="bi bi-play-fill"></i> Play
+            </button>
+            <a class="video-link text-decoration-none" :href="file.filename">
+                <i class="bi bi-link-45deg"></i> {{ file.title }}
+            </a>
+        </div>
         <div class="text-muted">
             <p v-if="file.yt_id" class="text-info"><a :href="'https://youtube.com/watch?v=' + file.yt_id">YouTube Link</a></p>
             <p>

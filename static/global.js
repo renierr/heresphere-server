@@ -32,5 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollButton.classList.add('d-none');
         }
     });
+    document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+        try {
+            const player = videojs('videoPlayer');
+            if (player && typeof player.pause === 'function') {
+                player.pause();
+                player.dispose();
+            }
+        } catch (error) {
+            console.error('Error stopping the video player:', error);
+        }
+    });
 });
 
