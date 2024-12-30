@@ -35,8 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
         try {
             const player = videojs('videoPlayer');
-            if (player && typeof player.pause === 'function') {
-                player.pause();
+            if (player && typeof player.dispose === 'function') {
                 player.dispose();
             }
         } catch (error) {
