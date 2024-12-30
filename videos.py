@@ -198,6 +198,7 @@ def download_video(url, title):
     else:
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
+        url_map[url_id]['may_exist'] = False
 
     push_text_to_client(f"Downloading video {url_id}...")
     try:
