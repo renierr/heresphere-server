@@ -6,7 +6,7 @@ from enum import Enum
 from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
-from cache import cache
+from cache import cache, clear_cache_by_name
 from globals import is_debug, get_static_directory, get_real_path_from_url
 
 
@@ -282,6 +282,7 @@ def generate_thumbnail_for_path(video_path):
         return {"success": False, "error": "Video file does not exist"}
 
     success = generate_thumbnail(real_path, thumbnail_path)
+    clear_cache_by_name('list_files')
     push_text_to_client(f"Generate thumbnails finished for {base_name} with {'success' if success else 'failure'}")
     if success:
         return {"success": True, "message": f"Generate thumbnails finished for {base_name}" }

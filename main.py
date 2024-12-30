@@ -106,6 +106,7 @@ def cache_stats():
 
 @app.route('/cache/clear')
 def cache_clear():
+    push_text_to_client("Clearing all caches finished")
     return cache.clear_caches()
 
 @app.route('/sse')

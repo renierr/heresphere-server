@@ -64,3 +64,10 @@ def clear_caches():
         cleared[func.__name__] = 'cleared'
     return cleared
 
+def clear_cache_by_name(name):
+    for func in cache_registry:
+        if func.__name__ == name:
+            func.cache__clear()
+            return {func.__name__: 'cleared'}
+    return {name: 'not found'}
+
