@@ -206,7 +206,7 @@ def start_server():
     server_ip = socket.gethostbyname(hostname)
     logger.info(f"Serving most likely on: http://{hostname}:{UI_PORT} or http://{server_ip}:{UI_PORT}")
     #app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0', threaded=True)
-    serve(app, host='0.0.0.0', port=UI_PORT, threads=50)
+    serve(app, host='0.0.0.0', port=UI_PORT, threads=100)
 
 if __name__ == '__main__':
     start_server()
