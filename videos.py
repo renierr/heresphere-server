@@ -208,7 +208,7 @@ def download_video(url, title):
         url_info = url_map[url_id]
         url_info['video_url'] = video_url
         # try to figure out if file was already downloaded and filename is in library
-        files = list_files(directory='library')
+        files = list_files('library')
         for file in files:
             fname = file.get('filename')
             fname_comp = url_info.get('filename')
