@@ -215,7 +215,7 @@ def download_video(url, title):
             if fname_comp and fname_comp in fname:
                 url_info['may_exist'] =  True
                 logger.info(f"File {fname} may already exists in library")
-                push_text_to_client(f"File {fname} may already exists in library")
+                push_text_to_client(f"File {fname} may already exists in library: {fname_comp}")
                 break
         save_url_map()
         list_files.cache__clear()
