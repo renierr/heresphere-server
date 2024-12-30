@@ -218,7 +218,7 @@ def download_video(url, title):
                 push_text_to_client(f"File {fname} may already exists in library")
                 break
         save_url_map()
-        list_files.cache_clear()
+        list_files.cache__clear()
         generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
@@ -247,7 +247,7 @@ def download_progress(d):
             if last_zero_percent == message:
                 return
             last_zero_percent = message
-            list_files.cache_clear()
+            list_files.cache__clear()
         elif current_time - last_call_time < throttle_delay:
             return
         last_call_time = current_time
