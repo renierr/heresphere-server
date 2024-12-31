@@ -33,28 +33,6 @@ new Vue({
                         if (modalBody && video_url) {
                             // strip trailing / from video url
                             const video_source = video_url.replace(/\/+$/, '');
-                            const video_cookies = data.cookies;
-                            if (video_cookies) {
-                                const cookies = video_cookies.split(/; (?!Domain|Path|Secure|Expires)(?=[^;]+=)/);
-                                cookies.forEach(cookie => {
-                                    // Remove the Domain part from the cookie string
-                                    let updatedCookie = cookie.replace(/; Domain=[^;]+/, '');
-                                    // Ensure the cookie ends with a semicolon
-                                    if (!updatedCookie.endsWith(';')) {
-                                        updatedCookie += ';';
-                                    }
-                                    console.log('Setting cookie:', updatedCookie);
-                                    document.cookie = updatedCookie;
-                                });
-                                setTimeout(() => {
-                                    // clear cookies after 5 minutes
-                                    cookies.forEach(cookie => {
-                                        // remove the cookie
-                                        const [name] = cookie.split('=');
-                                        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-                                    });
-                                }, 6000);
-                            }
                             modalBody.innerHTML = `
                                 <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
                                     <source src="${video_source}" type="video/webm">
