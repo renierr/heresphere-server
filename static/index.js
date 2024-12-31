@@ -26,29 +26,30 @@ new Vue({
             })
                 .then(response => response.json())
                 .then(data => {
-                    this.serverResult = data;
                     if (stream) {
                         const video_url = data.videoUrl;
                         const audio_url = data.audioUrl;
                         const modalBody = document.getElementById('videoModalBody');
                         if (modalBody && video_url) {
+                            // strip trailing / from video url
+                            const video_source = video_url.replace(/\/+$/, '');
                             const video_cookies = data.cookies;
                             if (video_cookies) {
                                 console.log('Setting cookies:', video_cookies);
                                 document.cookie = video_cookies;
                             }
                             modalBody.innerHTML = `
-                                <p>If the video does not start, <a href="${video_url}">here is the link from source</a>.</p>
-                                <video-js id="videoPlayer" class="vjs-default-skin w-100" controls>
-                                    <source src="${video_url}">
+                                <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
+                                    <source src="${video_source}" type="video/webm">
                                 </video-js>
+                                <p>If the video does not start, <a href="${video_source}">here is the link from source</a>.</p>
                             `;
                             videojs('videoPlayer');
                             const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                             videoModal.show();
-
+                        } else {
+                            this.serverResult = 'Error: No video URL found to be played';
                         }
-                        this.serverResult = 'Stream file video: ' + video_url + ' and audio: ' + audio_url;
                     } else {
                         this.serverResult = data;
                     }
