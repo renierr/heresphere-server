@@ -163,6 +163,9 @@ Additionally, the server interface provides:
 * Server information with current download progress
 * And more...
 
+_Example Screenshot_
+![img_1.png](img_1.png)
+
 ## Optimized View for HereSphere
 
 HereSphere has its own API and optimized UI for browsing the videos from a server like this one.
