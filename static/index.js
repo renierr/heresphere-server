@@ -36,7 +36,6 @@ new Vue({
                             const video_cookies = data.cookies;
                             if (video_cookies) {
                                 console.log('Setting cookies:', video_cookies);
-                                document.cookie = video_cookies;
                             }
                             modalBody.innerHTML = `
                                 <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
