@@ -77,7 +77,7 @@ new Vue({
         },
         moveToLibrary(confData) {
             if (!confData && !confData.file) {
-                this.showMessage('Wrong number of parameters for deleteFile');
+                this.showMessage('Wrong number of parameters for move to library');
                 return;
             }
             const file = confData.file;

@@ -6,6 +6,17 @@ from cache import cache
 from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url
 from thumbnail import get_thumbnail, ThumbnailFormat, get_video_info
 
+@cache(maxsize=512, ttl=3600)
+def library_subfolders():
+    subfolders = []
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'library'), followlinks=True):
+        # Exclude directories that start with a dot
+        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        subfolder = os.path.relpath(root, os.path.join(get_static_directory(), 'library')).replace('\\', '/')
+        if subfolder != '.':
+            subfolders.append(subfolder)
+    return subfolders
+
 @cache(maxsize=512, ttl=120)
 def list_files(directory='videos'):
     extracted_details = []
@@ -20,8 +31,8 @@ def list_files(directory='videos'):
             if 'part-Frag' in filename or filename.endswith('.ytdl'):
                 continue
 
-            subfolder = os.path.relpath(root, os.path.join(get_static_directory(), directory))
-            if subfolder == '.' or subfolder is None:
+            subfolder = os.path.relpath(root, os.path.join(get_static_directory(), directory)).replace('\\', '/')
+            if subfolder == '.':
                 subfolder = ''
             common_details = extract_file_details(root, filename, base_path, subfolder)
 
