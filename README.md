@@ -149,7 +149,7 @@ To build the Windows distributable with PyInstaller:
 3. The generated binary and necessary files will be located in the `./dist` folder.
 
 
-## Server Interface
+# Server Interface
 
 The server interface is reachable on the URL provided during startup of the server, typically `http://127.0.0.1:5000`.
 
