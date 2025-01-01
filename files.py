@@ -127,7 +127,7 @@ def get_basic_save_video_info(filename):
     return VideoInfo(created, size, duration, width, height, resolution, stereo)
 
 
-def move_to_library(video_path):
+def move_to_library(video_path, subfolder):
     """
     Move a video file from the videos folder to the library folder
     all thumbnails will be moved as well
@@ -145,7 +145,7 @@ def move_to_library(video_path):
             return {"success": False, "error": "Video file does not exist"}
 
         base_name = os.path.basename(real_path)
-        library_path = os.path.join(static_dir, 'library', base_name)
+        library_path = os.path.join(static_dir, 'library', subfolder, base_name)
 
         if os.path.exists(library_path):
             return {"success": False, "error": f"Target exists in library: {base_name}"}

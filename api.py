@@ -27,12 +27,13 @@ def get_library_files():
 def mtl():
     data = request.get_json()
     video_path = data.get("video_path")
+    subfolder = data.get("subfolder")
 
     if not video_path:
         return jsonify({"success": False, "error": "No video path provided"}), 400
 
     try:
-        result = move_to_library(video_path)
+        result = move_to_library(video_path, subfolder)
         return jsonify(result)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500

@@ -64,18 +64,34 @@ new Vue({
             });
         },
         confirmMoveToLibrary(filename) {
-            this.currentFile = filename;
+            const modalConfirmExtras = document.getElementById('confirmModalExtras');
+            const options = library_subfolders.map(subfolder => `<option value="${subfolder}">${subfolder}</option>`).join('');
+            modalConfirmExtras.innerHTML = `
+            <div>
+                <select id="subfolderSelect">
+                    <option value="">Select a subfolder or leave for root folder</option>
+                    ${options}
+                </select>
+            </div>
+            `;
             this.confirmData = {
                 title: 'Move file',
                 message: `Are you sure you want to move the following file?`,
                 file: filename,
                 submit: 'Move',
-                action: this.moveToLibrary,
+                action: (confData) => {
+                    let subfolderSelection = document.getElementById('subfolderSelect').value;
+                    this.moveToLibrary(confData, subfolderSelection);
+                },
             }
             const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
             modal.show();
+            // clear extras on modal close
+            modal._element.addEventListener('hidden.bs.modal', () => {
+                modalConfirmExtras.innerHTML = '';
+            });
         },
-        moveToLibrary(confData) {
+        moveToLibrary(confData, subfolder) {
             if (!confData && !confData.file) {
                 this.showMessage('Wrong number of parameters for move to library');
                 return;
@@ -84,7 +100,7 @@ new Vue({
             this.confirmData = {};
             fetch('/api/move_to_library', {
                 method: 'POST',
-                body: JSON.stringify({ video_path: file }),
+                body: JSON.stringify({ video_path: file, subfolder: subfolder }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
