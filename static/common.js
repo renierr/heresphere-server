@@ -125,6 +125,16 @@ export const methods = {
                 this.serverResult = 'Error generating thumbnails';
             });
     },
+    confirmCleanup() {
+        this.confirmData = {
+            title: 'Cleanup files',
+            message: `This will clean the download tracked files and find orphan thumbnails and delete them, Are you sure you want to proceed?`,
+            submit: 'Cleanup',
+            action: this.cleanup,
+        }
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+    },
     cleanup() { // Add this method
         fetch('/cleanup')
             .then(response => response.json())

@@ -7,7 +7,7 @@
       </div>
       <div class="modal-body text-center">
         <span>{{ confirmData.message }}</span>
-        <div class="small alert alert-warning text-break">{{ confirmData.file ? confirmData.file.split('/').pop() : '' }}</div>
+        <div v-if="confirmData.file" class="small alert alert-warning text-break">{{ confirmData.file ? confirmData.file.split('/').pop() : '' }}</div>
         <div id="confirmModalExtras" class="mt-2"></div>
       </div>
       <div class="modal-footer">
