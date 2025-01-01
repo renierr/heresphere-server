@@ -20,7 +20,10 @@ def list_files(directory='videos'):
             if 'part-Frag' in filename or filename.endswith('.ytdl'):
                 continue
 
-            common_details = extract_file_details(root, filename, base_path)
+            subfolder = os.path.relpath(root, os.path.join(get_static_directory(), directory))
+            if subfolder == '.' or subfolder is None:
+                subfolder = ''
+            common_details = extract_file_details(root, filename, base_path, subfolder)
 
             # only for videos directory
             if directory == 'videos':
@@ -35,11 +38,6 @@ def list_files(directory='videos'):
                     common_details.update({
                         'yt_id': yt_id,
                         'title': title,
-                        'filename': f"{base_path}/youtube/{filename}"
-                    })
-                else:
-                    common_details.update({
-                        'filename': f"{base_path}/direct/{filename}"
                     })
             extracted_details.append(common_details)
 
@@ -47,7 +45,7 @@ def list_files(directory='videos'):
     return extracted_details
 
 
-def extract_file_details(root, filename, base_path):
+def extract_file_details(root, filename, base_path, subfolder):
     realfile = os.path.join(root, filename)
 
     if not os.path.exists(realfile):
@@ -58,7 +56,8 @@ def extract_file_details(root, filename, base_path):
         'partial': partial,
         'yt_id': None,
         'title': os.path.splitext(filename)[0],
-        'filename': f"{base_path}/{filename}",
+        'filename': f"{base_path}/{subfolder + '/' if subfolder else ''}{filename}",
+        'folder' : subfolder,
     }
     if partial:
         result.update({
