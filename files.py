@@ -145,6 +145,10 @@ def move_to_library(video_path, subfolder):
             return {"success": False, "error": "Video file does not exist"}
 
         base_name = os.path.basename(real_path)
+
+        if subfolder not in library_subfolders():
+            return {"success": False, "error": "Invalid subfolder name"}
+
         library_path = os.path.join(static_dir, 'library', subfolder, base_name)
 
         if os.path.exists(library_path):
@@ -166,7 +170,7 @@ def move_to_library(video_path, subfolder):
 
         list_files.cache__clear()
         push_text_to_client(f"File moved to library: {base_name}")
-        return {"success": True, "library_path": library_path}
+        return {"success": True, "moved": base_name}
     else:
         return {"success": False, "error": "Invalid video path"}
 
