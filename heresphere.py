@@ -4,7 +4,7 @@ import os
 import urllib.parse
 from datetime import datetime
 from flask import Blueprint, jsonify, request
-from files import list_files, get_basic_save_video_info
+from files import list_files, get_basic_save_video_info, library_subfolders
 from globals import get_static_directory
 from thumbnail import ThumbnailFormat, get_thumbnails
 
@@ -38,19 +38,30 @@ def generate_heresphere_json(server_path):
 
     result_json = {
         "access": 0,
-        "library": [
-            {"name": "Library", "list": []},
-            {"name": "Downloads", "list": []}
-        ]
+        "library": []
     }
 
-    for i, category in enumerate(['library', 'videos']):
-        files = list_files(category)
+    subfolders = library_subfolders()
+    subfolders.append('')
+    all_library_files = list_files('library')
+
+    for subfolder in subfolders:
+        print(f"subfolder: {subfolder}")
+        files = [file for file in all_library_files if file.get('folder', '') == subfolder]
         url_list = [
             f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
             for file in files
         ]
-        result_json["library"][i]["list"] = url_list
+        name = "Library" if subfolder == '' else f"Library - {subfolder}"
+        result_json["library"].append({"name": name, "list": url_list})
+
+    # Add Downloads section
+    files = list_files('videos')
+    url_list = [
+        f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
+        for file in files
+    ]
+    result_json["library"].append({"name": "Downloads", "list": url_list})
 
     return result_json
 
