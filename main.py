@@ -15,7 +15,7 @@ from threading import Event
 from loguru import logger
 from flask import Flask, Response, render_template, jsonify, send_from_directory, request
 
-from files import library_subfolders
+from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client
 from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
@@ -139,30 +139,8 @@ def sse():
     return response
 
 @app.route('/cleanup')
-def cleanup_maps():
-    url_map = get_url_map()
-    static_dir = get_static_directory()
-
-    to_remove = []
-    for url_id, url_info in url_map.items():
-        filename = url_info.get('filename')
-        logger.debug(f"Checking file: {filename}")
-        if filename:
-            youtube_dir = os.path.join(static_dir, 'videos', 'youtube')
-            direct_dir = os.path.join(static_dir, 'videos', 'direct')
-            youtube_files = os.listdir(youtube_dir)
-            direct_files = os.listdir(direct_dir)
-            if not any(f.startswith(filename) for f in youtube_files) and not any(f.startswith(filename) for f in direct_files):
-                to_remove.append(url_id)
-
-    logger.debug(f"to removed: {to_remove}")
-    for url_id in to_remove:
-        del url_map[url_id]
-
-    save_url_map()
-    push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
-    return jsonify({"success": True, "message": "Cleanup tracking map finished"})
-
+def cl():
+    return jsonify(cleanup())
 
 def start_server():
     global ffmpeg_version_info, ffprobe_version_info

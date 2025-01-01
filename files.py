@@ -1,9 +1,10 @@
 import os
 import shutil
 
+from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url
+from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map
 from thumbnail import get_thumbnail, ThumbnailFormat, get_video_info
 
 @cache(maxsize=512, ttl=3600)
@@ -176,6 +177,13 @@ def move_to_library(video_path, subfolder):
 
 
 def delete_file(url):
+    """
+    Delete a file from the videos directory and all thumbnails
+    only allow delete from videos directory
+
+    :param url: url path to file
+    :return: object with success and message
+    """
     if not url:
         return {"success": False, "error": "URL missing"}
 
@@ -199,3 +207,51 @@ def delete_file(url):
     list_files.cache__clear()
     push_text_to_client(f"File deleted: {base_name}")
     return {"success": True, "message": f"File {base_name} deleted"}
+
+def cleanup():
+    """
+    Cleanup the tracking map by removing entries that no longer exist.
+    Also cleanup thumbnails that no longer have a corresponding video file.
+
+    :return: object with success and message
+    """
+    url_map = get_url_map()
+    static_dir = get_static_directory()
+
+    to_remove = []
+    for url_id, url_info in url_map.items():
+        filename = url_info.get('filename')
+        logger.debug(f"Checking file: {filename}")
+        if filename:
+            youtube_dir = os.path.join(static_dir, 'videos', 'youtube')
+            direct_dir = os.path.join(static_dir, 'videos', 'direct')
+            youtube_files = os.listdir(youtube_dir)
+            direct_files = os.listdir(direct_dir)
+            if not any(f.startswith(filename) for f in youtube_files) and not any(f.startswith(filename) for f in direct_files):
+                to_remove.append(url_id)
+
+    logger.debug(f"to removed: {to_remove}")
+    for url_id in to_remove:
+        del url_map[url_id]
+
+    save_url_map()
+    push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
+
+    # cleanup thumbnails from .thumb directory that no longer have a corresponding video file for both videos and library directory
+    to_remove = []
+    for directory in ['videos', 'library']:
+        # get all files from .thumb sub folders
+        for root, dirs, files in os.walk(os.path.join(static_dir, directory), followlinks=True):
+            if '.thumb' in dirs:
+                thumb_dir = os.path.join(root, '.thumb')
+                root_files = os.listdir(root)
+                for filename in os.listdir(thumb_dir):
+                    if not any(filename.startswith(f) for f in root_files):
+                        thumb_file = os.path.join(thumb_dir, filename)
+                        to_remove.append(thumb_file)
+                        os.remove(thumb_file)
+
+    push_text_to_client(f"Cleanup thumbnails finished (removed: {len(to_remove)} orphan entries).")
+    list_files.cache__clear()
+    return {"success": True, "message": "Cleanup finished"}
+
