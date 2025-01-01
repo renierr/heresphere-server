@@ -85,6 +85,8 @@ def generate_heresphere_json_item(server_path, file_base64):
         relative_path = filename.replace('/static/library/', '')
         real_path = os.path.join(static_dir, 'library', relative_path)
 
+    folders = os.path.dirname(relative_path)
+
     if not os.path.exists(real_path):
         return {}
 
@@ -138,4 +140,11 @@ def generate_heresphere_json_item(server_path, file_base64):
         "isFavorite": False,
         "writeFavorite": False,
     }
+
+    if folders:
+        result["tags"] = [
+            {
+                "name": folders,
+            }
+        ]
     return result
