@@ -15,7 +15,7 @@ new Vue({
         ...watch,
     },
     mounted: function () {
-        this.fetchFiles(true);
+        this.fetchFiles();
         const eventSource = new EventSource('/sse');
         const serverOutput = [];
         eventSource.onmessage = event => {
@@ -25,7 +25,7 @@ new Vue({
             }
             this.serverOutput = serverOutput.slice().reverse().join('\n');
             if (event.data.includes('Generate thumbnails finished')) {
-                this.fetchFiles(true);
+                this.fetchFiles();
             }
         };
     }

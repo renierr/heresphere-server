@@ -83,8 +83,11 @@ export const methods = {
             });
 
     },
-    fetchFiles: debounce(function (library=false) {
+    fetchFiles: debounce(function () {
             console.log('Fetching files');
+            // if we are in library url path we should use library api
+            const library = window.location.pathname.includes('/library');
+
             this.loading = true;
             const url = library ? '/api/library/list' : '/api/list';
             fetch(url)
@@ -103,7 +106,9 @@ export const methods = {
                     this.loading = false;
                 })
         }, 3000),
-    generateThumbnails(library=false) {
+    generateThumbnails() {
+        // if we are in library url path we should use library api
+        const library = window.location.pathname.includes('/library');
         const url = library ? '/api/library/generate_thumbnails' : '/api/generate_thumbnails';
         fetch(url, {
             method: 'POST',
