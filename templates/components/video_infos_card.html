@@ -2,7 +2,7 @@
     <img v-if="file.thumbnail" :src="file.thumbnail" class="card-img-top" alt="Thumbnail" @click="openThumbnail(file.thumbnail)">
     <img v-else src="/static/images/placeholder.png" class="card-img-top" alt="Placeholder">
     <div class="card-body">
-        <h5 class="card-title">
+        <h5 class="card-title text-truncate" data-bs-toggle="tooltip" :title="file.title">
             <a class="video-link text-decoration-none" :href="file.filename">
                 <i class="bi bi-link-45deg"></i> {{ file.title }}
             </a>
