@@ -15,6 +15,7 @@ export const data = {
     totalItems: 0,
     totalSize: 0,
     confirmData: {},
+    cardLayout: false,
 };
 
 function debounce(func, wait) {

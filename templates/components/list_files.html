@@ -1,14 +1,25 @@
+<div v-else-if = "cardLayout" >
+  <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
+  {% include "components/paging.html" %}
+
+  <div class="container">
+    <div class="row">
+      <div v-for="file in filteredFiles" :key="file.filename" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+        {% include "components/video_infos_card.html" %}
+        {% include "components/file_progress.html" %}
+      </div>
+    </div>
+  </div>
+</div>
+
 <div v-else>
   <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
   {% include "components/paging.html" %}
   <ul class="list-group list-group-flush">
     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-1">
       {% include "components/video_infos.html" %}
-      {% if show_progress %}
-      <div v-if="getProgressForId(file.url_id) > 0" class="progress">
-        <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100">{{ getProgressForId(file.url_id) }}%</div>
-      </div>
-      {% endif %}
+      {% include "components/file_progress.html" %}
     </li>
   </ul>
 </div>
+
