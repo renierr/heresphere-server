@@ -1,3 +1,13 @@
-<div class="row mb-1 p-2">
-  <input type="text" v-model="filter" placeholder="Filter files..." class="mb-4 form-control">
+<div class="row mb-1">
+  <div class="input-group">
+    <input type="text" v-model="filter" placeholder="Filter files..." class="form-control">
+  </div>
+</div>
+<div class="row mb-1">
+  <div class="input-group">
+    <select v-model="selectedFolder" class="form-control">
+      <option value="">All Folders</option>
+      <option v-for="folder in uniqueFolders" :key="folder" :value="folder">{{ folder }}</option>
+    </select>
+  </div>
 </div>

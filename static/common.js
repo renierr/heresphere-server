@@ -3,6 +3,7 @@ export const data = {
     files: [],
     filter: '',
     videoUrl: '',
+    selectedFolder: '',
     loading: false,
     currentSort: 'created',
     currentSortDir: 'desc',
@@ -223,10 +224,15 @@ export const methods = {
 
 export const computed = {
     filteredFiles: function () {
-        let filtered = this.files.filter(file => {
+
+        let filtered = this.files;
+        if (this.selectedFolder) {
+            filtered = this.files.filter(file => file.folder === this.selectedFolder);
+        }
+
+        filtered = filtered.filter(file => {
             return file.filename.toLowerCase().includes(this.filter.toLowerCase());
         });
-
 
         filtered = filtered.sort((a, b) => {
             let modifier = 1;
@@ -241,6 +247,10 @@ export const computed = {
         this.totalItems = filtered.length;
         this.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
         return filtered.slice(start, end);
+    },
+    uniqueFolders() {
+        const folders = this.files.map(file => file.folder).filter(folder => folder);
+        return [...new Set(folders)].sort();
     },
     totalPages: function () {
         return Math.ceil(this.totalItems / this.pageSize);
