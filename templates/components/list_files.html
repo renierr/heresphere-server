@@ -4,9 +4,9 @@
 
   <div class="container">
     <div class="row">
-      <div v-for="file in filteredFiles" :key="file.filename" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-        {% include "components/video_infos_card.html" %}
+      <div v-for="file in filteredFiles" :key="file.filename" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 position-relative">
         {% include "components/file_progress.html" %}
+        {% include "components/video_infos_card.html" %}
       </div>
     </div>
   </div>
@@ -16,9 +16,9 @@
   <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
   {% include "components/paging.html" %}
   <ul class="list-group list-group-flush">
-    <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-1">
-      {% include "components/video_infos.html" %}
+    <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-1 position-relative">
       {% include "components/file_progress.html" %}
+      {% include "components/video_infos.html" %}
     </li>
   </ul>
 </div>

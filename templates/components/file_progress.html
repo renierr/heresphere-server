@@ -1,5 +1,5 @@
 {% if show_progress %}
-<div v-if="getProgressForId(file.url_id) > 0" class="progress">
+<div v-if="getProgressForId(file.url_id) > 0" class="progress position-absolute z-1" style="width: calc(100% - 1.5rem)">
   <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100">{{ getProgressForId(file.url_id) }}%</div>
 </div>
 {% endif %}
