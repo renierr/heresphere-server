@@ -64,7 +64,13 @@ export const methods = {
         modal.show();
     },
     changePage(page) {
-        this.currentPage = page;
+        if (page < 1) {
+            this.currentPage = 1;
+        } else if (page > this.totalPages) {
+            this.currentPage = this.totalPages;
+        } else {
+            this.currentPage = page;
+        }
     },
     generateThumbnail(file) {
         fetch('/api/generate_thumbnail', {
@@ -223,6 +229,16 @@ export const methods = {
     saveSettings() {
         localStorage.setItem('settings', JSON.stringify(this.settings));
     },
+    handleKeyup(event) {
+        // only if paging present
+        if (this.totalPages === 1) return;
+
+        if (event.key === 'ArrowLeft') {
+            this.changePage(this.currentPage - 1);
+        } else if (event.key === 'ArrowRight') {
+            this.changePage(this.currentPage + 1);
+        }
+    },
 };
 
 export const computed = {
@@ -312,3 +328,11 @@ export const watch = {
         this.saveSettings();
     },
 };
+
+export const addKeyUpListener = (vueContext) => {
+    debugger;
+    window.addEventListener('keyup', vueContext.handleKeyup);
+}
+export const removeKeyUpListener = (vueContext) => {
+    window.removeEventListener('keyup', vueContext.handleKeyup);
+}

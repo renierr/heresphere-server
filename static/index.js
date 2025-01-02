@@ -1,4 +1,4 @@
-import { data, methods, computed, watch } from './common.js';
+import {data, methods, computed, watch, addKeyUpListener, removeKeyUpListener} from './common.js';
 
 new Vue({
     el: '#app',
@@ -129,7 +129,11 @@ new Vue({
     watch: {
         ...watch,
     },
+    beforeDestroy() {
+        removeKeyUpListener(this);
+    },
     mounted: function () {
+        addKeyUpListener(this);
         this.fetchFiles();
         const eventSource = new EventSource('/sse');
         const serverOutput = [];
