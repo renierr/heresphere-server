@@ -330,7 +330,6 @@ export const watch = {
 };
 
 export const addKeyUpListener = (vueContext) => {
-    debugger;
     window.addEventListener('keyup', vueContext.handleKeyup);
 }
 export const removeKeyUpListener = (vueContext) => {
