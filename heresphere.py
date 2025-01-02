@@ -42,11 +42,9 @@ def generate_heresphere_json(server_path):
     }
 
     subfolders = library_subfolders()
-    subfolders.append('')
     all_library_files = list_files('library')
 
-    for subfolder in subfolders:
-        print(f"subfolder: {subfolder}")
+    for subfolder in [''] + subfolders:
         files = [file for file in all_library_files if file.get('folder', '') == subfolder]
         url_list = [
             f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
