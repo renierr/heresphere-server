@@ -8,15 +8,7 @@
     {% include "components/filter.html" %}
 
     {% include "components/loading.html" %}
-    <div v-else>
-        <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
-        {% include "components/paging.html" %}
-        <ul class="list-group list-group-flush">
-            <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-1">
-               {% include "components/video_infos.html" %}
-            </li>
-        </ul>
-    </div>
+    {% include "components/list_files.html" %}
     {% include "components/page_functions.html" %}
     <script type="module" src="/static/library.js"></script>
 {% endblock %}

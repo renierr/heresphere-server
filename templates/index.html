@@ -17,20 +17,9 @@
     {% include "components/filter.html" %}
 
     {% include "components/loading.html" %}
-    <div v-else>
-        <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
-        {% include "components/paging.html" %}
-        <ul class="list-group list-group-flush">
-            <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-1">
-                {% with option_move = true, option_download = true %}
-                {% include "components/video_infos.html" %}
-                {% endwith %}
-                <div v-if="getProgressForId(file.url_id) > 0" class="progress">
-                    <div class="progress-bar" role="progressbar" :style="{ width: getProgressForId(file.url_id) + '%' }" :aria-valuenow="getProgressForId(file.url_id)" aria-valuemin="0" aria-valuemax="100">{{ getProgressForId(file.url_id) }}%</div>
-                </div>
-            </li>
-        </ul>
-    </div>
+    {% with option_move = true, option_download = true, show_progress = true %}
+    {% include "components/list_files.html" %}
+    {% endwith %}
     {% include "components/page_functions.html" %}
 
     <script type="module" src="/static/index.js"></script>
