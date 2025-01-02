@@ -11,11 +11,10 @@ export const data = {
     serverResult: null,
     currentThumbnail: null,
     currentPage: 1,
-    pageSize: 10,
     totalItems: 0,
     totalSize: 0,
     confirmData: {},
-    cardLayout: false,
+    settings: JSON.parse(localStorage.getItem('settings')) || { cardLayout: false, pageSize: 10 },
 };
 
 function debounce(func, wait) {
@@ -220,7 +219,10 @@ export const methods = {
         videojs('videoPlayer');
         const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
         videoModal.show();
-    }
+    },
+    saveSettings() {
+        localStorage.setItem('settings', JSON.stringify(this.settings));
+    },
 };
 
 export const computed = {
@@ -279,6 +281,12 @@ export const computed = {
     formattedTotalSize() {
         return this.formatFileSize(this.totalSize);
     },
+    cardLayout() {
+        return this.settings.cardLayout;
+    },
+    pageSize() {
+        return this.settings.pageSize;
+    }
 };
 
 export const watch = {
@@ -288,10 +296,19 @@ export const watch = {
     pageSize: function (newPageSize, oldPageSize) {
         this.currentPage = 1;
     },
+    cardLayout(newValue) {
+        localStorage.setItem('cardLayout', newValue);
+    },
     serverResult: function (newResult) {
         if (newResult) {
             this.showMessage(newResult);
             this.serverResult = null;
         }
+    },
+    'settings.cardLayout': function(newValue) {
+        this.saveSettings();
+    },
+    'settings.pageSize': function(newValue) {
+        this.saveSettings();
     },
 };
