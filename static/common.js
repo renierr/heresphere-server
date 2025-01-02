@@ -242,6 +242,10 @@ export const computed = {
             return 0;
         });
 
+        if (this.pageSize === 0) {
+            return filtered; // Return all items if pageSize is 0
+        }
+
         const start = (this.currentPage - 1) * this.pageSize;
         const end = start + this.pageSize;
         this.totalItems = filtered.length;
@@ -253,6 +257,7 @@ export const computed = {
         return [...new Set(folders)].sort();
     },
     totalPages: function () {
+        if (this.pageSize === 0) return 1;
         return Math.ceil(this.totalItems / this.pageSize);
     },
     pagesToShow() {
@@ -277,6 +282,9 @@ export const computed = {
 
 export const watch = {
     filter: function (newFilter, oldFilter) {
+        this.currentPage = 1;
+    },
+    pageSize: function (newPageSize, oldPageSize) {
         this.currentPage = 1;
     },
     serverResult: function (newResult) {

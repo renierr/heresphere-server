@@ -3,11 +3,21 @@
     <input type="text" v-model="filter" placeholder="Filter files..." class="form-control">
   </div>
 </div>
-<div class="row mb-1">
-  <div class="input-group">
-    <select v-model="selectedFolder" class="form-control">
-      <option value="">All Folders</option>
-      <option v-for="folder in uniqueFolders" :key="folder" :value="folder">{{ folder }}</option>
+
+<div class="input-group d-flex justify-content-center align-items-center mb-2">
+  <select v-model="selectedFolder" class="form-control w-auto">
+    <option value="">All Folders</option>
+    <option v-for="folder in uniqueFolders" :key="folder" :value="folder">{{ folder }}</option>
+  </select>
+  <div class="input-group-append ms-2 d-flex align-items-center">
+    <label for="pageSize" class="me-1">Items per page</label>
+    <select v-model="pageSize" id="pageSize" class="form-control w-auto ml-2">
+      <option :value="1">1</option>
+      <option :value="5">5</option>
+      <option :value="10">10</option>
+      <option :value="20">20</option>
+      <option :value="30">30</option>
+      <option :value="0">All</option>
     </select>
   </div>
 </div>
