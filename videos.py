@@ -2,7 +2,6 @@ import os
 import re
 import threading
 import time
-import traceback
 
 import yt_dlp
 from datetime import datetime
@@ -223,7 +222,7 @@ def download_video(url, title):
         generate_thumbnail_for_path(video_url)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
-        error_message = f"Failed to download video: {e}\n{traceback.format_exc()}"
+        error_message = f"Failed to download video: {e}"
         logger.error(error_message)
         push_text_to_client(f"Download failed: {e}")
 
