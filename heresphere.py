@@ -37,7 +37,7 @@ def generate_heresphere_json(server_path):
     """
 
     result_json = {
-        "access": 0,
+        "access": 1,
         "library": []
     }
 
@@ -106,6 +106,7 @@ def generate_heresphere_json_item(server_path, file_base64):
     date_added = datetime.fromtimestamp(info.created).strftime('%Y-%m-%d')
 
     result = {
+        "access": 1,
         "title": os.path.splitext(base_name)[0],
         "description": "",
         "thumbnailImage": f"{thumbnail}",
