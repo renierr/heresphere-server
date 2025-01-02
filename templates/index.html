@@ -7,7 +7,7 @@
     {% include "components/server_info.html" %}
     <div class="row mb-1">
         <div class="input-group mb-2">
-            <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..." class="form-control">
+            <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..." class="form-control" @keyup.enter="postVideoUrl(false)">
             <div class="input-group-append">
                 <button @click="postVideoUrl(false)" class="btn btn-outline-primary">Download</button>
                 <button @click="postVideoUrl(true)" class="btn btn-outline-success">Stream</button>
