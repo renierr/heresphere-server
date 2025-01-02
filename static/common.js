@@ -14,7 +14,7 @@ export const data = {
     totalItems: 0,
     totalSize: 0,
     confirmData: {},
-    settings: JSON.parse(localStorage.getItem('settings')) || { cardLayout: false, pageSize: 10 },
+    settings: JSON.parse(localStorage.getItem('settings')) || { cardLayout: false, pageSize: 12 },
 };
 
 function debounce(func, wait) {

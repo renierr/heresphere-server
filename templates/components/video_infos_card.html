@@ -21,7 +21,7 @@
         <p v-if="file.folder" class="mb-0"><i class="bi bi-folder"></i> {{ file.folder }}</p>
     </div>
     <div class="mt-auto p-2">
-        <button class="btn btn-primary btn-sm" @click="playVideo(file.filename)">
+        <button class="btn btn-success btn-sm" @click="playVideo(file.filename)">
             <i class="bi bi-play-fill"></i> Play
         </button>
         <button v-if="!file.partial" class="btn btn-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
