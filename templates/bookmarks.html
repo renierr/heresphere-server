@@ -44,12 +44,14 @@
         </ul>
     </div>
 
-    <div class="text-center mt-4">
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <a href="#" @click.prevent="cacheClear" class="btn btn-warning">Clear all Caches</a>
-            <a href="/static/bookmarks.json" download="bookmarks.json" class="btn btn-secondary">Download All Bookmarks</a>
+    <footer class="footer py-3">
+        <div class="text-center mt-4">
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="#" @click.prevent="cacheClear" class="btn btn-warning">Clear all Caches</a>
+                <a href="/static/bookmarks.json" download="bookmarks.json" class="btn btn-secondary">Download All Bookmarks</a>
+            </div>
         </div>
-    </div>
+    </footer>
 
     <script type="module" src="/static/bookmarks.js"></script>
 {% endblock %}
