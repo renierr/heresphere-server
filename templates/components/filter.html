@@ -1,7 +1,6 @@
-<div class="row mb-1">
-  <div class="input-group">
-    <input type="text" v-model="filter" placeholder="Filter files..." class="form-control">
-  </div>
+<div class="input-group mb-3 position-relative">
+  <input type="text" class="form-control pe-5" placeholder="Filter files..." v-model="filter">
+  <button v-if="filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="filter = ''"><i class="bi bi-x"></i></button>
 </div>
 
 <div class="input-group d-flex justify-content-center align-items-center mb-2">
