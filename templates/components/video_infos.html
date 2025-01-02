@@ -3,7 +3,7 @@
     <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="thumbnail img-fluid me-3 mb-1">
     <div class="w-100 d-flex flex-column align-items-start pt-2 ">
         <div class="fw-bold h5">
-            <button class="btn btn-success btn-sm" @click="playVideo(file.filename)">
+            <button class="btn btn-outline-success btn-sm" @click="playVideo(file.filename)">
                 <i class="bi bi-play-fill"></i> Play
             </button>
             <a class="video-link text-decoration-none" :href="file.filename">
@@ -29,12 +29,12 @@
             <div v-if="file.partial" class="partial d-inline-block p-2 mt-2 w-100 text-center text-bg-danger rounded">Partial file - download maybe in progress</div>
             <a v-if="file.url" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.url); return false;">Copy Original Link</a>
             {% if option_download %}
-            <button v-if="file.url" class="btn btn-secondary btn-sm m-1" @click="redownload(file.url)">Download again (id={{ file.url_id }})</button>
+            <button v-if="file.url" class="btn btn-outline-secondary btn-sm m-1" @click="redownload(file.url)">Download again (id={{ file.url_id }})</button>
             {% endif %}
-            <button v-if="!file.partial" class="btn btn-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
+            <button v-if="!file.partial" class="btn btn-outline-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
             {% if option_move %}
-            <button v-if="!file.partial" class="btn btn-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
-            <button @click="confirmDeleteFile(file.filename)" class="btn btn-danger btn-sm m-1">Delete</button>
+            <button v-if="!file.partial" class="btn btn-outline-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
+            <button @click="confirmDeleteFile(file.filename)" class="btn btn-outline-danger btn-sm m-1">Delete</button>
             {% endif %}
 
         </div>
