@@ -147,7 +147,7 @@ def move_to_library(video_path, subfolder):
 
         base_name = os.path.basename(real_path)
 
-        if subfolder not in library_subfolders():
+        if subfolder and subfolder not in library_subfolders():
             return {"success": False, "error": "Invalid subfolder name"}
 
         library_path = os.path.join(static_dir, 'library', subfolder, base_name)
