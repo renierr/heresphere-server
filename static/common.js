@@ -361,7 +361,7 @@ export const removeKeyNavigationForPagingListener = () => {
 
 let swipeNavigationForPagingHandler;
 export const addSwipeNavigationForPagingListener = (vueContext) => {
-    const hammer = new Hammer(document);
+    const hammer = new Hammer(document.body);
     hammer.get('swipe').set({ threshold: 50 });
     hammer.on('swipe', (event) => {
         if (event.direction === Hammer.DIRECTION_LEFT) {

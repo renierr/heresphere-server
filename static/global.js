@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (event.direction === Hammer.DIRECTION_DOWN) {
                 selectElement.selectedIndex = Math.min(selectElement.length - 1, selectElement.selectedIndex + 1);
             }
+            selectElement.dispatchEvent(new Event('change', { bubbles: true }));
         });
         selectElement.dataset.hammerApplied = 'true';
     };
