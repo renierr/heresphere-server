@@ -52,3 +52,6 @@ img.thumbnail {
     -webkit-box-orient: vertical;
     color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
 }
+.icon-overlay {
+    backdrop-filter: brightness(1.5);
+}
