@@ -1,4 +1,16 @@
-<div class="row border rounded p-1 m-0 mb-2">
-    <h2 class="h6 border-bottom pb-1">Server Information</h2>
-    <div v-text="serverOutput" class="text-muted small" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
+<div class="accordion" id="serverinfo">
+    <div class="accordion-item">
+        <h5 class="accordion-header">
+            <button class="accordion-button btn-sm p-1" type="button" data-bs-toggle="collapse" data-bs-target="#serverinfo-collapse" aria-expanded="true" aria-controls="serverinfo-collapse">
+                Server Information
+            </button>
+        </h5>
+    </div>
+    <div class="accordion-item">
+        <div id="serverinfo-collapse" class="accordion-collapse collapse show">
+            <div class="accordion-body p-1">
+                <div v-text="serverOutput" class="text-muted small" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
+            </div>
+        </div>
+    </div>
 </div>

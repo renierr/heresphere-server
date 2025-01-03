@@ -5,7 +5,9 @@
 {% block content %}
     {% include "components/thumbnail_modal.html" %}
     {% include "components/server_info.html" %}
-    <div class="row mb-1">
+    {% include "components/filter.html" %}
+
+    <div class="row mt-2 mb-1">
         <div class="input-group mb-2">
             <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..." class="form-control" @keyup.enter="postVideoUrl(false)">
             <div class="input-group-append">
@@ -14,7 +16,6 @@
             </div>
         </div>
     </div>
-    {% include "components/filter.html" %}
 
     {% include "components/loading.html" %}
     {% with option_move = true, option_download = true, show_progress = true %}
