@@ -7,13 +7,14 @@
     {% include "components/server_info.html" %}
     {% include "components/filter.html" %}
 
-    <div class="row mt-2 mb-1">
-        <div class="input-group mb-2">
-            <input type="text" v-model="videoUrl" placeholder="Enter video URL to download..." class="form-control" @keyup.enter="postVideoUrl(false)">
-            <div class="input-group-append">
-                <button @click="postVideoUrl(false)" class="btn btn-outline-primary">Download</button>
-                <button @click="postVideoUrl(true)" class="btn btn-outline-success">Stream</button>
-            </div>
+    <div class="w-100 d-flex gap-2 align-items-center flex-row p-2">
+        <div class="form-floating flex-grow-1">
+            <input id="videoInput" type="text" v-model="videoUrl" placeholder="video URL" class="form-control" @keyup.enter="postVideoUrl(false)">
+            <label class="text-muted" for="videoInput">Video URL...</label>
+        </div>
+        <div class="">
+            <button @click="postVideoUrl(false)" class="btn btn-outline-primary">Download</button>
+            <button @click="postVideoUrl(true)" class="btn btn-outline-success">Stream</button>
         </div>
     </div>
 

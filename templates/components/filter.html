@@ -9,8 +9,9 @@
   <div class="accordion-item">
     <div id="filter-collapse" class="accordion-collapse collapse show">
       <div class="accordion-body p-1">
-        <div class="input-group mb-3 position-relative">
-          <input type="text" class="form-control pe-5" placeholder="Filter files..." v-model="filter">
+        <div class="form-floating mb-3 position-relative">
+          <input id="filterInput" type="text" class="form-control pe-5" placeholder="Filter files..." v-model="filter">
+          <label for="filterInput" class="text-muted">Filter files...</label>
           <button v-if="filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="filter = ''"><i class="bi bi-x"></i></button>
         </div>
 
