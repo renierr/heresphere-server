@@ -14,7 +14,7 @@ export const data = {
     totalItems: 0,
     totalSize: 0,
     confirmData: {},
-    settings: JSON.parse(localStorage.getItem('settings')) || { cardLayout: false, pageSize: 12 },
+    settings: JSON.parse(localStorage.getItem('settings')) || { cardLayout: false, pageSize: 12, filterAccordionOpen: true },
 };
 
 function debounce(func, wait) {
@@ -238,6 +238,10 @@ export const methods = {
         } else if (event.key === 'ArrowRight') {
             this.changePage(this.currentPage + 1);
         }
+    },
+    toggleAccordion() {
+        this.settings.filterAccordionOpen = !this.settings.filterAccordionOpen;
+        this.saveSettings();
     },
 };
 
