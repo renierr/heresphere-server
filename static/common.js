@@ -1,6 +1,6 @@
 function localStoreSettingsLoading() {
     const defaults = { cardLayout: true, pageSize: 12,
-        filterAccordionOpen: true, infoAccordionOpen: true };
+        filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '' };
     let storedSetting = JSON.parse(localStorage.getItem('settings')) || {};
     storedSetting = {...defaults, ...storedSetting};
     return storedSetting;

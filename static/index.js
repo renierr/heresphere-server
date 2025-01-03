@@ -70,8 +70,12 @@ new Vue({
             });
         },
         confirmMoveToLibrary(filename) {
+            const lastFolder = this.settings.lastMoveSubfolder || '';
             const modalConfirmExtras = document.getElementById('confirmModalExtras');
-            const options = library_subfolders.map(subfolder => `<option value="${subfolder}">${subfolder}</option>`).join('');
+            const options = library_subfolders.map(subfolder => {
+                const selected = subfolder === lastFolder ? 'selected' : '';
+                return `<option value="${subfolder}" ${selected}>${subfolder}</option>`;
+            }).join('');
             modalConfirmExtras.innerHTML = `
             <div>
                 <select id="subfolderSelect" class="form-select">
@@ -103,6 +107,8 @@ new Vue({
                 return;
             }
             const file = confData.file;
+            this.settings.lastMoveSubfolder = subfolder;
+            this.saveSettings();
             this.confirmData = {};
             fetch('/api/move_to_library', {
                 method: 'POST',
