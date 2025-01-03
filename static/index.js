@@ -1,4 +1,10 @@
-import {data, methods, computed, watch, addKeyUpListener, removeKeyUpListener} from './common.js';
+import {
+    data,
+    methods,
+    computed,
+    watch,
+    addSwipeNavigationForPagingListener, addKeyNavigationForPagingListener, removeKeyNavigationForPagingListener
+} from './common.js';
 
 new Vue({
     el: '#app',
@@ -130,10 +136,11 @@ new Vue({
         ...watch,
     },
     beforeDestroy() {
-        removeKeyUpListener(this);
+        removeKeyNavigationForPagingListener(this);
     },
     mounted: function () {
-        addKeyUpListener(this);
+        addKeyNavigationForPagingListener(this);
+        addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
         const eventSource = new EventSource('/sse');
         const serverOutput = [];

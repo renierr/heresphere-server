@@ -237,16 +237,6 @@ export const methods = {
     saveSettings() {
         localStorage.setItem('settings', JSON.stringify(this.settings));
     },
-    handleKeyup(event) {
-        // only if paging present
-        if (this.totalPages === 1) return;
-
-        if (event.key === 'ArrowLeft') {
-            this.changePage(this.currentPage - 1);
-        } else if (event.key === 'ArrowRight') {
-            this.changePage(this.currentPage + 1);
-        }
-    },
     toggleFilterAccordion() {
         this.settings.filterAccordionOpen = !this.settings.filterAccordionOpen;
         this.saveSettings();
@@ -346,9 +336,40 @@ export const watch = {
     },
 };
 
-export const addKeyUpListener = (vueContext) => {
-    window.addEventListener('keyup', vueContext.handleKeyup);
+function keyNavigationForPaging(event, vueContext) {
+    // only if paging present
+    if (vueContext.totalPages === 1) return;
+
+    if (event.key === 'ArrowLeft') {
+        vueContext.changePage(this.currentPage - 1);
+    } else if (event.key === 'ArrowRight') {
+        vueContext.changePage(this.currentPage + 1);
+    }
 }
-export const removeKeyUpListener = (vueContext) => {
-    window.removeEventListener('keyup', vueContext.handleKeyup);
+
+let keyNavigationForPagingHandler;
+export const addKeyNavigationForPagingListener = (vueContext) => {
+    keyNavigationForPagingHandler = (event) => keyNavigationForPaging(event, vueContext);
+    window.addEventListener('keyup', keyNavigationForPagingHandler);
+}
+export const removeKeyNavigationForPagingListener = () => {
+    if (keyNavigationForPagingHandler) {
+        window.removeEventListener('keyup', keyNavigationForPagingHandler);
+        keyNavigationForPagingHandler = null;
+    }
+}
+
+let swipeNavigationForPagingHandler;
+export const addSwipeNavigationForPagingListener = (vueContext) => {
+    const hammer = new Hammer(document);
+    hammer.on('swipeleft', function() {
+        vueContext.changePage(vueContext.currentPage + 1);
+    });
+    hammer.on('swiperight', function() {
+        vueContext.changePage(vueContext.currentPage - 1);
+    });
+}
+
+export const removeSwipeListener = (vueContext) => {
+
 }
