@@ -4,7 +4,7 @@
         <img v-else src="/static/images/placeholder.png" class="card-img-top" alt="Placeholder">
         <span v-if="file.partial" class="position-absolute text-danger h3 shadow" style="left: .5rem; top: 1rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-circle-fill partial-icon"></i>  Partial</span>
     </div>
-    <div class="card-body flex-grow-1 pb-0">
+    <div class="card-body flex-grow-1">
         <h5 class="card-title text-truncate" data-bs-toggle="tooltip" :title="file.title">
             <a class="video-link text-decoration-none" :href="file.filename">
                 <i class="bi bi-link-45deg"></i> {{ file.title }}
@@ -20,7 +20,7 @@
         </p>
         <p v-if="file.folder" class="mb-0"><i class="bi bi-folder"></i> {{ file.folder }}</p>
     </div>
-    <div class="mt-auto p-2">
+    <div class="card-footer p-2">
         <button class="btn btn-outline-success btn-sm" @click="playVideo(file.filename)">
             <i class="bi bi-play-fill"></i> Play
         </button>
