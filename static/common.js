@@ -1,7 +1,8 @@
 function localStoreSettingsLoading() {
-    const defaults = { cardLayout: true, pageSize: 12, filterAccordionOpen: true };
+    const defaults = { cardLayout: true, pageSize: 12,
+        filterAccordionOpen: true, infoAccordionOpen: true };
     let storedSetting = JSON.parse(localStorage.getItem('settings')) || {};
-    storedSetting = Object.assign({}, defaults, storedSetting);
+    storedSetting = {...defaults, ...storedSetting};
     return storedSetting;
 }
 
@@ -246,10 +247,15 @@ export const methods = {
             this.changePage(this.currentPage + 1);
         }
     },
-    toggleAccordion() {
+    toggleFilterAccordion() {
         this.settings.filterAccordionOpen = !this.settings.filterAccordionOpen;
         this.saveSettings();
     },
+    toggleInfoAccordion() {
+        this.settings.infoAccordionOpen = !this.settings.infoAccordionOpen;
+        this.saveSettings();
+    },
+
 };
 
 export const computed = {
