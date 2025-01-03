@@ -77,7 +77,8 @@ new Vue({
                 return `<option value="${subfolder}" ${selected}>${subfolder}</option>`;
             }).join('');
             modalConfirmExtras.innerHTML = `
-            <div>
+            <div class="d-flex align-items-center flex-column flex-md-row">
+                <label for="subfolderSelect" class="form-label me-2 text-nowrap">Target Subfolder</label>
                 <select id="subfolderSelect" class="form-select">
                     <option value="">Select a subfolder or leave for root folder</option>
                     ${options}
@@ -86,7 +87,7 @@ new Vue({
             `;
             this.confirmData = {
                 title: 'Move file',
-                message: `Are you sure you want to move the following file?`,
+                message: `Are you sure you want to move the following file to the library?`,
                 file: filename,
                 submit: 'Move',
                 action: (confData) => {
