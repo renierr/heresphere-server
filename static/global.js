@@ -42,5 +42,37 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error stopping the video player:', error);
         }
     });
+
+    // swipe listener for select (up/down) to select option
+    const applySelectOptionSwipeHandler = (selectElement) => {
+        if (selectElement.dataset.hammerApplied) {
+            return;
+        }
+        const hammer = new Hammer(selectElement);
+        hammer.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
+        hammer.on('swipe', (event) => {
+            if (event.direction === Hammer.DIRECTION_UP) {
+                selectElement.selectedIndex = Math.max(0, selectElement.selectedIndex - 1);
+            } else if (event.direction === Hammer.DIRECTION_DOWN) {
+                selectElement.selectedIndex = Math.min(selectElement.length - 1, selectElement.selectedIndex + 1);
+            }
+        });
+        selectElement.dataset.hammerApplied = 'true';
+    };
+    document.querySelectorAll('select').forEach(applySelectOptionSwipeHandler);
+
+    // Create a MutationObserver to watch for new select elements
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.tagName === 'SELECT') {
+                    applySelectOptionSwipeHandler(node);
+                } else if (node.querySelectorAll) {
+                    node.querySelectorAll('select').forEach(applySelectOptionSwipeHandler);
+                }
+            });
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
 });
 
