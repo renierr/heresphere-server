@@ -362,14 +362,12 @@ export const removeKeyNavigationForPagingListener = () => {
 let swipeNavigationForPagingHandler;
 export const addSwipeNavigationForPagingListener = (vueContext) => {
     const hammer = new Hammer(document);
-    hammer.on('swipeleft', function() {
-        vueContext.changePage(vueContext.currentPage + 1);
+    hammer.get('swipe').set({ threshold: 50 });
+    hammer.on('swipe', (event) => {
+        if (event.direction === Hammer.DIRECTION_LEFT) {
+            vueContext.changePage(vueContext.currentPage + 1);
+        } else if (event.direction === Hammer.DIRECTION_RIGHT) {
+            vueContext.changePage(vueContext.currentPage - 1);
+        }
     });
-    hammer.on('swiperight', function() {
-        vueContext.changePage(vueContext.currentPage - 1);
-    });
-}
-
-export const removeSwipeListener = (vueContext) => {
-
 }
