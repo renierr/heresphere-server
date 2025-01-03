@@ -53,5 +53,5 @@ img.thumbnail {
     color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
 }
 .icon-overlay {
-    backdrop-filter: brightness(1.5);
+    backdrop-filter: brightness(2);
 }

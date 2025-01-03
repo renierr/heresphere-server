@@ -3,7 +3,7 @@
         <img v-if="file.thumbnail" :src="file.thumbnail" class="card-img-top" alt="Thumbnail" @click="openThumbnail(file.thumbnail)">
         <img v-else src="/static/images/placeholder.png" class="card-img-top" alt="Placeholder">
         <span v-if="file.partial" class="position-absolute text-danger h3" style="left: .5rem; top: 1rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-circle-fill partial-icon"></i>  Partial</span>
-        <div class="icon-overlay position-absolute bottom-0 end-0 pe-1 ps-1 text-primary fs-3 lh-1 rounded">
+        <div class="icon-overlay position-absolute bottom-0 end-0 pe-1 ps-1 text-secondary fs-3 lh-1 rounded">
             <span v-if="file.width && (file.width > 1900 || file.height > 1900)"><i class="bi bi-badge-hd-fill"></i></span>
             <span v-if="file.width && (file.width > 8000 || file.height > 8000)"><i class="bi bi-badge-8k-fill"></i></span>
             <span v-else-if="file.width && (file.width > 3800 || file.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
