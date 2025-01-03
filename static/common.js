@@ -1,3 +1,10 @@
+function localStoreSettingsLoading() {
+    const defaults = { cardLayout: true, pageSize: 12, filterAccordionOpen: true };
+    let storedSetting = JSON.parse(localStorage.getItem('settings')) || {};
+    storedSetting = Object.assign({}, defaults, storedSetting);
+    return storedSetting;
+}
+
 // common.js
 export const data = {
     files: [],
@@ -14,7 +21,7 @@ export const data = {
     totalItems: 0,
     totalSize: 0,
     confirmData: {},
-    settings: JSON.parse(localStorage.getItem('settings')) || { cardLayout: false, pageSize: 12, filterAccordionOpen: true },
+    settings: localStoreSettingsLoading(),
 };
 
 function debounce(func, wait) {
