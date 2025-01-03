@@ -4,7 +4,7 @@
             <button class="accordion-button btn-sm p-1" type="button"
                     data-bs-toggle="collapse" data-bs-target="#serverinfo-collapse"
                     aria-expanded="true" aria-controls="serverinfo-collapse"
-                    @click="toggleInfoAccordion">
+                    @click="toggleInfoAccordion" :class="{collapsed: !settings.infoAccordionOpen}">
                 Server Information
             </button>
         </h5>
