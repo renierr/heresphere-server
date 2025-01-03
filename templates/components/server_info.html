@@ -7,7 +7,7 @@
         </h5>
     </div>
     <div class="accordion-item">
-        <div id="serverinfo-collapse" class="accordion-collapse collapse show">
+        <div id="serverinfo-collapse" class="accordion-collapse collapse {% if not closed %}show{% endif %}">
             <div class="accordion-body p-1">
                 <div v-text="serverOutput" class="text-muted small" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
             </div>
