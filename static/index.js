@@ -68,7 +68,7 @@ new Vue({
             const options = library_subfolders.map(subfolder => `<option value="${subfolder}">${subfolder}</option>`).join('');
             modalConfirmExtras.innerHTML = `
             <div>
-                <select id="subfolderSelect">
+                <select id="subfolderSelect" class="form-select">
                     <option value="">Select a subfolder or leave for root folder</option>
                     ${options}
                 </select>
