@@ -1,4 +1,4 @@
-<div class="accordion" id="filters">
+<div class="accordion mb-1" id="filters">
   <div class="accordion-item">
     <h5 class="accordion-header">
       <button class="accordion-button btn-sm p-1" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse" aria-expanded="true" aria-controls="filter-collapse">
@@ -9,12 +9,6 @@
   <div class="accordion-item">
     <div id="filter-collapse" class="accordion-collapse collapse show">
       <div class="accordion-body p-1">
-        <div class="form-floating mb-3 position-relative">
-          <input id="filterInput" type="text" class="form-control pe-5" placeholder="Filter files..." v-model="filter">
-          <label for="filterInput" class="text-muted">Filter files...</label>
-          <button v-if="filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="filter = ''"><i class="bi bi-x"></i></button>
-        </div>
-
         <div class="input-group d-flex justify-content-center align-items-center mb-2">
           <select v-model="selectedFolder" class="form-select form-control w-auto">
             <option value="">All Folders</option>
@@ -38,6 +32,11 @@
               <i class="bi bi-list-ul"></i><span class="d-none d-lg-inline"> Detail</span>
             </button>
           </div>
+        </div>
+        <div class="form-floating mb-3 position-relative">
+          <input id="filterInput" type="text" class="form-control pe-5" placeholder="Filter files..." v-model="filter">
+          <label for="filterInput" class="text-muted">Filter files...</label>
+          <button v-if="filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="filter = ''"><i class="bi bi-x"></i></button>
         </div>
       </div>
     </div>
