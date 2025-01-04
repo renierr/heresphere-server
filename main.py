@@ -151,8 +151,9 @@ def start_server():
     # Register save_url_map to be called on application exit
     atexit.register(save_url_map)
 
-    sys.stdout = open(os.devnull, 'w')
-    sys.stderr = open(os.devnull, 'w')
+    if not is_debug():
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
 
     # we need ffmpeg and ffprobe check if it is available in path
     logger.info("Checking for ffmpeg and ffprobe")
