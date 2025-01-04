@@ -117,7 +117,8 @@ export const methods = {
                 .then(data => {
                     this.files = data.map(file => ({
                         ...file,
-                        showPreview: false
+                        showPreview: false,
+                        previewTimeout: null,
                     }));
                     this.loading = false;
                 })
