@@ -12,6 +12,7 @@ export const data = {
     filter: '',
     videoUrl: '',
     selectedFolder: '',
+    selectedResolution: '',
     loading: false,
     currentSort: 'created',
     currentSortDir: 'desc',
@@ -245,19 +246,27 @@ export const methods = {
         this.settings.infoAccordionOpen = !this.settings.infoAccordionOpen;
         this.saveSettings();
     },
+    checkResolution(file) {
+        if (this.selectedResolution === 'HD') {
+            return file.width > 1900 || file.height > 1900;
+        } else if (this.selectedResolution === '4K') {
+            return file.width >= 3800 || file.height >= 3800;
+        } else if (this.selectedResolution === '8K') {
+            return file.width >= 8000 || file.height >= 8000;
+        }
+        return true;
+    },
 
 };
 
 export const computed = {
     filteredFiles: function () {
 
-        let filtered = this.files;
-        if (this.selectedFolder) {
-            filtered = this.files.filter(file => file.folder === this.selectedFolder);
-        }
-
-        filtered = filtered.filter(file => {
-            return file.filename.toLowerCase().includes(this.filter.toLowerCase());
+        let filtered = this.files.filter(file => {
+            const matchesFolder = this.selectedFolder ? file.folder === this.selectedFolder : true;
+            const matchesFilter = this.filter ? file.filename.toLowerCase().includes(this.filter.toLowerCase()) : true;
+            const matchesResolution = this.selectedResolution ? this.checkResolution(file) : true;
+            return matchesFolder && matchesFilter && matchesResolution;
         });
 
         filtered = filtered.sort((a, b) => {

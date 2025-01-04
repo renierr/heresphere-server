@@ -37,6 +37,12 @@
             </button>
           </div>
         </div>
+        <div class="btn-group mb-3" role="group" aria-label="Filter by Resolution">
+          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === '' }" @click="selectedResolution = ''">All Resolutions</button>
+          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === 'HD' }" @click="selectedResolution = 'HD'">HD+</button>
+          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === '4K' }" @click="selectedResolution = '4K'">4K+</button>
+          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === '8K' }" @click="selectedResolution = '8K'">8K+</button>
+        </div>
         <div class="form-floating mb-3 position-relative">
           <input id="filterInput" type="text" class="form-control pe-5"
                  placeholder="Filter files..." v-model="filter">
