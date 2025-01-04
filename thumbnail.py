@@ -54,7 +54,7 @@ def gt():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@cache(maxsize=512, bypass_cache_param='force')
+@cache(maxsize=4096, bypass_cache_param='force')
 def get_video_info(video_path, force=False):
     """
     (cached; max time in cache CACHE_EXPIRATION_TIME)
@@ -88,6 +88,7 @@ def get_video_info(video_path, force=False):
                 return info
 
         logger.debug(f"Running ffprobe for {video_path}")
+        push_text_to_client(f"Running ffprobe to get video info for {os.path.basename(video_path)}")
         result = subprocess.run(
             ['ffprobe', '-v', 'error', '-show_entries', 'format', '-show_entries', 'stream', '-of', 'json', video_path],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
@@ -102,8 +103,8 @@ def get_video_info(video_path, force=False):
         info['infos'] = infos
 
         # store json to .thumb folder
-        with open(json_path, 'w', encoding='utf-8') as f:
-            json.dump(info, f, indent=2, ensure_ascii=False)
+        #with open(json_path, 'w', encoding='utf-8') as f:
+        #    json.dump(info, f, indent=2, ensure_ascii=False)
 
         return info
     except subprocess.CalledProcessError as e:
