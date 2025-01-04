@@ -97,14 +97,14 @@ def get_video_info(video_path, force=False):
 
         # additional infos
         infos = {}
-        with open(video_path, 'rb') as f:
-            infos['md5'] = hashlib.md5(f.read()).hexdigest()
+        #with open(video_path, 'rb') as f:
+        #    infos['md5'] = hashlib.md5(f.read()).hexdigest()
 
         info['infos'] = infos
 
         # store json to .thumb folder
-        #with open(json_path, 'w', encoding='utf-8') as f:
-        #    json.dump(info, f, indent=2, ensure_ascii=False)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(info, f, indent=2, ensure_ascii=False)
 
         return info
     except subprocess.CalledProcessError as e:
