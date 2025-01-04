@@ -1,3 +1,4 @@
+import hashlib
 import os
 import subprocess
 import json
@@ -53,8 +54,8 @@ def gt():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
-@cache(maxsize=512)
-def get_video_info(video_path):
+@cache(maxsize=512, bypass_cache_param='force')
+def get_video_info(video_path, force=False):
     """
     (cached; max time in cache CACHE_EXPIRATION_TIME)
     Get video info using ffprobe, try to load from .thumb folder first
@@ -63,9 +64,11 @@ def get_video_info(video_path):
     Example:
     {
         "streams": [ ... ],
-        "format": { ... }
+        "format": { ... },
+        "infos": { "md5": "..." } // additional infos
     }
 
+    :param force: force to run ffprobe
     :param video_path: full path to video file
     :return: json object or None
     """
@@ -76,9 +79,9 @@ def get_video_info(video_path):
             return None
 
         # find the video json in .thumb folder first
-        json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + '.thumb.json'
+        json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
-        if os.path.exists(json_path):
+        if os.path.exists(json_path) and not force:
             with open(json_path, 'r', encoding='utf-8') as f:
                 logger.debug(f"Loading pre existing video info from {json_path}")
                 info = json.load(f)
@@ -90,6 +93,13 @@ def get_video_info(video_path):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
         )
         info = json.loads(result.stdout)
+
+        # additional infos
+        infos = {}
+        with open(video_path, 'rb') as f:
+            infos['md5'] = hashlib.md5(f.read()).hexdigest()
+
+        info['infos'] = infos
 
         # store json to .thumb folder
         with open(json_path, 'w', encoding='utf-8') as f:
@@ -122,29 +132,32 @@ def generate_thumbnails(library=False):
             if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
                 video_path = os.path.join(root, filename)
                 thumbnail_dir = os.path.join(root, '.thumb')
-                os.makedirs(thumbnail_dir, exist_ok=True)
-                thumbnail_path = os.path.join(thumbnail_dir, f"{filename}.thumb.webp")
 
                 logger.debug(f"Checking thumbnail for {filename}")
                 # if one of the thumbs for file is missing, generate all thumbs
-                if not os.path.exists(thumbnail_path) or not os.path.exists(os.path.splitext(thumbnail_path)[0] + '.jpg') or not os.path.exists(os.path.splitext(thumbnail_path)[0] + '.webm'):
-                    success = generate_thumbnail(video_path, thumbnail_path)
+                missing = False
+                for fmt in ThumbnailFormat:
+                    if not os.path.exists(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}")):
+                        missing = True
+                        break
+
+                if not missing:
+                    success = generate_thumbnail(video_path)
                     if success:
-                        generated_thumbnails.append(thumbnail_path)
+                        generated_thumbnails.append(video_path)
                     else:
                         thumbnail_errors.append(video_path)
 
     push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails {'(' + str(len(thumbnail_errors)) + ' failed)' if thumbnail_errors else ''}")
-    return {"success": True, "generated_thumbnails": generated_thumbnails}
+    return {"success": True, "generated_thumbnails": len(generated_thumbnails)}
 
 
-def generate_thumbnail(video_path, thumbnail_path):
+def generate_thumbnail(video_path):
     """
     Generate thumbnail for video file using ffmpeg
     this method will generate a webp, jpg and webm thumbnails
 
     :param video_path: full path to video file
-    :param thumbnail_path: full path to thumbnail file that will be generated (default webp)
     :return: true if success, false if failed
     """
     try:
@@ -152,11 +165,18 @@ def generate_thumbnail(video_path, thumbnail_path):
         if video_path.endswith('.part'):
             return None
 
-        push_text_to_client(f"Generating thumbnail and info for {os.path.basename(video_path)}")
+        if not os.path.exists(video_path):
+            return False
+
+        base_name = os.path.basename(video_path)
+        push_text_to_client(f"Generating thumbnail and info for {base_name}")
         logger.debug(f"Evict cache for {video_path}")
         get_thumbnails.cache__evict(video_path)   # evict cache for thumbnails
 
-        video_info = get_video_info(video_path)
+        thumbnail_dir = os.path.join(os.path.dirname(video_path), '.thumb')
+        os.makedirs(thumbnail_dir, exist_ok=True)
+
+        video_info = get_video_info(video_path, force=True)
         if not video_info:
             logger.error(f"Failed to get video info for {video_path}")
             return False
@@ -189,8 +209,9 @@ def generate_thumbnail(video_path, thumbnail_path):
             stdout = None if is_debug() else devnull
             execution_timelimit = 120
 
-            logger.debug(f"Starting ffmpeg for webp")
-            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', str(clip_duration), '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', thumbnail_path]
+            outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBP.extension}")
+            logger.debug(f"Starting ffmpeg for webp - {outfile}")
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', str(clip_duration), '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', outfile]
             logger.debug(f"Running command: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
@@ -198,8 +219,9 @@ def generate_thumbnail(video_path, thumbnail_path):
                 logger.error(f"Failed to generate thumbnail for webp (timeout): {video_path}")
                 return False
 
-            logger.debug(f"Starting ffmpeg for jpg")
-            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-update', '1', os.path.splitext(thumbnail_path)[0] + '.jpg']
+            outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.JPG.extension}")
+            logger.debug(f"Starting ffmpeg for jpg - {outfile}")
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-update', '1', outfile]
             logger.debug(f"Running command: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
@@ -207,8 +229,9 @@ def generate_thumbnail(video_path, thumbnail_path):
                 logger.error(f"Failed to generate thumbnail for jpg (timeout): {video_path}")
                 return False
 
-            logger.debug(f"Starting ffmpeg for webm")
-            cmd = ['ffmpeg', '-ss', str(midpoint), '-t', str(clip_duration), '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', os.path.splitext(thumbnail_path)[0] + '.webm']
+            outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
+            logger.debug(f"Starting ffmpeg for webm - {outfile}")
+            cmd = ['ffmpeg', '-ss', str(midpoint), '-t', str(clip_duration), '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-deadline', 'realtime', '-cpu-used', '16', '-crf', '8', '-b:v', '256k', '-c:a', 'libvorbis', outfile]
             logger.debug(f"Running command: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
@@ -273,15 +296,11 @@ def generate_thumbnail_for_path(video_path):
     if not real_path:
         return {"success": False, "error": "Invalid video path"}
 
-    base_name = os.path.basename(real_path)
-    thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
-    os.makedirs(thumbnail_dir, exist_ok=True)
-    thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}.thumb.webp")
-
     if not os.path.exists(real_path):
         return {"success": False, "error": "Video file does not exist"}
 
-    success = generate_thumbnail(real_path, thumbnail_path)
+    base_name = os.path.basename(real_path)
+    success = generate_thumbnail(real_path)
     clear_cache_by_name('list_files')
     push_text_to_client(f"Generate thumbnails finished for {base_name} with {'success' if success else 'failure'}")
     if success:
