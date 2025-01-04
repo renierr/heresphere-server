@@ -115,7 +115,10 @@ export const methods = {
                     return response.json();
                 })
                 .then(data => {
-                    this.files = data;
+                    this.files = data.map(file => ({
+                        ...file,
+                        showPreview: false
+                    }));
                     this.loading = false;
                 })
                 .catch(error => {

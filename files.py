@@ -5,7 +5,8 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache
 from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map
-from thumbnail import get_thumbnail, ThumbnailFormat, get_video_info
+from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
+
 
 @cache(maxsize=512, ttl=3600)
 def library_subfolders():
@@ -76,9 +77,12 @@ def extract_file_details(root, filename, base_path, subfolder):
             'created': os.path.getctime(realfile),
         })
     else:
-        thumbnail = get_thumbnail(realfile, ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
+        thumbnails = get_thumbnails(realfile)
+        thumbnail = thumbnails.get(ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
+        preview = thumbnails.get(ThumbnailFormat.WEBM)
         info = get_basic_save_video_info(realfile)
         result.update({
+            'preview': preview,
             'thumbnail': thumbnail,
             'created': info.created,
             'filesize': info.size,
