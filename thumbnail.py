@@ -141,7 +141,7 @@ def generate_thumbnails(library=False):
                         missing = True
                         break
 
-                if not missing:
+                if missing:
                     success = generate_thumbnail(video_path)
                     if success:
                         generated_thumbnails.append(video_path)
