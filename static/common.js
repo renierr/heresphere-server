@@ -126,6 +126,15 @@ export const methods = {
                     this.loading = false;
                 })
         }, 3000),
+    startPreview(file) {
+        file.previewTimeout = setTimeout(() => {
+            file.showPreview = true;
+        }, 1000); // 1 second delay
+    },
+    stopPreview(file) {
+        clearTimeout(file.previewTimeout);
+        file.showPreview = false;
+    },
     generateThumbnails() {
         // if we are in library url path we should use library api
         const library = window.location.pathname.includes('/library');
