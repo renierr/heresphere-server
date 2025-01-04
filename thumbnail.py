@@ -103,7 +103,8 @@ def get_video_info(video_path, force=False):
         streams_info = info.get('streams', [])
         unique_info = f"{format_info.get('format_name', '')}_{format_info.get('duration', '')}_{format_info.get('size', '')}"
         for stream in streams_info:
-            unique_info += f"_{stream.get('codec_name', '')}_{stream.get('width', '')}_{stream.get('height', '')}"
+            unique_info += f"_{stream.get('codec_name', '')}_{stream.get('width', '')}_{stream.get('height', '')}_{stream.get('bit_rate', '')}_{stream.get('sample_rate', '')}_{stream.get('channels', '')}"
+
         infos['unique_info'] = unique_info
 
         # store json to .thumb folder
