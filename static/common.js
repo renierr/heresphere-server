@@ -319,6 +319,9 @@ export const watch = {
     pageSize: function (newPageSize, oldPageSize) {
         this.currentPage = 1;
     },
+    selectedFolder: function (newFolder, oldFolder) {
+        this.currentPage = 1;
+    },
     cardLayout(newValue) {
         localStorage.setItem('cardLayout', newValue);
     },
