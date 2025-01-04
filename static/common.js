@@ -13,6 +13,7 @@ export const data = {
     videoUrl: '',
     selectedFolder: '',
     selectedResolution: '',
+    selectedDuration: 0,
     loading: false,
     currentSort: 'created',
     currentSortDir: 'desc',
@@ -256,6 +257,10 @@ export const methods = {
         }
         return true;
     },
+    checkDuration(file) {
+        const durationInMinutes = file.duration / 60;
+        return durationInMinutes >= this.selectedDuration;
+    },
 
 };
 
@@ -266,7 +271,8 @@ export const computed = {
             const matchesFolder = this.selectedFolder ? file.folder === this.selectedFolder : true;
             const matchesFilter = this.filter ? file.filename.toLowerCase().includes(this.filter.toLowerCase()) : true;
             const matchesResolution = this.selectedResolution ? this.checkResolution(file) : true;
-            return matchesFolder && matchesFilter && matchesResolution;
+            const matchesDuration = this.selectedDuration ? this.checkDuration(file) : true;
+            return matchesFolder && matchesFilter && matchesResolution && matchesDuration;
         });
 
         filtered = filtered.sort((a, b) => {

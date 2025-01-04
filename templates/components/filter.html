@@ -27,26 +27,35 @@
             </select>
           </div>
           <div class="btn-group ms-2" role="group" aria-label="Layout Switch">
-            <button type="button" class="btn btn-outline-secondary"
+            <button type="button" class="btn btn-outline-secondary btn-sm"
                     :class="{ active: settings.cardLayout }" @click="settings.cardLayout = true">
               <i class="bi bi-card-list"></i><span class="d-none d-lg-inline"> Card</span>
             </button>
-            <button type="button" class="btn btn-outline-secondary"
+            <button type="button" class="btn btn-outline-secondary btn-sm"
                     :class="{ active: !settings.cardLayout }" @click="settings.cardLayout = false">
               <i class="bi bi-list-ul"></i><span class="d-none d-lg-inline"> Detail</span>
             </button>
           </div>
         </div>
-        <div class="btn-group mb-3" role="group" aria-label="Filter by Resolution">
-          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === '' }" @click="selectedResolution = ''">All Resolutions</button>
-          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === 'HD' }" @click="selectedResolution = 'HD'">HD+</button>
-          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === '4K' }" @click="selectedResolution = '4K'">4K+</button>
-          <button type="button" class="btn btn-outline-secondary" :class="{ active: selectedResolution === '8K' }" @click="selectedResolution = '8K'">8K+</button>
+        <div class="d-flex flex-column flex-md-row justify-content-between mb-3 gap-2">
+          <div class="btn-group" role="group" aria-label="Filter by Resolution">
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedResolution === '' }" @click="selectedResolution = ''">All&nbsp;Resolutions</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedResolution === 'HD' }" @click="selectedResolution = 'HD'">HD+</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedResolution === '4K' }" @click="selectedResolution = '4K'">4K+</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedResolution === '8K' }" @click="selectedResolution = '8K'">8K+</button>
+          </div>
+          <div class="btn-group" role="group" aria-label="Filter by Duration">
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedDuration === 0 }" @click="selectedDuration = 0">All&nbsp;Durations</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedDuration === 5 }" @click="selectedDuration = 5">+5min</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedDuration === 15 }" @click="selectedDuration = 15">+15min</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedDuration === 30 }" @click="selectedDuration = 30">+30min</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedDuration === 60 }" @click="selectedDuration = 60">+60min</button>
+          </div>
         </div>
         <div class="form-floating mb-3 position-relative">
           <input id="filterInput" type="text" class="form-control pe-5"
-                 placeholder="Filter files..." v-model="filter">
-          <label for="filterInput" class="text-muted">Filter files...</label>
+                 placeholder="Filter files by Name..." v-model="filter">
+          <label for="filterInput" class="text-muted">Filter files by Name...</label>
           <button v-if="filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="filter = ''"><i class="bi bi-x"></i></button>
         </div>
       </div>
