@@ -20,8 +20,6 @@ def cache(maxsize=128, ttl=None, bypass_cache_param=None):
                         # Remove expired cache entry
                         del local_cache._cache[args]
                         del local_cache._timestamps[args]
-            else:
-                print(f"Bypassing cache for {func.__name__}")
 
             result = func(*args, **kwargs)
             if result:
