@@ -9,6 +9,9 @@ footer.footer {
     text-align: center;
     backdrop-filter: blur(10px);
 }
+.cursor-pointer {
+    cursor: pointer;
+}
 
 @media (min-width: 768px) {
     .w-md-auto {

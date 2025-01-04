@@ -1,6 +1,6 @@
 <div class="d-flex align-items-start flex-column flex-md-row p-2">
-    <div class="thumbnail-wrapper me-3 mb-1 w-100 w-md-auto">
-        <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail" @click="openThumbnail(file.thumbnail)">
+    <div class="thumbnail-wrapper me-3 mb-1 w-100 w-md-auto cursor-pointer" @click="openThumbnail(file.thumbnail)">
+        <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail">
     </div>
     <div class="w-100 d-flex flex-column align-items-start pt-2 flex-grow-1">
         <div class="fw-bold h5">
