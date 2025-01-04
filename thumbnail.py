@@ -1,4 +1,3 @@
-import hashlib
 import os
 import subprocess
 import json
@@ -97,10 +96,15 @@ def get_video_info(video_path, force=False):
 
         # additional infos
         infos = {}
-        #with open(video_path, 'rb') as f:
-        #    infos['md5'] = hashlib.md5(f.read()).hexdigest()
-
         info['infos'] = infos
+
+        # generate unique info string from specific fields
+        format_info = info.get('format', {})
+        streams_info = info.get('streams', [])
+        unique_info = f"{format_info.get('format_name', '')}_{format_info.get('duration', '')}_{format_info.get('size', '')}"
+        for stream in streams_info:
+            unique_info += f"_{stream.get('codec_name', '')}_{stream.get('width', '')}_{stream.get('height', '')}"
+        infos['unique_info'] = unique_info
 
         # store json to .thumb folder
         with open(json_path, 'w', encoding='utf-8') as f:
