@@ -3,7 +3,7 @@ from functools import lru_cache, wraps
 
 cache_registry = []
 
-def cache(maxsize=128, ttl=None):
+def cache(maxsize=128, ttl=None, bypass_cache_param=None):
     def decorator(func):
         local_cache = lru_cache(maxsize=maxsize)(func)
         local_cache._cache = {}
@@ -12,13 +12,17 @@ def cache(maxsize=128, ttl=None):
         @wraps(func)
         def wrapped(*args, **kwargs):
             current_time = time.time()
-            if args in local_cache._cache:
-                if ttl is None or current_time - local_cache._timestamps[args] < ttl:
-                    return local_cache._cache[args]
-                else:
-                    # Remove expired cache entry
-                    del local_cache._cache[args]
-                    del local_cache._timestamps[args]
+            if not (bypass_cache_param and kwargs.get(bypass_cache_param, False)):
+                if args in local_cache._cache:
+                    if ttl is None or current_time - local_cache._timestamps[args] < ttl:
+                        return local_cache._cache[args]
+                    else:
+                        # Remove expired cache entry
+                        del local_cache._cache[args]
+                        del local_cache._timestamps[args]
+            else:
+                print(f"Bypassing cache for {func.__name__}")
+
             result = func(*args, **kwargs)
             if result:
                 local_cache._cache[args] = result
