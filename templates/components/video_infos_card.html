@@ -6,7 +6,7 @@
         <span v-if="file.may_exist" class="position-absolute text-warning h3" style="left: 0.5rem; top: 3rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-triangle-fill exist-icon"></i> Duplicate?</span>
         <div class="icon-overlay position-absolute bottom-0 end-0 pe-1 ps-1 text-secondary fs-3 lh-1 rounded">
             <span v-if="file.width && (file.width > 1900 || file.height > 1900)"><i class="bi bi-badge-hd-fill"></i></span>
-            <span v-if="file.width && (file.width > 8000 || file.height > 8000)"><i class="bi bi-badge-8k-fill"></i></span>
+            <span v-if="file.width && (file.width >= 8000 || file.height >= 8000)"><i class="bi bi-badge-8k-fill"></i></span>
             <span v-else-if="file.width && (file.width > 3800 || file.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
             <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
         </div>
