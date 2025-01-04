@@ -1,7 +1,8 @@
 <div class="d-flex align-items-start flex-column flex-md-row p-2">
-    <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail img-fluid me-3 mb-1" @click="openThumbnail(file.thumbnail)">
-    <img v-else src="/static/images/placeholder.png" alt="Placeholder" class="thumbnail img-fluid me-3 mb-1">
-    <div class="w-100 d-flex flex-column align-items-start pt-2 ">
+    <div class="thumbnail-wrapper me-3 mb-1 w-100 w-md-auto">
+        <img v-if="file.thumbnail" :src="file.thumbnail" alt="Thumbnail" class="thumbnail" @click="openThumbnail(file.thumbnail)">
+    </div>
+    <div class="w-100 d-flex flex-column align-items-start pt-2 flex-grow-1">
         <div class="fw-bold h5">
             <button class="btn btn-outline-success btn-sm" @click="playVideo(file.filename)">
                 <i class="bi bi-play-fill"></i> Play

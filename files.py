@@ -118,9 +118,9 @@ def get_basic_save_video_info(filename):
         height = video_info['streams'][0].get('height', 0) if 'streams' in video_info and len(
             video_info['streams']) > 0 else 0
         resolution = max(width, height)
-        if (height > 0 and (width / height == 2)):
+        if height > 0 and (width / height == 2):
             stereo = 'sbs'
-        elif (height > 0 and (width / height == 1)):
+        elif height > 0 and (width / height == 1):
             stereo = 'tb'
         else:
             stereo = ''
