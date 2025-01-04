@@ -247,6 +247,7 @@ def cleanup():
     push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
 
     # cleanup thumbnails from .thumb directory that no longer have a corresponding video file for both videos and library directory
+    known_extensions = [fmt.extension for fmt in ThumbnailFormat]
     to_remove = []
     for directory in ['videos', 'library']:
         # get all files from .thumb sub folders
@@ -256,9 +257,10 @@ def cleanup():
                 root_files = os.listdir(root)
                 for filename in os.listdir(thumb_dir):
                     if not any(filename.startswith(f) for f in root_files):
-                        thumb_file = os.path.join(thumb_dir, filename)
-                        to_remove.append(thumb_file)
-                        os.remove(thumb_file)
+                        if any(filename.endswith(ext) for ext in known_extensions):
+                            thumb_file = os.path.join(thumb_dir, filename)
+                            to_remove.append(thumb_file)
+                            os.remove(thumb_file)
 
     push_text_to_client(f"Cleanup thumbnails finished (removed: {len(to_remove)} orphan entries).")
     list_files.cache__clear()
