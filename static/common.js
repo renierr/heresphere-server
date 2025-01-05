@@ -118,7 +118,6 @@ export const methods = {
                     this.files = data.map(file => ({
                         ...file,
                         showPreview: false,
-                        previewTimeout: null,
                     }));
                     this.loading = false;
                 })
@@ -127,17 +126,20 @@ export const methods = {
                     this.loading = false;
                 })
         }, 3000),
-    startPreview(file) {
-        if (file.showPreview) return;
-        file.previewTimeout = setTimeout(() => {
-            file.showPreview = true;
-        }, 100); // 1 second delay
+    startPreview(file, evt) {
+        evt.target.play()
+            .then(() => file.showPreview = true)
+            .catch(error => {
+            if (error.name === 'NotAllowedError') {
+                this.showMessage('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
+            } else {
+                console.error('Error playing video:', error);
+            }
+        });
     },
-    stopPreview(file) {
-        setTimeout(() => {
-            clearTimeout(file.previewTimeout);
-            this.previewTimeout = null;
-            file.showPreview = false;}, 50);
+    stopPreview(file, evt) {
+        evt.target.pause();
+        file.showPreview = false;
     },
     generateThumbnails() {
         // if we are in library url path we should use library api

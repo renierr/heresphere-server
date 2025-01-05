@@ -1,10 +1,10 @@
-<div class="d-flex align-items-start flex-column flex-md-row p-2" @mouseleave="stopPreview(file)">
-    <div class="thumbnail-wrapper me-3 mb-1 w-100 w-md-auto cursor-pointer" @click="openThumbnail(file.thumbnail)" @mouseover="startPreview(file)">
-        <span v-if="file.preview">
-            <video v-if="file.showPreview" :src="file.preview" class="thumbnail" autoplay loop disablePictureInPicture></video>
-            <img v-else :src="file.thumbnail" class="thumbnail" alt="Thumbnail">
-        </span>
-        <span v-if="file.showPreview" class="position-absolute top-0 end-0 p-2 text-primary fs-3">
+<div class="d-flex align-items-start flex-column flex-md-row p-2">
+    <div class="thumbnail-wrapper me-3 mb-1 w-100 w-md-auto cursor-pointer" @click="openThumbnail(file.thumbnail)">
+        <video v-if="file.preview" :poster="file.thumbnail" :src="file.preview" class="thumbnail"
+               @mouseover="startPreview(file, this.event)" @mouseleave="stopPreview(file, this.event)"
+               preload="none" loop disablePictureInPicture></video>
+        <img v-else :src="file.thumbnail" class="thumbnail" />
+        <span v-if="file.showPreview" class="video-preview-indicator text-primary fs-3">
             <i class="bi bi-play-circle-fill"></i>
         </span>
     </div>
