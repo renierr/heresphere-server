@@ -2,7 +2,7 @@ html, body {
     height: 100%;
 }
 footer.footer {
-    position: sticky;
+    position: static;
     bottom: 0;
     width: 100%;
     padding: 1rem;
@@ -11,6 +11,12 @@ footer.footer {
 }
 .cursor-pointer {
     cursor: pointer;
+}
+
+@media (min-width: 768px) and (min-height: 512px) {
+    footer.footer {
+        position: sticky;
+    }
 }
 
 @media (min-width: 768px) {
@@ -31,7 +37,7 @@ footer.footer {
 .video-link {
     word-wrap: break-word;
     white-space: normal;
-    word-break: break-word;
+    word-break: break-all;
 }
 .thumbnail {
     max-height: 300px;
