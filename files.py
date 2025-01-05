@@ -61,7 +61,7 @@ def list_files(directory='videos'):
         if uid:
             if uid in uids:
                 original_file = uids[uid]
-                details['may_exist'] = f"id[{uid}]_file[{details.get('filename')}]_original[{original_file}]"
+                details['may_exist'] = f"id[{uid}]\n file[{details.get('filename')}]\n original[{original_file}]"
             else:
                 uids[uid] = details.get('filename')
 

@@ -31,7 +31,7 @@ footer.footer {
 .video-link {
     word-wrap: break-word;
     white-space: normal;
-    word-break: break-all;
+    word-break: break-word;
 }
 img.thumbnail {
     max-height: 300px;

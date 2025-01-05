@@ -26,7 +26,7 @@
             <p v-if="file.folder"><i class="bi bi-folder"></i> {{ file.folder }}</p>
         </div>
         <div class="item-function align-self-end w-100 text-end">
-            <div v-if="file.may_exist" class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded">Possible duplicate file {{ file.may_exist }}</div>
+            <div v-if="file.may_exist" class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded" style="word-break: break-word">Possible duplicate file {{ file.may_exist }}</div>
             <div v-if="file.partial" class="partial d-inline-block p-2 mt-2 w-100 text-center text-bg-danger rounded">Partial file - download maybe in progress</div>
             <a v-if="file.url" class="btn btn-sm m-1" :href="file.orig_link" @click="copyToClipboard($event, file.url); return false;">Copy Original Link</a>
             {% if option_download %}
