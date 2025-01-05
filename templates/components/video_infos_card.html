@@ -1,7 +1,7 @@
 <div class="card h-100 d-flex flex-column" @mouseleave="stopPreview(file)">
     <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="openThumbnail(file.thumbnail)" @mouseover="startPreview(file)">
-        <span v-if="!file.preview">
-            <video v-if="file.showPreview" :poster="file.thumbnail" :src="file.preview" class="card-img-top" loop disablePictureInPicture></video>
+        <span v-if="true">
+            <video v-if="true" :poster="file.thumbnail" :src="file.preview" class="card-img-top" preload="none" loop disablePictureInPicture></video>
         </span>
         <img v-else :src="file.thumbnail" class="card-img-top" alt="Thumbnail">
         <span v-if="file.showPreview" class="position-absolute top-0 end-0 p-2 text-primary fs-3">
