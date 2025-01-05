@@ -93,6 +93,7 @@ def favicon():
 def inject_globals():
     return {
         'library_subfolders': library_subfolders(),
+        'server_update_possible': os.path.exists('update.sh')
     }
 
 @app.route('/')
@@ -106,6 +107,27 @@ def library():
 @app.route('/bookmarks')
 def bookmarks():
     return render_template('bookmarks.html')
+
+@app.route('/update')
+def update():
+    # check if update.sh file is present in root folder
+    if os.path.exists('update.sh'):
+        push_text_to_client("Update triggered, try to update server - possible connection lost, look for reconnect")
+        try:
+            process = subprocess.Popen(['sh', 'update.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            # Read stdout line by line and push to client
+            for line in process.stdout:
+                push_text_to_client(line.strip())
+
+            stderr_output = process.stderr.read().strip()
+            if stderr_output:
+                push_text_to_client(stderr_output)
+        except Exception as e:
+            push_text_to_client(f"Error during update call: {e}")
+    else:
+        push_text_to_client("Update triggered, no update.sh in root folder present!")
+    return jsonify({'update': 'finished'})
+
 
 
 @app.route('/cache')

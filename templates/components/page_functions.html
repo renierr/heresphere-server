@@ -1,6 +1,7 @@
 <footer class="footer py-3">
     <div class="text-center">
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            {% if server_update_possible %}<a href="#" @click.prevent="confirmUpdate" class="btn btn-danger btn-sm">Server Update</a>{% endif %}
             <a href="#" @click.prevent="confirmCleanup" class="btn btn-danger btn-sm">Cleanup Files</a>
             <a href="#" @click.prevent="cacheClear" class="btn btn-warning btn-sm">Clear all Caches</a>
             <a href="#" @click.prevent="findDuplicates" class="btn btn-info btn-sm">Find Duplicates</a>

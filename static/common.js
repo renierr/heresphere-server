@@ -158,6 +158,28 @@ export const methods = {
                 this.serverResult = 'Error generating thumbnails';
             });
     },
+    confirmUpdate() {
+        this.confirmData = {
+            title: 'Server Update',
+            message: `This will call a Server Update. The process might be killed and connection can get lost, Are you sure you want to proceed?`,
+            submit: 'Update',
+            action: this.updateServer,
+        }
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+
+    },
+    updateServer() { // Add this method
+        fetch('/update')
+            .then(response => response.json())
+            .then(data => {
+                this.serverResult = data;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.serverResult = 'Error occurred during server update';
+            });
+    },
     confirmCleanup() {
         this.confirmData = {
             title: 'Cleanup files',
