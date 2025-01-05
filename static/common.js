@@ -19,7 +19,7 @@ export const data = {
     currentSortDir: 'desc',
     serverOutput: '',
     serverResult: null,
-    currentThumbnail: null,
+    currentFile: null,
     currentPage: 1,
     totalItems: 0,
     totalSize: 0,
@@ -68,8 +68,8 @@ export const methods = {
             return `${secs}s`;
         }
     },
-    openThumbnail(thumbnail) {
-        this.currentThumbnail = thumbnail;
+    openThumbnail(file) {
+        this.currentFile = file;
         const modal = new bootstrap.Modal(document.getElementById('thumbnailModal'));
         modal.show();
     },

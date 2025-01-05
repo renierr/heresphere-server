@@ -1,5 +1,5 @@
 <div class="card h-100 d-flex flex-column">
-    <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="openThumbnail(file.thumbnail)">
+    <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="openThumbnail(file)">
         <video v-if="file.preview" :poster="file.thumbnail" :src="file.preview" class="card-img-top"
                @mouseenter="startPreview(file, this.event)" @mouseleave="stopPreview(file, this.event)"
                preload="none" loop disablePictureInPicture></video>
