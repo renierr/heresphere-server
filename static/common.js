@@ -128,13 +128,16 @@ export const methods = {
                 })
         }, 3000),
     startPreview(file) {
+        if (file.showPreview) return;
         file.previewTimeout = setTimeout(() => {
             file.showPreview = true;
-        }, 1000); // 1 second delay
+        }, 100); // 1 second delay
     },
     stopPreview(file) {
-        clearTimeout(file.previewTimeout);
-        file.showPreview = false;
+        setTimeout(() => {
+            clearTimeout(file.previewTimeout);
+            this.previewTimeout = null;
+            file.showPreview = false;}, 50);
     },
     generateThumbnails() {
         // if we are in library url path we should use library api
