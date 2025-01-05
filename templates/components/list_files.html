@@ -16,7 +16,7 @@
   <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
   {% include "components/paging.html" %}
   <ul class="list-group list-group-flush">
-    <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-1 position-relative">
+    <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-0 position-relative">
       {% include "components/file_progress.html" %}
       {% include "components/video_infos.html" %}
     </li>
