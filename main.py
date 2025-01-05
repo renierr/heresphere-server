@@ -175,17 +175,20 @@ def start_server():
 
     # make sure library and video directory exists and if not create them
     library_dir = os.path.join(static_dir, 'library')
-    if not os.path.exists(library_dir):
+    if not os.path.exists(library_dir) and not os.path.islink(library_dir):
         os.makedirs(library_dir, exist_ok=True)
+
     video_dir = os.path.join(static_dir, 'videos')
-    if not os.path.exists(video_dir):
+    if not os.path.exists(video_dir) and not os.path.islink(video_dir):
         os.makedirs(video_dir, exist_ok=True)
+
     # inside videos directory there should be a direct and a youtube directory
     direct_dir = os.path.join(video_dir, 'direct')
-    if not os.path.exists(direct_dir):
+    if not os.path.exists(direct_dir) and not os.path.islink(direct_dir):
         os.makedirs(direct_dir, exist_ok=True)
+
     youtube_dir = os.path.join(video_dir, 'youtube')
-    if not os.path.exists(youtube_dir):
+    if not os.path.exists(youtube_dir) and not os.path.islink(youtube_dir):
         os.makedirs(youtube_dir, exist_ok=True)
 
     # Get the server's IP address
