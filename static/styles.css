@@ -33,7 +33,7 @@ footer.footer {
     white-space: normal;
     word-break: break-word;
 }
-img.thumbnail {
+.thumbnail {
     max-height: 300px;
 }
 @media (min-width: 768px) {
