@@ -1,5 +1,5 @@
 <div class="d-flex align-items-start flex-column flex-md-row p-0">
-    <div class="thumbnail-wrapper me-3 w-100 w-md-auto cursor-pointer" @click="openThumbnail(file.thumbnail)">
+    <div class="thumbnail-wrapper me-2 w-100 w-md-auto cursor-pointer" @click="openThumbnail(file.thumbnail)">
         <video v-if="file.preview" :poster="file.thumbnail" :src="file.preview" class="thumbnail"
                @mouseover="startPreview(file, this.event)" @mouseleave="stopPreview(file, this.event)"
                preload="none" loop disablePictureInPicture></video>
@@ -8,8 +8,8 @@
             <i class="bi bi-play-circle-fill"></i>
         </span>
     </div>
-    <div class="w-100 d-flex flex-column align-items-start p-2 flex-grow-1">
-        <div class="fw-bold h5">
+    <div class="w-100 d-flex flex-column align-items-start pt-3 p-2 flex-grow-1">
+        <div class="fw-bold h5 text-truncate card-title">
             <button class="btn btn-outline-success btn-sm" @click="playVideo(file.filename)">
                 <i class="bi bi-play-fill"></i>&nbsp;Play
             </button>
