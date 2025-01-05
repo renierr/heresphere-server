@@ -146,4 +146,64 @@ def generate_heresphere_json_item(server_path, file_base64):
                 "name": folders,
             }
         ]
+
+    result.update(detect_vr_format(base_name, info.stereo))
     return result
+
+
+def detect_vr_format(filename, sbs):
+    """
+    Detect VR video format from filename
+
+    :param filename: filename to detect the VR format
+    :param sbs: predefined stereo format - use it if exist (calculated from video resolution)
+    :return: dictionary with VR format information
+    """
+    filename_lower = filename.lower()
+
+    # check for stereo, possible values are "mono", "sbs", "tb"
+    stereo = "mono"
+    if sbs:
+        stereo = sbs
+    elif any(x in filename_lower for x in ["sbs", "side-by-side", "sidebyside", "_3d", "stereoscopic", "_lr", "_rl"]):
+        stereo = "sbs"
+    elif any(x in filename_lower for x in ["_tb", "_bt"]):
+        stereo = "tb"
+
+    # check for projection, possible values are "perspective", "equirectangular", "equirectangular360", "fisheye", "cubemap", "equiangularCubemap"
+    projection = "perspective"
+    if any(x in filename_lower for x in ["_180_", "180x180"]):
+        projection = "equirectangular"
+    elif any(x in filename_lower for x in ["_360_", "360x180"]):
+        projection = "equirectangular360"
+    elif any(x in filename_lower for x in ["fisheye"]):
+        projection = "fisheye"
+    elif any(x in filename_lower for x in ["cubemap", "equiangularCubemap"]):
+        projection = "cubemap"
+    elif any(x in filename_lower for x in ["equiangularCubemap"]):
+        projection = "equiangularCubemap"
+
+    # check for fov, possible values is a decimal number with the actual FOV of the video (180.0 for example)
+    fov = ""
+    if any(x in filename_lower for x in ["_180_", "180x180"]):
+        fov = 180.0
+    elif any(x in filename_lower for x in ["_360_", "360x180"]):
+        fov = 360.0
+    elif any(x in filename_lower for x in ["_90_", "90x90"]):
+        fov = 90.0
+
+    # check for lens, possible values are "Linear", "MKX220", "MKX200", "VRCA220"
+    lens = "Linear"
+    if any(x in filename_lower for x in ["MKX220"]):
+        lens = "MKX220"
+    elif any(x in filename_lower for x in ["MKX200"]):
+        lens = "MKX200"
+    elif any(x in filename_lower for x in ["VRCA220"]):
+        lens = "VRCA220"
+
+    return {
+        "projection": projection,
+        "stereo": stereo,
+        "fov": fov,
+        "lens": lens
+    }
