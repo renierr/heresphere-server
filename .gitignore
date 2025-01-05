@@ -13,3 +13,4 @@ venv
 .idea
 /url_map.json
 /static/bookmarks.json
+/update.sh
