@@ -283,6 +283,7 @@ export const methods = {
         const duplicates = [];
 
         this.files.forEach(file => {
+            if (!file.uid) return;
             if (fileMap.has(file.uid)) {
                 duplicates.push(file);
             } else {
