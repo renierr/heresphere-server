@@ -138,6 +138,7 @@ export const methods = {
         });
     },
     stopPreview(file, evt) {
+        evt.target.currentTime = 0;
         evt.target.pause();
         file.showPreview = false;
     },
