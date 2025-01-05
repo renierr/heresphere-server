@@ -19,7 +19,7 @@ def library_subfolders():
             subfolders.append(subfolder)
     return subfolders
 
-@cache(maxsize=512, ttl=120)
+@cache(maxsize=1024, ttl=120)
 def list_files(directory='videos'):
     extracted_details = []
     base_path = f"/static/{directory}"
@@ -53,6 +53,17 @@ def list_files(directory='videos'):
                         'title': title,
                     })
             extracted_details.append(common_details)
+
+    # check for duplicates
+    uids = {}
+    for details in extracted_details:
+        uid = details.get('uid')
+        if uid:
+            if uid in uids:
+                original_file = uids[uid]
+                details['may_exist'] = f"id[{uid}]_file[{details.get('filename')}]_original[{original_file}]"
+            else:
+                uids[uid] = details.get('filename')
 
     extracted_details.sort(key=lambda x: x['created'], reverse=True)
     return extracted_details
@@ -90,7 +101,8 @@ def extract_file_details(root, filename, base_path, subfolder):
             'height': info.height,
             'duration': info.duration,
             'resolution': info.resolution,
-            'stereo': info.stereo
+            'stereo': info.stereo,
+            'uid': info.uid
         })
     return result
 
@@ -110,7 +122,7 @@ def parse_youtube_filename(filename):
     return id_part, title_part
 
 
-@cache(maxsize=512)
+@cache(maxsize=4096, ttl=7200)
 def get_basic_save_video_info(filename):
     size = os.path.getsize(filename)
     created = os.path.getctime(filename)
@@ -128,13 +140,15 @@ def get_basic_save_video_info(filename):
             stereo = 'tb'
         else:
             stereo = ''
+        uid = video_info.get('infos', {}).get('unique_info', None)
     else:
         duration = 0
         width = 0
         height = 0
         resolution = 0
         stereo = ''
-    return VideoInfo(created, size, duration, width, height, resolution, stereo)
+        uid = None
+    return VideoInfo(created, size, duration, width, height, resolution, stereo, uid)
 
 
 def move_to_library(video_path, subfolder):

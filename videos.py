@@ -191,13 +191,13 @@ def download_video(url, title):
     if url_id is None:
         url_id = get_url_counter()
         increment_url_counter()
-        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'may_exist': False,
+        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'may_exist': None,
                            'title': title,
                            'downloaded_date': int(datetime.now().timestamp())}
     else:
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
-        url_map[url_id]['may_exist'] = False
+        url_map[url_id]['may_exist'] = None
 
     push_text_to_client(f"Downloading video {url_id}...")
     try:
@@ -213,7 +213,7 @@ def download_video(url, title):
             fname = file.get('filename')
             fname_comp = url_info.get('filename')
             if fname_comp and fname_comp in fname:
-                url_info['may_exist'] =  True
+                url_info['may_exist'] = fname
                 logger.info(f"File {fname} may already exists in library")
                 push_text_to_client(f"File {fname} may already exists in library: {fname_comp}")
                 break

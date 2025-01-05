@@ -9,7 +9,7 @@ DEBUG = False
 url_map = {}
 url_counter = 1
 
-VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo'])
+VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid'])
 
 def set_debug(value):
     global DEBUG
