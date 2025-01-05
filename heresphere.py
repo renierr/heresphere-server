@@ -172,7 +172,7 @@ def detect_vr_format(filename, sbs):
 
     # check for projection, possible values are "perspective", "equirectangular", "equirectangular360", "fisheye", "cubemap", "equiangularCubemap"
     projection = "perspective"
-    if any(x in filename_lower for x in ["_180_", "180x180"]):
+    if any(x in filename_lower for x in ["_180_", "180x180"]) or sbs == "sbs" or sbs == "tb":
         projection = "equirectangular"
     elif any(x in filename_lower for x in ["_360_", "360x180"]):
         projection = "equirectangular360"
