@@ -277,7 +277,29 @@ export const methods = {
         const durationInMinutes = file.duration / 60;
         return durationInMinutes >= this.selectedDuration;
     },
+    findDuplicates() {
+        this.serverOutput = 'Try to Find duplicates...\n' + this.serverOutput;
+        const fileMap = new Map();
+        const duplicates = [];
 
+        this.files.forEach(file => {
+            if (fileMap.has(file.uid)) {
+                duplicates.push(file);
+            } else {
+                fileMap.set(file.uid, true);
+            }
+        });
+
+        if (duplicates.length > 0) {
+            console.log("Duplicate files found:", duplicates);
+            this.serverOutput = 'Duplicate files found:\n' + duplicates.map(file => file.filename).join('\n') + '\n' + this.serverOutput;
+            this.showMessage(`Duplicate files found (${duplicates.length})\n` + duplicates.map(file => file.filename).join('\n'));
+        } else {
+            console.log("No duplicate files found.");
+            this.serverOutput = 'No duplicate files found.\n' + this.serverOutput;
+            this.showMessage('No duplicate files found');
+        }
+    },
 };
 
 export const computed = {
