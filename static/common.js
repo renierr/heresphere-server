@@ -1,6 +1,6 @@
 function localStoreSettingsLoading() {
     const defaults = { cardLayout: true, pageSize: 12,
-        filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '' };
+        filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '', showVideoPreview: true };
     let storedSetting = JSON.parse(localStorage.getItem('settings')) || {};
     storedSetting = {...defaults, ...storedSetting};
     return storedSetting;
@@ -435,6 +435,9 @@ export const watch = {
         this.saveSettings();
     },
     'settings.pageSize': function(newValue) {
+        this.saveSettings();
+    },
+    'settings.showVideoPreview': function(newValue) {
         this.saveSettings();
     },
 };
