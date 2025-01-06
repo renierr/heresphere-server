@@ -217,8 +217,10 @@ export const methods = {
                 this.serverResult = 'Error clearing cache';
             });
     },
-    showMessage: function (input) {
+    showMessage: function (input, options = {}) {
+        const { title = 'Message', stayOpen = false, asHtml = false } = options;
         const toastElement = document.getElementById('serverResultToast');
+        const toastTitle = document.getElementById('serverResultTitle');
         const toastMessage = document.getElementById('serverResultMessage');
         let message;
         try {
@@ -230,8 +232,14 @@ export const methods = {
         } catch (e) {
             message = input;
         }
-        toastMessage.textContent = message;
-        const toast = new bootstrap.Toast(toastElement);
+        if (asHtml) {
+            toastTitle.innerHTML = title;
+            toastMessage.innerHTML = message;
+        } else {
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+        }
+        const toast = new bootstrap.Toast(toastElement, { autohide: !stayOpen });
         toast.show();
     },
     confirmDeleteFile(filename) {
@@ -328,7 +336,15 @@ export const methods = {
     },
     showDuplicateInfo(file) {
         if (file.may_exist) {
-            this.showMessage(file.may_exist);
+            let message = file.may_exist.split('\n');
+            message = message.map((line) => {
+                if (line.includes('id[')) {
+                    return `<h5 class="text-info">${line}</h5>`
+                } else {
+                    return `<p class="text-muted">${line}</p>`;
+                }
+            }).join('<br>');
+            this.showMessage(message, {title: "Duplicates", stayOpen: true, asHtml: true});
         }
     },
 };
