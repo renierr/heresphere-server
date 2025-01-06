@@ -326,6 +326,11 @@ export const methods = {
             this.showMessage('No duplicate files found');
         }
     },
+    showDuplicateInfo(file) {
+        if (file.may_exist) {
+            this.showMessage(file.may_exist);
+        }
+    },
 };
 
 export const computed = {
