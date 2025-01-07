@@ -23,17 +23,17 @@
 <body class="p-2">
     <nav class="navbar navbar-expand-sm mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">HSServer</a>
+            <a class="navbar-brand {% if request.path == '/' %}active fw-bold{% endif %}" href="/">HSServer</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mb-2 mb-sm-0 me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/library' %}active{% endif %}" href="/library">Library</a>
+                        <a class="nav-link {% if request.path == '/library' %}active fw-bold{% endif %}" href="/library">Library</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/bookmarks' %}active{% endif %}" href="/bookmarks">Bookmarks</a>
+                        <a class="nav-link {% if request.path == '/bookmarks' %}active fw-bold{% endif %}" href="/bookmarks">Bookmarks</a>
                     </li>
                 </ul>
                 <div class="form-check form-switch">
