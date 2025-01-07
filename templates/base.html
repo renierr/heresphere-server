@@ -30,10 +30,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/library">Library</a>
+                        <a class="nav-link {% if request.path == '/library' %}active{% endif %}" href="/library">Library</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/bookmarks">Bookmarks</a>
+                        <a class="nav-link {% if request.path == '/bookmarks' %}active{% endif %}" href="/bookmarks">Bookmarks</a>
                     </li>
                 </ul>
                 <div class="form-check form-switch">
