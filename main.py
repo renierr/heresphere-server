@@ -18,7 +18,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client
-from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug
+from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug, get_application_path
 from thumbnail import thumbnail_bp
 from videos import video_bp
 from api import api_bp
@@ -88,6 +88,14 @@ def add_cache_control(response):
 @app.route('/favicon.png')
 def favicon():
     return send_from_directory(app.static_folder, 'favicon.png', mimetype='image/png')
+
+@app.route('/manifest.json')
+def manifest():
+    return send_from_directory(get_application_path(), 'manifest.json', mimetype='application/json')
+
+@app.route('/service-worker.js')
+def service_worker():
+    return send_from_directory(get_application_path(), 'service-worker.js')
 
 @app.context_processor
 def inject_globals():
