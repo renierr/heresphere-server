@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
 from files import list_files, move_to_library, delete_file
+from globals import VideoFolder
 
 api_bp = Blueprint('api', __name__)
 
@@ -18,7 +19,7 @@ def get_files():
 @api_bp.route('/api/library/list')
 def get_library_files():
     try:
-        return jsonify(list_files('library'))
+        return jsonify(list_files(VideoFolder.library))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

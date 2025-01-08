@@ -4,12 +4,21 @@ import json
 import re
 import sys
 from collections import namedtuple
+from enum import Enum
 
 DEBUG = False
 url_map = {}
 url_counter = 1
 
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid'])
+
+class VideoFolder(Enum):
+    library = ("library", "/static/library")
+    videos = ("videos", "/static/videos")
+
+    def __init__(self, dir, web_path):
+        self.dir: str = dir
+        self.web_path: str = web_path
 
 def set_debug(value):
     global DEBUG

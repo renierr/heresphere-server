@@ -5,7 +5,7 @@ import urllib.parse
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 from files import list_files, get_basic_save_video_info, library_subfolders
-from globals import get_static_directory
+from globals import get_static_directory, VideoFolder
 from thumbnail import ThumbnailFormat, get_thumbnails
 
 heresphere_bp = Blueprint('heresphere', __name__)
@@ -42,7 +42,7 @@ def generate_heresphere_json(server_path):
     }
 
     subfolders = library_subfolders()
-    all_library_files = list_files('library')
+    all_library_files = list_files(VideoFolder.library)
 
     for subfolder in [''] + subfolders:
         files = [file for file in all_library_files if file.get('folder', '') == subfolder]
@@ -54,7 +54,7 @@ def generate_heresphere_json(server_path):
         result_json["library"].append({"name": name, "list": url_list})
 
     # Add Downloads section
-    files = list_files('videos')
+    files = list_files(VideoFolder.videos)
     url_list = [
         f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
         for file in files

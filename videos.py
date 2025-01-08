@@ -12,7 +12,7 @@ from yt_dlp import ImpersonateTarget
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
-    find_url_info, remove_ansi_codes, save_url_map
+    find_url_info, remove_ansi_codes, save_url_map, VideoFolder
 from thumbnail import generate_thumbnail_for_path
 
 root_path = get_application_path()
@@ -208,7 +208,7 @@ def download_video(url, title):
         url_info = url_map[url_id]
         url_info['video_url'] = video_url
         # try to figure out if file was already downloaded and filename is in library
-        files = list_files('library')
+        files = list_files(VideoFolder.library)
         for file in files:
             fname = file.get('filename')
             fname_comp = url_info.get('filename')

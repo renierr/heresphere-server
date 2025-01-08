@@ -4,27 +4,27 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map
+from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, VideoFolder
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
 @cache(maxsize=512, ttl=3600)
 def library_subfolders():
     subfolders = []
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), 'library'), followlinks=True):
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), VideoFolder.library.dir), followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
-        subfolder = os.path.relpath(root, os.path.join(get_static_directory(), 'library')).replace('\\', '/')
+        subfolder = os.path.relpath(root, os.path.join(get_static_directory(), VideoFolder.library.dir)).replace('\\', '/')
         if subfolder != '.':
             subfolders.append(subfolder)
     return subfolders
 
-@cache(maxsize=1024, ttl=120)
-def list_files(directory='videos'):
+@cache(maxsize=128, ttl=18000)
+def list_files(directory=VideoFolder.videos):
     extracted_details = []
-    base_path = f"/static/{directory}"
+    base_path = directory.web_path
 
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), directory), followlinks=True):
+    for root, dirs, files in os.walk(os.path.join(get_static_directory(), directory.dir), followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
@@ -33,13 +33,13 @@ def list_files(directory='videos'):
             if 'part-Frag' in filename or filename.endswith('.ytdl'):
                 continue
 
-            subfolder = os.path.relpath(root, os.path.join(get_static_directory(), directory)).replace('\\', '/')
+            subfolder = os.path.relpath(root, os.path.join(get_static_directory(), directory.dir)).replace('\\', '/')
             if subfolder == '.':
                 subfolder = ''
             common_details = extract_file_details(root, filename, base_path, subfolder)
 
             # only for videos directory
-            if directory == 'videos':
+            if directory == VideoFolder.videos:
                 url_id, url_info = find_url_info(filename)
                 common_details.update({
                     'url_id': url_id,
@@ -56,9 +56,9 @@ def list_files(directory='videos'):
 
     # check for duplicates
     duplicate_details = []
-    if directory == 'videos':
+    if directory == VideoFolder.videos:
         # find extracted infos for library as well and add to duplicate list
-        duplicate_details.extend(list_files('library'))
+        duplicate_details.extend(list_files(VideoFolder.library))
     duplicate_details.extend(extracted_details)
 
     uids = {}
@@ -173,7 +173,7 @@ def move_to_library(video_path, subfolder):
     static_dir = get_static_directory()
     if '/static/videos/' in video_path:
         relative_path = video_path.replace('/static/videos/', '')
-        real_path = os.path.join(static_dir, 'videos', relative_path)
+        real_path = os.path.join(static_dir, VideoFolder.videos.dir, relative_path)
 
         if not os.path.exists(real_path):
             return {"success": False, "error": "Video file does not exist"}
@@ -183,7 +183,7 @@ def move_to_library(video_path, subfolder):
         if subfolder and subfolder not in library_subfolders():
             return {"success": False, "error": "Invalid subfolder name"}
 
-        library_path = os.path.join(static_dir, 'library', subfolder, base_name)
+        library_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
 
         if os.path.exists(library_path):
             return {"success": False, "error": f"Target exists in library: {base_name}"}
@@ -256,8 +256,8 @@ def cleanup():
         filename = url_info.get('filename')
         logger.debug(f"Checking file: {filename}")
         if filename:
-            youtube_dir = os.path.join(static_dir, 'videos', 'youtube')
-            direct_dir = os.path.join(static_dir, 'videos', 'direct')
+            youtube_dir = os.path.join(static_dir, VideoFolder.videos.dir, 'youtube')
+            direct_dir = os.path.join(static_dir, VideoFolder.videos.dir, 'direct')
             youtube_files = os.listdir(youtube_dir)
             direct_files = os.listdir(direct_dir)
             if not any(f.startswith(filename) for f in youtube_files) and not any(f.startswith(filename) for f in direct_files):
@@ -273,9 +273,9 @@ def cleanup():
     # cleanup thumbnails from .thumb directory that no longer have a corresponding video file for both videos and library directory
     known_extensions = [fmt.extension for fmt in ThumbnailFormat]
     to_remove = []
-    for directory in ['videos', 'library']:
+    for directory in VideoFolder:
         # get all files from .thumb sub folders
-        for root, dirs, files in os.walk(os.path.join(static_dir, directory), followlinks=True):
+        for root, dirs, files in os.walk(os.path.join(static_dir, directory.dir), followlinks=True):
             if '.thumb' in dirs:
                 thumb_dir = os.path.join(root, '.thumb')
                 root_files = os.listdir(root)
