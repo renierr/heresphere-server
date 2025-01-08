@@ -103,9 +103,13 @@ def generate_heresphere_json_item(server_path, file_base64):
     info = get_basic_save_video_info(real_path)
     date_added = datetime.fromtimestamp(info.created).strftime('%Y-%m-%d')
 
+    title = info.title
+    if not title:
+        title = os.path.splitext(base_name)[0]
+
     result = {
         "access": 1,
-        "title": os.path.splitext(base_name)[0],
+        "title": title,
         "description": "",
         "thumbnailImage": f"{thumbnail}",
         "thumbnailVideo": f"{thumbnail_video}",

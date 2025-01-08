@@ -10,7 +10,7 @@ DEBUG = False
 url_map = {}
 url_counter = 1
 
-VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid'])
+VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title'])
 
 class VideoFolder(Enum):
     library = ("library", "/static/library/")

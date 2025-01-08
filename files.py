@@ -111,8 +111,10 @@ def extract_file_details(root, filename, base_path, subfolder):
             'duration': info.duration,
             'resolution': info.resolution,
             'stereo': info.stereo,
-            'uid': info.uid
+            'uid': info.uid,
         })
+        if info.title:
+            result['title'] = info.title
     return result
 
 
@@ -149,7 +151,9 @@ def get_basic_save_video_info(filename):
             stereo = 'tb'
         else:
             stereo = ''
-        uid = video_info.get('infos', {}).get('unique_info', None)
+        infos = video_info.get('infos', {})
+        uid = infos.get('unique_info', None)
+        title = infos.get('title', None)
     else:
         duration = 0
         width = 0
@@ -157,7 +161,8 @@ def get_basic_save_video_info(filename):
         resolution = 0
         stereo = ''
         uid = None
-    return VideoInfo(created, size, duration, width, height, resolution, stereo, uid)
+        title = None
+    return VideoInfo(created, size, duration, width, height, resolution, stereo, uid, title)
 
 
 def move_to_library(video_path, subfolder):
