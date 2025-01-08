@@ -20,7 +20,7 @@ def library_subfolders():
     return subfolders
 
 @cache(maxsize=128, ttl=18000)
-def list_files(directory=VideoFolder.videos):
+def list_files(directory):
     extracted_details = []
     base_path = directory.web_path
 

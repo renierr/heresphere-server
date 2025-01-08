@@ -11,7 +11,7 @@ api_bp = Blueprint('api', __name__)
 @api_bp.route('/api/list')
 def get_files():
     try:
-        return jsonify(list_files())
+        return jsonify(list_files(VideoFolder.videos))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
