@@ -237,7 +237,7 @@ def delete_file(url):
             if os.path.exists(thumbnail_path):
                 os.remove(thumbnail_path)
     os.remove(real_path)
-    list_files.cache__clear()
+    list_files.cache__evict(VideoFolder.videos)
     push_text_to_client(f"File deleted: {base_name}")
     return {"success": True, "message": f"File {base_name} deleted"}
 
