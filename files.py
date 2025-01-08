@@ -90,7 +90,7 @@ def extract_file_details(root, filename, base_path, subfolder):
         'partial': partial,
         'yt_id': None,
         'title': os.path.splitext(filename)[0],
-        'filename': f"{base_path}/{subfolder + '/' if subfolder else ''}{filename}",
+        'filename': f"{base_path}{subfolder + '/' if subfolder else ''}{filename}",
         'folder' : subfolder,
     }
     if partial:

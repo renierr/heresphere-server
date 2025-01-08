@@ -76,12 +76,12 @@ def generate_heresphere_json_item(server_path, file_base64):
     filename = base64.urlsafe_b64decode(file_base64.encode()).decode()
     base_name = os.path.basename(filename)
     static_dir = get_static_directory()
-    if '/static/videos/' in filename:
-        relative_path = filename.replace('/static/videos/', '')
-        real_path = os.path.join(static_dir, 'videos', relative_path)
+    if VideoFolder.videos.web_path in filename:
+        relative_path = filename.replace(VideoFolder.videos.web_path, '')
+        real_path = os.path.join(static_dir, VideoFolder.videos.dir, relative_path)
     else:
-        relative_path = filename.replace('/static/library/', '')
-        real_path = os.path.join(static_dir, 'library', relative_path)
+        relative_path = filename.replace(VideoFolder.library.web_path, '')
+        real_path = os.path.join(static_dir, VideoFolder.library.dir, relative_path)
 
     folders = os.path.dirname(relative_path)
 

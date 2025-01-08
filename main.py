@@ -18,7 +18,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client
-from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug, get_application_path
+from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder
 from thumbnail import thumbnail_bp
 from videos import video_bp
 from api import api_bp
@@ -204,11 +204,11 @@ def start_server():
         return "Static directory does not exist"
 
     # make sure library and video directory exists and if not create them
-    library_dir = os.path.join(static_dir, 'library')
+    library_dir = os.path.join(static_dir, VideoFolder.library.dir)
     if not os.path.exists(library_dir) and not os.path.islink(library_dir):
         os.makedirs(library_dir, exist_ok=True)
 
-    video_dir = os.path.join(static_dir, 'videos')
+    video_dir = os.path.join(static_dir, VideoFolder.videos.dir)
     if not os.path.exists(video_dir) and not os.path.islink(video_dir):
         os.makedirs(video_dir, exist_ok=True)
 

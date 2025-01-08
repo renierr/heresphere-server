@@ -13,8 +13,8 @@ url_counter = 1
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid'])
 
 class VideoFolder(Enum):
-    library = ("library", "/static/library")
-    videos = ("videos", "/static/videos")
+    library = ("library", "/static/library/")
+    videos = ("videos", "/static/videos/")
 
     def __init__(self, dir, web_path):
         self.dir: str = dir
@@ -93,12 +93,12 @@ def get_real_path_from_url(url):
         return None
 
     static_dir = get_static_directory()
-    if '/static/library/' in url:
-        relative_path = url.replace('/static/library/', '')
-        real_path = os.path.join(static_dir, 'library', relative_path)
+    if VideoFolder.library.web_path in url:
+        relative_path = url.replace(VideoFolder.library.web_path, '')
+        real_path = os.path.join(static_dir, VideoFolder.library.dir, relative_path)
     else:
-        relative_path = url.replace('/static/videos/', '')
-        real_path = os.path.join(static_dir, 'videos', relative_path)
+        relative_path = url.replace(VideoFolder.videos.web_path, '')
+        real_path = os.path.join(static_dir, VideoFolder.videos.dir, relative_path)
 
     real_path = os.path.normpath(real_path)
     if not os.path.exists(real_path):

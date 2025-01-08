@@ -58,8 +58,8 @@ def request_stream():
 
 
 def filename_with_ext(filename, youtube=True):
-    path = os.path.join(root_path, 'static', 'videos', 'youtube')
-    if not youtube: path = os.path.join(root_path, 'static', 'videos', 'direct')
+    path = os.path.join(root_path, 'static', VideoFolder.videos.dir, 'youtube')
+    if not youtube: path = os.path.join(root_path, 'static', VideoFolder.videos.dir, 'direct')
 
     for file in os.listdir(path):
         basename, _ = os.path.splitext(file)
@@ -138,7 +138,7 @@ def download_yt(url, progress_function, url_id):
 
     ydl_opts = {
         'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
-        'outtmpl': os.path.join('static', 'videos', 'youtube', filename) + '.%(ext)s',
+        'outtmpl': os.path.join('static', VideoFolder.videos.dir, 'youtube', filename) + '.%(ext)s',
         'progress_hooks': [progress_function],
         'nocolor': True,
         'updatetime': False,
@@ -168,7 +168,7 @@ def download_direct(url, progress_function, url_id, title):
     url_map[url_id]['title'] = title
 
     ydl_opts = {
-        'outtmpl': os.path.join('static', 'videos', 'direct', filename) + '.%(ext)s',
+        'outtmpl': os.path.join('static', VideoFolder.videos.dir, 'direct', filename) + '.%(ext)s',
         'progress_hooks': [progress_function],
         'nocolor': True,
         'updatetime': False,

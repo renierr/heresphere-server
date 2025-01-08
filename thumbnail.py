@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
-from globals import is_debug, get_static_directory, get_real_path_from_url
+from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder
 
 
 class ThumbnailFormat(Enum):
@@ -124,11 +124,11 @@ def generate_thumbnails(library=False):
     :return: json object with success and generated_thumbnails
     """
     static_dir = get_static_directory()
-    video_dir = os.path.join(static_dir, 'videos' if not library else 'library')
+    video_dir = os.path.join(static_dir, VideoFolder.videos.dir if not library else VideoFolder.library.dir)
     generated_thumbnails = []
     thumbnail_errors = []
     logger.debug(f"Generating thumbnails for {video_dir}")
-    push_text_to_client(f"Generating thumbnails for {'library' if library else 'videos'}")
+    push_text_to_client(f"Generating thumbnails for {VideoFolder.library.dir if library else VideoFolder.videos.dir}")
 
     for root, dirs, files in os.walk(video_dir, followlinks=True):
         # Exclude directories that start with a dot
