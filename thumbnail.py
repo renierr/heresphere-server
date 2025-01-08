@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
-from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder
+from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info
 
 
 class ThumbnailFormat(Enum):
@@ -97,6 +97,15 @@ def get_video_info(video_path, force=False):
         # additional infos
         infos = {}
         info['infos'] = infos
+
+        # find title from url map
+        idnr, url_info = find_url_info(os.path.basename(video_path))
+        if url_info:
+            infos['download_id'] = idnr
+            infos['url_info'] = url_info
+            title = url_info.get('title')
+            if title:
+                infos['title'] = title
 
         # generate unique info string from specific fields
         format_info = info.get('format', {})
