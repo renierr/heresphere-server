@@ -43,14 +43,13 @@ def list_files(directory=VideoFolder.videos):
                 url_id, url_info = find_url_info(filename)
                 common_details.update({
                     'url_id': url_id,
-                    **({k: url_info.get(k) for k in ['url', 'video_url', 'downloaded_date', 'may_exist']} if url_info else {})
+                    **({k: url_info.get(k) for k in ['url', 'video_url', 'downloaded_date', 'may_exist', 'title']} if url_info else {})
                 })
 
                 if filename.count('___') == 1:
                     yt_id, title = parse_youtube_filename(filename)
                     common_details.update({
                         'yt_id': yt_id,
-                        'title': title,
                     })
             extracted_details.append(common_details)
 

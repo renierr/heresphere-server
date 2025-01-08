@@ -14,8 +14,8 @@ new Vue({
     },
     methods: {
         ...methods,
-        redownload(url) {
-            this.videoUrl = url;
+        redownload(file) {
+            this.videoUrl = file.url;
             this.postVideoUrl();
         },
         postVideoUrl(stream=false) {
@@ -60,14 +60,6 @@ new Vue({
                     this.serverResult = 'Error download/stream file: ' + error;
                     console.error('Error:', error);
                 });
-        },
-        copyToClipboard: function (event, text) {
-            event.preventDefault();
-            navigator.clipboard.writeText(text).then(() => {
-                this.showMessage(`Copied '${text}' to clipboard`);
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
         },
         confirmMoveToLibrary(filename) {
             const lastFolder = this.settings.lastMoveSubfolder || '';
