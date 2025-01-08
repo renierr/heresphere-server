@@ -1,10 +1,12 @@
 import atexit
+import json
 import os
 import logging
 import socket
 import subprocess
 import sys
 import time
+from enum import Enum
 
 import cache
 import argparse
@@ -137,10 +139,16 @@ def update():
     return jsonify({'update': 'finished'})
 
 
+class CustomJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Enum):
+            return obj.name
+        return super().default(obj)
 
 @app.route('/cache')
 def cache_stats():
-    return cache.get_all_cache_stats()
+    cache_stats = cache.get_all_cache_stats()
+    return Response(json.dumps(cache_stats, cls=CustomJSONEncoder), mimetype='application/json')
 
 @app.route('/cache/clear')
 def cache_clear():
