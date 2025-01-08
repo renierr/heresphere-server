@@ -1,6 +1,6 @@
 <div class="d-flex align-items-start flex-column flex-md-row p-0">
     <div class="thumbnail-wrapper me-2 w-100 w-md-auto cursor-pointer" @click="openThumbnail(file)">
-        <video v-if="file.preview" :poster="file.thumbnail" :src="file.preview" class="thumbnail"
+        <video v-if="settings.showVideoPreview && file.preview" :poster="file.thumbnail" :src="file.preview" class="thumbnail"
                @mouseover="startPreview(file, this.event)" @mouseleave="stopPreview(file, this.event)"
                preload="none" loop disablePictureInPicture></video>
         <img v-else :src="file.thumbnail" class="thumbnail" />
