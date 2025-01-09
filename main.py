@@ -78,6 +78,20 @@ app.register_blueprint(thumbnail_bp)
 #     logger.info(f"Body: {response.get_data()}")
 #     return response
 
+@app.errorhandler(Exception)
+def handle_exception(e):
+    if is_debug():
+        logger.exception(f"An error occurred: {e}")
+    else:
+        logger.error(f"An error occurred: {e}")
+
+    response = {
+        "error": "An unexpected error occurred",
+        "message": str(e)
+    }
+    return jsonify(response), 500
+
+
 @app.after_request
 def add_cache_control(response):
     if 'static' in request.path:

@@ -10,18 +10,12 @@ api_bp = Blueprint('api', __name__)
 
 @api_bp.route('/api/list')
 def get_files():
-    try:
-        return jsonify(list_files(VideoFolder.videos))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    return jsonify(list_files(VideoFolder.videos))
 
 
 @api_bp.route('/api/library/list')
 def get_library_files():
-    try:
-        return jsonify(list_files(VideoFolder.library))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    return jsonify(list_files(VideoFolder.library))
 
 
 @api_bp.route('/api/move_to_library', methods=['POST'])
@@ -33,45 +27,30 @@ def mtl():
     if not video_path:
         return jsonify({"success": False, "error": "No video path provided"}), 400
 
-    try:
-        result = move_to_library(video_path, subfolder)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    result = move_to_library(video_path, subfolder)
+    return jsonify(result)
 
 @api_bp.route('/api/bookmarks', methods=['GET'])
 def gb():
-    try:
-        return jsonify(list_bookmarks())
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    return jsonify(list_bookmarks())
 
 @api_bp.route('/api/bookmarks', methods=['POST'])
 def sb():
-    try:
-        data = request.get_json()
-        title = data.get("title")
-        url = data.get("url")
-        return jsonify(save_bookmark(data.get("title"), data.get("url")))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    data = request.get_json()
+    title = data.get("title")
+    url = data.get("url")
+    return jsonify(save_bookmark(data.get("title"), data.get("url")))
 
 @api_bp.route('/api/bookmarks', methods=['DELETE'])
 def db():
-    try:
-        encoded_url = request.args.get('url')
-        decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
-        return jsonify(delete_bookmark(decoded_url))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    encoded_url = request.args.get('url')
+    decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
+    return jsonify(delete_bookmark(decoded_url))
 
 @api_bp.route('/api/files', methods=['DELETE'])
 def df():
-    try:
-        encoded_url = request.args.get('url')
-        decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
-        return jsonify(delete_file(decoded_url))
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    encoded_url = request.args.get('url')
+    decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
+    return jsonify(delete_file(decoded_url))
 
 
