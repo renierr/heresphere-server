@@ -4,7 +4,7 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, VideoFolder
+from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, VideoFolder, THUMBNAIL_DIR_NAME
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
@@ -196,12 +196,12 @@ def move_to_library(video_path, subfolder):
         shutil.move(real_path, library_path)
 
         # Move the thumbnails
-        thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
+        thumbnail_dir = os.path.join(os.path.dirname(real_path), THUMBNAIL_DIR_NAME)
         if os.path.exists(thumbnail_dir):
             for fmt in ThumbnailFormat:
                 thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
                 if os.path.exists(thumbnail_path):
-                    library_thumbnail_dir = os.path.join(os.path.dirname(library_path), '.thumb')
+                    library_thumbnail_dir = os.path.join(os.path.dirname(library_path), THUMBNAIL_DIR_NAME)
                     os.makedirs(library_thumbnail_dir, exist_ok=True)
                     shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
 
@@ -234,7 +234,7 @@ def delete_file(url):
 
     # delete the file and thumbnails
     base_name = os.path.basename(real_path)
-    thumbnail_dir = os.path.join(os.path.dirname(real_path), '.thumb')
+    thumbnail_dir = os.path.join(os.path.dirname(real_path), THUMBNAIL_DIR_NAME)
     if os.path.exists(thumbnail_dir):
         for fmt in ThumbnailFormat:
             thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
@@ -280,8 +280,8 @@ def cleanup():
     for directory in VideoFolder:
         # get all files from .thumb sub folders
         for root, dirs, files in os.walk(os.path.join(static_dir, directory.dir), followlinks=True):
-            if '.thumb' in dirs:
-                thumb_dir = os.path.join(root, '.thumb')
+            if THUMBNAIL_DIR_NAME in dirs:
+                thumb_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
                 root_files = os.listdir(root)
                 for filename in os.listdir(thumb_dir):
                     if not any(filename.startswith(f) for f in root_files):

@@ -10,6 +10,7 @@ DEBUG = False
 url_map = {}
 url_counter = 1
 
+THUMBNAIL_DIR_NAME: str = '.thumb'
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title'])
 
 class VideoFolder(Enum):

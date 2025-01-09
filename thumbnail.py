@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
-from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info
+from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, THUMBNAIL_DIR_NAME
 
 
 class ThumbnailFormat(Enum):
@@ -78,7 +78,7 @@ def get_video_info(video_path, force=False):
             return None
 
         # find the video json in .thumb folder first
-        json_path = os.path.join(os.path.dirname(video_path), '.thumb', os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
+        json_path = os.path.join(os.path.dirname(video_path), THUMBNAIL_DIR_NAME, os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
         if os.path.exists(json_path) and not force:
             with open(json_path, 'r', encoding='utf-8') as f:
@@ -146,7 +146,7 @@ def generate_thumbnails(library=False):
         for filename in files:
             if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
                 video_path = os.path.join(root, filename)
-                thumbnail_dir = os.path.join(root, '.thumb')
+                thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
 
                 logger.debug(f"Checking thumbnail for {filename}")
                 # if one of the thumbs for file is missing, generate all thumbs
@@ -188,7 +188,7 @@ def generate_thumbnail(video_path):
         logger.debug(f"Evict cache for {video_path}")
         get_thumbnails.cache__evict(video_path)   # evict cache for thumbnails
 
-        thumbnail_dir = os.path.join(os.path.dirname(video_path), '.thumb')
+        thumbnail_dir = os.path.join(os.path.dirname(video_path), THUMBNAIL_DIR_NAME)
         os.makedirs(thumbnail_dir, exist_ok=True)
 
         video_info = get_video_info(video_path, force=True)
@@ -284,7 +284,7 @@ def get_thumbnails(filename):
     """
 
     base_name = os.path.basename(filename)
-    thumbnail_directory = os.path.join(os.path.dirname(filename), '.thumb')
+    thumbnail_directory = os.path.join(os.path.dirname(filename), THUMBNAIL_DIR_NAME)
     # check for all thumbnail formats if there exist here
     result = {}
     for fmt in ThumbnailFormat:
