@@ -47,7 +47,7 @@ def list_files(directory) -> list:
                 })
 
                 if filename.count('___') == 1:
-                    yt_id, title = parse_youtube_filename(filename)
+                    yt_id, _ = parse_youtube_filename(filename)
                     common_details.update({
                         'yt_id': yt_id,
                     })
@@ -92,7 +92,7 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
     realfile = os.path.join(root, filename)
 
     if not os.path.exists(realfile):
-        return None
+        return {}
 
     partial = filename.endswith('.part')
     result = {
@@ -199,17 +199,17 @@ def move_to_library(video_path, subfolder):
         real_path = os.path.join(static_dir, VideoFolder.videos.dir, relative_path)
 
         if not os.path.exists(real_path):
-            return {"success": False, "error": "Video file does not exist"}
+            return ServerResponse(False, "Video file does not exist")
 
         base_name = os.path.basename(real_path)
 
         if subfolder and subfolder not in library_subfolders():
-            return {"success": False, "error": "Invalid subfolder name"}
+            return ServerResponse(False, "Invalid subfolder name")
 
         library_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
 
         if os.path.exists(library_path):
-            return {"success": False, "error": f"Target exists in library: {base_name}"}
+            return ServerResponse(False, f"Target exists in library: {base_name}")
 
         # Move the video file
         shutil.move(real_path, library_path)
@@ -227,9 +227,9 @@ def move_to_library(video_path, subfolder):
 
         list_files.cache__clear()
         push_text_to_client(f"File moved to library: {base_name}")
-        return {"success": True, "moved": base_name}
+        return ServerResponse(True, f"moved {base_name} to library")
     else:
-        return {"success": False, "error": "Invalid video path"}
+        return ServerResponse(False, "Invalid video path")
 
 
 def delete_file(url):
@@ -242,15 +242,15 @@ def delete_file(url):
     """
 
     if not url:
-        return {"success": False, "error": "URL missing"}
+        return ServerResponse(False, "URL missing")
 
     # only allow delete from videos directory
-    if not '/static/videos/' in url:
-        return {"success": False, "error": "Invalid URL"}
+    if VideoFolder.videos.web_path not in url:
+        return ServerResponse(False, "Invalid URL")
 
     real_path = get_real_path_from_url(url)
     if not real_path:
-        return {"success": False, "error": "File not found"}
+        return ServerResponse(False, "File not found")
 
     # delete the file and thumbnails
     base_name = os.path.basename(real_path)
@@ -263,7 +263,7 @@ def delete_file(url):
     os.remove(real_path)
     list_files.cache__evict(VideoFolder.videos)
     push_text_to_client(f"File deleted: {base_name}")
-    return {"success": True, "message": f"File {base_name} deleted"}
+    return ServerResponse(True, f"File {base_name} deleted")
 
 def cleanup():
     """
