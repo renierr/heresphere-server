@@ -20,7 +20,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client
-from globals import save_url_map, load_url_map, get_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder
+from globals import save_url_map, load_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse
 from thumbnail import thumbnail_bp
 from videos import video_bp
 from api import api_bp
@@ -57,6 +57,16 @@ app.logger.setLevel(logging.WARNING)
 # avoid jinja template directive conflict
 app.jinja_env.variable_start_string = '[['
 app.jinja_env.variable_end_string = ']]'
+
+# own json encode to handle ServerResponse class
+class ServerResponseJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ServerResponse):
+            return obj.__dict__
+        if isinstance(obj, Enum):
+            return obj.name
+        return super().default(obj)
+app.json_encoder = ServerResponseJSONEncoder
 
 # Register blueprints
 app.register_blueprint(heresphere_bp)
@@ -152,17 +162,10 @@ def update():
         push_text_to_client("Update triggered, no update.sh in root folder present!")
     return jsonify({'update': 'finished'})
 
-
-class CustomJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, Enum):
-            return obj.name
-        return super().default(obj)
-
 @app.route('/cache')
 def cache_stats():
     cache_stats = cache.get_all_cache_stats()
-    return Response(json.dumps(cache_stats, cls=CustomJSONEncoder), mimetype='application/json')
+    return Response(json.dumps(cache_stats, cls=ServerResponseJSONEncoder), mimetype='application/json')
 
 @app.route('/cache/clear')
 def cache_clear():

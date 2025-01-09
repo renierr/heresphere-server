@@ -4,7 +4,7 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, VideoFolder, THUMBNAIL_DIR_NAME
+from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
@@ -312,5 +312,5 @@ def cleanup():
 
     push_text_to_client(f"Cleanup thumbnails finished (removed: {len(to_remove)} orphan entries).")
     list_files.cache__clear()
-    return {"success": True, "message": "Cleanup finished"}
+    return ServerResponse(True, "Cleanup finished")
 

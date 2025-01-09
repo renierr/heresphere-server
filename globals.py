@@ -4,6 +4,7 @@ import json
 import re
 import sys
 from collections import namedtuple
+from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Optional
 
@@ -21,6 +22,11 @@ class VideoFolder(Enum):
     def __init__(self, dir, web_path):
         self.dir: str = dir
         self.web_path: str = web_path
+
+@dataclass
+class ServerResponse:
+    success: bool
+    message: str
 
 def set_debug(value) -> None:
     global DEBUG
