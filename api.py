@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
 from files import list_files, move_to_library, delete_file
-from globals import VideoFolder
+from globals import VideoFolder, ServerResponse
 
 api_bp = Blueprint('api', __name__)
 
@@ -25,10 +25,9 @@ def mtl():
     subfolder = data.get("subfolder")
 
     if not video_path:
-        return jsonify({"success": False, "error": "No video path provided"}), 400
+        return jsonify(ServerResponse(False, "No video path provided")), 400
 
-    result = move_to_library(video_path, subfolder)
-    return jsonify(result)
+    return jsonify(move_to_library(video_path, subfolder))
 
 @api_bp.route('/api/bookmarks', methods=['GET'])
 def gb():

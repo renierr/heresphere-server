@@ -24,7 +24,7 @@ def write_bookmarks(bookmarks):
 
 def save_bookmark(title, url):#
     if not title or not url:
-        return {"success": False, "error": "Title or URL missing"}
+        return ServerResponse(False, "Title or URL missing")
 
     bookmarks = list_bookmarks()
     bookmark = next((b for b in bookmarks if b['url'] == url), None)
@@ -35,18 +35,18 @@ def save_bookmark(title, url):#
         bookmarks.append({"title": title, "url": url})
 
     write_bookmarks(bookmarks)
-    return {"success": True, "message": "Bookmark added"}
+    return ServerResponse(True, "Bookmark added")
 
 
 def delete_bookmark(url):
     if not url:
-        return {"success": False, "error": "URL missing"}
+        return ServerResponse(False, "URL missing")
 
     bookmarks_before = list_bookmarks()
     bookmarks = [b for b in bookmarks_before if b['url'] != url]
     if len(bookmarks) == len(bookmarks_before):
-        return {"success": False, "error": "Bookmark not found"}
+        return ServerResponse(False, "Bookmark not found")
     else:
         write_bookmarks(bookmarks)
 
-    return {"success": True, "message": "Bookmark deleted"}
+    return ServerResponse(True, "Bookmark deleted")
