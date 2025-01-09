@@ -29,15 +29,12 @@ def glt():
 
 @thumbnail_bp.route('/api/generate_thumbnails', methods=['POST'])
 def gts(library=False):
-    try:
-        thumbnail_thread = threading.Thread(target=generate_thumbnails, args=(library,))
-        thumbnail_thread.daemon = True
-        thumbnail_thread.start()
+    thumbnail_thread = threading.Thread(target=generate_thumbnails, args=(library,))
+    thumbnail_thread.daemon = True
+    thumbnail_thread.start()
 
-        push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
-        return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
+    return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
 
 @thumbnail_bp.route('/api/generate_thumbnail', methods=['POST'])
 def gt():
@@ -47,11 +44,7 @@ def gt():
     if not video_path:
         return jsonify({"success": False, "error": "No video path provided"}), 400
 
-    try:
-        result = generate_thumbnail_for_path(video_path)
-        return jsonify(result)
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    return jsonify(generate_thumbnail_for_path(video_path))
 
 @cache(maxsize=4096, bypass_cache_param='force')
 def get_video_info(video_path, force=False):
