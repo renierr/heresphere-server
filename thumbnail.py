@@ -7,7 +7,7 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
-from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, THUMBNAIL_DIR_NAME
+from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, THUMBNAIL_DIR_NAME, ServerResponse
 
 
 class ThumbnailFormat(Enum):
@@ -25,7 +25,7 @@ thumbnail_bp = Blueprint('thumbnail', __name__)
 
 @thumbnail_bp.route('/api/library/generate_thumbnails', methods=['POST'])
 def glt():
-    return generate_thumbnails(library=True)
+    return gts(True)
 
 @thumbnail_bp.route('/api/generate_thumbnails', methods=['POST'])
 def gts(library=False):
@@ -34,7 +34,7 @@ def gts(library=False):
     thumbnail_thread.start()
 
     push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
-    return jsonify({"success": True, "message": "Generate Thumbnails started in the background"})
+    return jsonify(ServerResponse(True, "Generate Thumbnails started in the background"))
 
 @thumbnail_bp.route('/api/generate_thumbnail', methods=['POST'])
 def gt():
@@ -42,7 +42,7 @@ def gt():
     video_path = data.get("video_path")
 
     if not video_path:
-        return jsonify({"success": False, "error": "No video path provided"}), 400
+        return jsonify(ServerResponse(False, "No video path provided")), 400
 
     return jsonify(generate_thumbnail_for_path(video_path))
 
@@ -157,7 +157,7 @@ def generate_thumbnails(library=False):
                         thumbnail_errors.append(video_path)
 
     push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails {'(' + str(len(thumbnail_errors)) + ' failed)' if thumbnail_errors else ''}")
-    return {"success": True, "generated_thumbnails": len(generated_thumbnails)}
+    return ServerResponse(True, f"generated_thumbnails: {len(generated_thumbnails)}")
 
 
 def generate_thumbnail(video_path):
@@ -302,16 +302,16 @@ def generate_thumbnail_for_path(video_path):
 
     real_path = get_real_path_from_url(video_path)
     if not real_path:
-        return {"success": False, "error": "Invalid video path"}
+        return ServerResponse(False, "Invalid video path")
 
     if not os.path.exists(real_path):
-        return {"success": False, "error": "Video file does not exist"}
+        return ServerResponse(False, "Video file does not exist")
 
     base_name = os.path.basename(real_path)
     success = generate_thumbnail(real_path)
     clear_cache_by_name('list_files')
     push_text_to_client(f"Generate thumbnails finished for {base_name} with {'success' if success else 'failure'}")
     if success:
-        return {"success": True, "message": f"Generate thumbnails finished for {base_name}" }
+        return ServerResponse(True, f"Generate thumbnails finished for {base_name}")
     else:
-        return {"success": False, "error": "Failed to generate thumbnail"}
+        return ServerResponse(False, "Failed to generate thumbnail")
