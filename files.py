@@ -189,6 +189,7 @@ def move_to_library(video_path, subfolder):
     all thumbnails will be moved as well
 
     :param video_path: full path to video file
+    :param subfolder: subfolder in library
     :return: json object with success and library_path
     """
 

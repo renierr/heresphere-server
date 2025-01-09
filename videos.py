@@ -12,7 +12,7 @@ from yt_dlp import ImpersonateTarget
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
-    find_url_info, remove_ansi_codes, save_url_map, VideoFolder
+    find_url_info, remove_ansi_codes, save_url_map, VideoFolder, ServerResponse
 from thumbnail import generate_thumbnail_for_path
 
 root_path = get_application_path()
@@ -20,7 +20,7 @@ video_bp = Blueprint('video', __name__)
 
 @video_bp.route('/download', methods=['POST'])
 def download():
-    push_text_to_client(f"Download triggered")
+    push_text_to_client("Download triggered")
     data = request.get_json()
     # use sourceUrl except if heresphere is in name
     url = data.get("sourceUrl")
@@ -31,15 +31,15 @@ def download():
 
     if not url:
         logger.error("No direct video URL provided in the request")
-        return jsonify({"success": False, "error": "No URL provided"}), 400
+        return jsonify(ServerResponse(False, "No URL provided")), 400
 
     # Start a new thread for the download process
-    push_text_to_client(f"Starting download in background")
+    push_text_to_client("Starting download in background")
     download_thread = threading.Thread(target=download_video, args=(url, title,))
     download_thread.daemon = True
     download_thread.start()
 
-    return jsonify({"success": True, "message": "Download started in the background"})
+    return jsonify(ServerResponse(True, "Download started in the background"))
 
 
 @video_bp.route('/stream', methods=['POST'])
@@ -49,11 +49,11 @@ def request_stream():
 
     if not url:
         logger.error("No URL provided in the request")
-        return jsonify({"success": False, "error": "No URL provided"}), 400
+        return jsonify(ServerResponse(False, "No URL provided")), 400
 
     video_url, audio_url, cookies = get_stream(url)
     if video_url is None and audio_url is None:
-        return jsonify({"success": False, "error": "Failed to retrieve video and audio streams"}), 500
+        return jsonify(ServerResponse(False, "Failed to retrieve video and audio streams")), 500
     return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url, "cookies": cookies })
 
 
