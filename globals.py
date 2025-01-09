@@ -5,10 +5,11 @@ import re
 import sys
 from collections import namedtuple
 from enum import Enum
+from typing import Tuple, Optional
 
-DEBUG = False
+DEBUG: bool = False
 url_map = {}
-url_counter = 1
+url_counter: int = 1
 
 THUMBNAIL_DIR_NAME: str = '.thumb'
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title'])
@@ -21,31 +22,31 @@ class VideoFolder(Enum):
         self.dir: str = dir
         self.web_path: str = web_path
 
-def set_debug(value):
+def set_debug(value) -> None:
     global DEBUG
     DEBUG = value
 
-def is_debug():
+def is_debug() -> bool:
     return DEBUG
 
-def get_url_map():
+def get_url_map() -> dict:
     return url_map
 
-def get_url_counter():
+def get_url_counter() -> int:
     return url_counter
 
-def increment_url_counter():
+def increment_url_counter() -> int:
     global url_counter
     url_counter += 1
     return url_counter
 
-def find_url_id(url):
+def find_url_id(url) -> Optional[str]:
     for url_id, url_info in url_map.items():
         if url_info.get('url') == url:
             return url_id
     return None
 
-def find_url_info(filename):
+def find_url_info(filename) -> Tuple[Optional[str], Optional[dict]]:
     for idnr, url_info in url_map.items():
         filename_check = os.path.splitext(filename.rstrip('.part'))[0]
         filename_info = url_info.get('filename', None)
@@ -53,11 +54,11 @@ def find_url_info(filename):
             return idnr, url_info
     return None, None
 
-def save_url_map(file_path='url_map.json'):
+def save_url_map(file_path='url_map.json') -> None:
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(url_map, f, indent=2, ensure_ascii=False)
 
-def load_url_map(file_path='url_map.json'):
+def load_url_map(file_path='url_map.json') -> None:
     global url_counter
     if os.path.exists(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
@@ -67,7 +68,7 @@ def load_url_map(file_path='url_map.json'):
                 url_counter = max(int(key) for key in loaded_url_map.keys()) + 1
 
 
-def get_application_path():
+def get_application_path() -> str:
     application_path = os.path.dirname(os.path.abspath(__file__))
     if getattr(sys, 'frozen', False):
         application_path = os.path.dirname(sys.executable)
@@ -80,16 +81,16 @@ def get_application_path():
     return application_path
 
 
-def get_static_directory():
+def get_static_directory() -> str:
     application_path = get_application_path()
     return os.path.join(application_path, 'static')
 
 
-def remove_ansi_codes(text):
+def remove_ansi_codes(text) -> str:
     ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', text)
 
-def get_real_path_from_url(url):
+def get_real_path_from_url(url) -> Optional[str]:
     if not url:
         return None
 
@@ -108,7 +109,7 @@ def get_real_path_from_url(url):
     return real_path
 
 
-def format_duration(duration):
+def format_duration(duration) -> str:
     """
     Format a duration in seconds to HH:MM:SS
 
@@ -121,7 +122,7 @@ def format_duration(duration):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
-def format_byte_size(size_bytes):
+def format_byte_size(size_bytes) -> str:
     """
     Format a byte size into a human-readable string.
 

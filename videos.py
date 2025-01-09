@@ -189,7 +189,7 @@ def download_video(url, title):
     url_map = get_url_map()
     url_id = find_url_id(url)
     if url_id is None:
-        url_id = get_url_counter()
+        url_id = str(get_url_counter())
         increment_url_counter()
         url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'may_exist': None,
                            'title': title,
