@@ -9,7 +9,7 @@ from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
 @cache(maxsize=512, ttl=3600)
-def library_subfolders():
+def library_subfolders() -> list:
     subfolders = []
     for root, dirs, files in os.walk(os.path.join(get_static_directory(), VideoFolder.library.dir), followlinks=True):
         # Exclude directories that start with a dot
@@ -20,7 +20,7 @@ def library_subfolders():
     return subfolders
 
 @cache(maxsize=128, ttl=18000)
-def list_files(directory):
+def list_files(directory) -> list:
     extracted_details = []
     base_path = directory.web_path
 
@@ -78,7 +78,17 @@ def list_files(directory):
     return extracted_details
 
 
-def extract_file_details(root, filename, base_path, subfolder):
+def extract_file_details(root, filename, base_path, subfolder) -> dict:
+    """
+    Extract details from a file in the videos directory
+
+    :param root: the root directory
+    :param filename: the filename
+    :param base_path: base path of the file
+    :param subfolder: subfolder of the file
+    :return: dictionary with extracted details
+    """
+
     realfile = os.path.join(root, filename)
 
     if not os.path.exists(realfile):
@@ -118,7 +128,7 @@ def extract_file_details(root, filename, base_path, subfolder):
     return result
 
 
-def parse_youtube_filename(filename):
+def parse_youtube_filename(filename) -> tuple:
     """
     Parse a YouTube filename into id and title
     The stored filename is in the format: id___title.ext
@@ -134,7 +144,15 @@ def parse_youtube_filename(filename):
 
 
 @cache(maxsize=4096, ttl=7200)
-def get_basic_save_video_info(filename):
+def get_basic_save_video_info(filename) -> VideoInfo:
+    """
+    Get basic video information from a file,
+    including created date, size, duration, width, height, resolution, stereo, uid and title
+
+    :param filename: the filename to which information should be extracted
+    :return: VideoInfo object with filled data
+    """
+
     size = os.path.getsize(filename)
     created = os.path.getctime(filename)
     video_info = get_video_info(filename)
@@ -173,6 +191,7 @@ def move_to_library(video_path, subfolder):
     :param video_path: full path to video file
     :return: json object with success and library_path
     """
+
     push_text_to_client(f"Move file to library: {video_path}")
     static_dir = get_static_directory()
     if '/static/videos/' in video_path:
@@ -221,6 +240,7 @@ def delete_file(url):
     :param url: url path to file
     :return: object with success and message
     """
+
     if not url:
         return {"success": False, "error": "URL missing"}
 

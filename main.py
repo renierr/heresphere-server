@@ -194,7 +194,7 @@ def sse():
 def cl():
     return jsonify(cleanup())
 
-def start_server():
+def start_server() -> None:
     global ffmpeg_version_info, ffprobe_version_info
 
     # Load url_map on startup
