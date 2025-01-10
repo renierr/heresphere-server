@@ -1,3 +1,6 @@
+from queue import Queue, Empty
+from threading import Event
+
 from loguru import logger
 
 clients = []
@@ -13,16 +16,16 @@ def broadcast_message(message):
 def client_add(client_queue, stop_event):
     clients.append((client_queue, stop_event))
 
-def client_remove(client_queue, stop_event):
+def client_remove(client_queue: Queue, stop_event: Event):
     clients.remove((client_queue, stop_event))
 
-def event_stream(client_queue, stop_event):
+def event_stream(client_queue: Queue, stop_event: Event):
     try:
         while not stop_event.is_set():
             try:
                 message = client_queue.get(timeout=1)
                 yield f'data: {message}\n\n'
-            except:
+            except Empty:
                 continue
     except GeneratorExit:
         logger.debug("Client disconnected, stopping the generator.")

@@ -191,11 +191,11 @@ def cache_clear():
 
 @app.route('/sse')
 def sse():
-    client_queue = Queue()
-    stop_event = Event()
+    client_queue: Queue = Queue()
+    stop_event: Event = Event()
     client_add(client_queue, stop_event)
 
-    def cleanup():
+    def cleanup_client():
         client_remove(client_queue, stop_event)
 
     # send server time on first request
@@ -207,7 +207,7 @@ def sse():
         client_queue.put(f"Server uses ffprobe: {ffprobe_version_info}\n\n")
 
     response = Response(event_stream(client_queue, stop_event), mimetype="text/event-stream")
-    response.call_on_close(cleanup)
+    response.call_on_close(cleanup_client)
     return response
 
 
