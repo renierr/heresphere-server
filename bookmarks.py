@@ -2,7 +2,7 @@ import json
 import os
 
 from cache import cache
-from globals import get_static_directory
+from globals import get_static_directory, ServerResponse
 
 
 @cache(maxsize=128, ttl=3600)

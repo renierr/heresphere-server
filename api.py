@@ -36,8 +36,6 @@ def gb():
 @api_bp.route('/api/bookmarks', methods=['POST'])
 def sb():
     data = request.get_json()
-    title = data.get("title")
-    url = data.get("url")
     return jsonify(save_bookmark(data.get("title"), data.get("url")))
 
 @api_bp.route('/api/bookmarks', methods=['DELETE'])
