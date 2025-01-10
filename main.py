@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 from enum import Enum
+from typing import Optional
 
 import cache
 import argparse
@@ -40,6 +41,7 @@ logger.add(sys.stdout, level=log_level)
 # Global variables to store ffmpeg and ffprobe version information
 ffmpeg_version_info = None
 ffprobe_version_info = None
+UPDATE_SCRIPT_NAME = 'update.sh'
 
 # Hide Flask debug banner
 cli = sys.modules['flask.cli']
@@ -58,6 +60,7 @@ app.logger.setLevel(logging.WARNING)
 app.jinja_env.variable_start_string = '[['
 app.jinja_env.variable_end_string = ']]'
 
+
 # own json encode to handle ServerResponse class
 class ServerResponseJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -66,6 +69,8 @@ class ServerResponseJSONEncoder(json.JSONEncoder):
         if isinstance(obj, Enum):
             return obj.name
         return super().default(obj)
+
+
 app.json_encoder = ServerResponseJSONEncoder
 
 # Register blueprints
@@ -73,6 +78,7 @@ app.register_blueprint(heresphere_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(video_bp)
 app.register_blueprint(thumbnail_bp)
+
 
 # debug purpose only
 # @app.before_request
@@ -111,44 +117,52 @@ def add_cache_control(response):
             response.headers['Cache-Control'] = 'public, max-age=2592000'  # Cache for 1 month
     return response
 
+
 @app.route('/favicon.png')
 def favicon():
     return send_from_directory(app.static_folder, 'favicon.png', mimetype='image/png')
+
 
 @app.route('/manifest.json')
 def manifest():
     return send_from_directory(get_application_path(), 'manifest.json', mimetype='application/json')
 
+
 @app.route('/service-worker.js')
 def service_worker():
     return send_from_directory(get_application_path(), 'service-worker.js')
+
 
 @app.context_processor
 def inject_globals():
     return {
         'library_subfolders': library_subfolders(),
-        'server_update_possible': os.path.exists('update.sh')
+        'server_update_possible': os.path.exists(UPDATE_SCRIPT_NAME)
     }
+
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
+
 @app.route('/library')
 def library():
     return render_template('library.html')
+
 
 @app.route('/bookmarks')
 def bookmarks():
     return render_template('bookmarks.html')
 
+
 @app.route('/update')
 def update():
     # check if update.sh file is present in root folder
-    if os.path.exists('update.sh'):
+    if os.path.exists(UPDATE_SCRIPT_NAME):
         push_text_to_client("Update triggered, try to update server - possible connection lost, look for reconnect")
         try:
-            process = subprocess.Popen(['sh', 'update.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            process = subprocess.Popen(['sh', UPDATE_SCRIPT_NAME], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             # Read stdout line by line and push to client
             for line in process.stdout:
                 push_text_to_client(line.strip())
@@ -160,17 +174,20 @@ def update():
             push_text_to_client(f"Error during update call: {e}")
     else:
         push_text_to_client("Update triggered, no update.sh in root folder present!")
-    return jsonify({'update': 'finished'})
+    return jsonify(ServerResponse(True, "update finished"))
+
 
 @app.route('/cache')
 def cache_stats():
     cache_stats = cache.get_all_cache_stats()
     return Response(json.dumps(cache_stats, cls=ServerResponseJSONEncoder), mimetype='application/json')
 
+
 @app.route('/cache/clear')
 def cache_clear():
     push_text_to_client("Clearing all caches finished")
     return cache.clear_caches()
+
 
 @app.route('/sse')
 def sse():
@@ -193,11 +210,13 @@ def sse():
     response.call_on_close(cleanup)
     return response
 
+
 @app.route('/cleanup')
 def cl():
     return jsonify(cleanup())
 
-def start_server() -> None:
+
+def start_server() -> Optional[str]:
     global ffmpeg_version_info, ffprobe_version_info
 
     # Load url_map on startup
@@ -253,6 +272,9 @@ def start_server() -> None:
     #app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0', threaded=True)
     serve(app, host='0.0.0.0', port=UI_PORT, threads=100)
 
-if __name__ == '__main__':
-    start_server()
 
+if __name__ == '__main__':
+    result = start_server()
+    if result:
+        logger.error(f"Server could not start: {result}")
+        sys.exit(1)
