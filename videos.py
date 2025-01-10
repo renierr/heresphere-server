@@ -191,13 +191,12 @@ def download_video(url, title):
     if url_id is None:
         url_id = str(get_url_counter())
         increment_url_counter()
-        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None, 'may_exist': None,
+        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None,
                            'title': title,
                            'downloaded_date': int(datetime.now().timestamp())}
     else:
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
-        url_map[url_id]['may_exist'] = None
 
     push_text_to_client(f"Downloading video {url_id}...")
     try:

@@ -43,7 +43,7 @@ def list_files(directory) -> list:
                 url_id, url_info = find_url_info(filename)
                 common_details.update({
                     'url_id': url_id,
-                    **({k: url_info.get(k) for k in ['url', 'video_url', 'downloaded_date', 'may_exist']} if url_info else {})
+                    **({k: url_info.get(k) for k in ['url', 'video_url', 'downloaded_date']} if url_info else {})
                 })
 
                 if filename.count('___') == 1:
