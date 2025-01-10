@@ -71,12 +71,16 @@ def get_video_info(video_path, force=False):
             return None
 
         # find the video json in .thumb folder first
+        infos = {}
         json_path = os.path.join(os.path.dirname(video_path), THUMBNAIL_DIR_NAME, os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
-        if os.path.exists(json_path) and not force:
+        if os.path.exists(json_path):
             with open(json_path, 'r', encoding='utf-8') as f:
-                logger.debug(f"Loading pre existing video info from {json_path}")
+                logger.debug(f"Loading pre existing video info from {json_path} - force: {force}")
                 info = json.load(f)
+            if 'infos' in info:
+                infos = info['infos']
+            if not force:
                 return info
 
         logger.debug(f"Running ffprobe for {video_path}")
@@ -88,7 +92,6 @@ def get_video_info(video_path, force=False):
         info = json.loads(result.stdout)
 
         # additional infos
-        infos = {}
         info['infos'] = infos
 
         # find title from url map
