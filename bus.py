@@ -17,12 +17,18 @@ def client_remove(client_queue, stop_event):
     clients.remove((client_queue, stop_event))
 
 def event_stream(client_queue, stop_event):
-    while not stop_event.is_set():
-        try:
-            message = client_queue.get(timeout=1)
-            yield f'data: {message}\n\n'
-        except:
-            continue
+    try:
+        while not stop_event.is_set():
+            try:
+                message = client_queue.get(timeout=1)
+                yield f'data: {message}\n\n'
+            except:
+                continue
+    except GeneratorExit:
+        logger.debug("Client disconnected, stopping the generator.")
+        return
+    finally:
+        client_remove(client_queue, stop_event)
 
 
 
