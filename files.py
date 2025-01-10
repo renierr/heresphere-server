@@ -60,7 +60,7 @@ def list_files(directory) -> list:
         duplicate_details.extend(list_files(VideoFolder.library))
     duplicate_details.extend(extracted_details)
 
-    uids = {}
+    uids: dict = {}
     for details in duplicate_details:
         uid = details.get('uid')
         if uid:

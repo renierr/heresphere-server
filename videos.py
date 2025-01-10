@@ -109,14 +109,14 @@ def get_stream(url):
                     video_url = info['requested_formats'][0]['url']
                     audio_url = info['requested_formats'][1]['url']
                 if not video_url and not audio_url:
-                    raise Exception("Could not retrieve both video and audio URLs")
+                    raise ValueError("Could not retrieve both video and audio URLs")
 
             else:
                 if info.get('_type') == 'playlist' and 'entries' in info and len(info['entries']) > 0:
                     info = info['entries'][0]
 
                 if 'url' not in info:
-                    raise Exception("Could not retrieve video URL")
+                    raise ValueError("Could not retrieve video URL")
 
                 video_url = info['url']
                 audio_url = None
