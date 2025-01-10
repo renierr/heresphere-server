@@ -207,8 +207,8 @@ def download_video(url, title):
         url_info = url_map[url_id]
         url_info['video_url'] = video_url
         save_url_map()
-        list_files.cache__evict(VideoFolder.videos)
         generate_thumbnail_for_path(video_url)
+        list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}"

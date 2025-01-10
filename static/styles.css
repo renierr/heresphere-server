@@ -59,7 +59,8 @@ footer.footer {
     min-width: 200px;
     height: 200px;
     background-image: url("/static/images/placeholder.png");
-    background-size: contain;
+    background-position: center;
+    background-size: cover;
     background-repeat: no-repeat;
     border-top-left-radius: var(--bs-card-inner-border-radius);
     border-top-right-radius: var(--bs-card-inner-border-radius);

@@ -44,6 +44,7 @@ def gt():
     if not video_path:
         return jsonify(ServerResponse(False, "No video path provided")), 400
 
+    clear_cache_by_name('list_files')
     return jsonify(generate_thumbnail_for_path(video_path))
 
 @cache(maxsize=4096, bypass_cache_param='force')
@@ -312,7 +313,6 @@ def generate_thumbnail_for_path(video_path):
 
     base_name = os.path.basename(real_path)
     success = generate_thumbnail(real_path)
-    clear_cache_by_name('list_files')
     push_text_to_client(f"Generate thumbnails finished for {base_name} with {'success' if success else 'failure'}")
     if success:
         return ServerResponse(True, f"Generate thumbnails finished for {base_name}")
