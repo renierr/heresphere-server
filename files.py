@@ -8,7 +8,7 @@ from globals import get_static_directory, find_url_info, VideoInfo, get_real_pat
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
-@cache(maxsize=512, ttl=3600)
+@cache(maxsize=128, ttl=3600)
 def library_subfolders() -> list:
     subfolders = []
     for root, dirs, files in os.walk(os.path.join(get_static_directory(), VideoFolder.library.dir), followlinks=True):

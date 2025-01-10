@@ -266,7 +266,7 @@ def get_thumbnail(filename, *formats):
             return thumbs[fmt]
     return None
 
-@cache(maxsize=512, ttl=3600)
+@cache(maxsize=4096, ttl=3600)
 def get_thumbnails(filename):
     """
     Get thumbnail object with all possible thumbnail formats as url paths for a video file
