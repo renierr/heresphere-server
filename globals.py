@@ -19,8 +19,8 @@ class VideoFolder(Enum):
     library = ("library", "/static/library/")
     videos = ("videos", "/static/videos/")
 
-    def __init__(self, dir, web_path):
-        self.dir: str = dir
+    def __init__(self, directory, web_path):
+        self.dir: str = directory
         self.web_path: str = web_path
 
 @dataclass
@@ -75,7 +75,6 @@ def load_url_map(file_path='url_map.json') -> None:
 
 
 def get_application_path() -> str:
-    application_path = os.path.dirname(os.path.abspath(__file__))
     if getattr(sys, 'frozen', False):
         application_path = os.path.dirname(sys.executable)
     else:
