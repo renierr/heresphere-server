@@ -17,7 +17,9 @@ def client_add(client_queue, stop_event):
     clients.append((client_queue, stop_event))
 
 def client_remove(client_queue: Queue, stop_event: Event):
-    clients.remove((client_queue, stop_event))
+    if (client_queue, stop_event) in clients:  # Replace `some_list` with the actual list you are using
+        clients.remove((client_queue, stop_event))
+    stop_event.set()
 
 def event_stream(client_queue: Queue, stop_event: Event):
     try:
