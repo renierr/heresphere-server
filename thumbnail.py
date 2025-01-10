@@ -223,7 +223,7 @@ def generate_thumbnail(video_path):
             outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBP.extension}")
             logger.debug(f"Starting ffmpeg for webp - {outfile}")
             cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', str(clip_duration), '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', outfile]
-            logger.debug(f"Running command: {' '.join(cmd)}")
+            logger.debug(f"Running command - webp: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
             except subprocess.TimeoutExpired:
@@ -233,7 +233,7 @@ def generate_thumbnail(video_path):
             outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.JPG.extension}")
             logger.debug(f"Starting ffmpeg for jpg - {outfile}")
             cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-update', '1', outfile]
-            logger.debug(f"Running command: {' '.join(cmd)}")
+            logger.debug(f"Running command - jpg: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
             except subprocess.TimeoutExpired:
@@ -243,7 +243,7 @@ def generate_thumbnail(video_path):
             outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
             logger.debug(f"Starting ffmpeg for webm - {outfile}")
             cmd = ['ffmpeg', '-ss', str(midpoint), '-t', str(clip_duration), '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-b:v', '256k', '-c:a', 'libvorbis', outfile]
-            logger.debug(f"Running command: {' '.join(cmd)}")
+            logger.debug(f"Running command - webm: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
             except subprocess.TimeoutExpired:
