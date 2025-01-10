@@ -207,16 +207,6 @@ def download_video(url, title):
             video_url = download_direct(url, download_progress, url_id, title)
         url_info = url_map[url_id]
         url_info['video_url'] = video_url
-        # try to figure out if file was already downloaded and filename is in library
-        files = list_files(VideoFolder.library)
-        for file in files:
-            fname = file.get('filename')
-            fname_comp = url_info.get('filename')
-            if fname_comp and fname_comp in fname:
-                url_info['may_exist'] = fname
-                logger.info(f"File {fname} may already exists in library")
-                push_text_to_client(f"File {fname} may already exists in library: {fname_comp}")
-                break
         save_url_map()
         list_files.cache__evict(VideoFolder.videos)
         generate_thumbnail_for_path(video_url)
