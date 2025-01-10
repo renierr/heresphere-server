@@ -5,24 +5,28 @@
         <h5 class="modal-title" id="thumbnailModalLabel">Video Info</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <h5 class="text-truncate">{{ currentFile?.title }}</h5>
-        <img v-if="currentFile?.thumbnail" :src="currentFile?.thumbnail" alt="Thumbnail" class="img-fluid p-2 border border-secondary-subtle border-2 text-center">
+      <div v-if="currentFile" class="modal-body">
+        <h5 class="text-truncate">{{ currentFile.title }}</h5>
+        <img v-if="currentFile.thumbnail" :src="currentFile.thumbnail" alt="Thumbnail" class="img-fluid p-2 border border-secondary-subtle border-2 text-center">
 
         <div class="text-muted">
           <p>
-            <span v-if="currentFile?.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(currentFile?.filesize) }}</span> <span v-if="currentFile?.width && currentFile?.height"><i class="bi bi-aspect-ratio"></i> {{ currentFile?.width }}x{{ currentFile?.height}}</span>
-            <span v-if="currentFile?.width && (currentFile?.width > 1900 || currentFile?.height > 1900)"><i class="bi bi-badge-hd-fill"></i></span>
-            <span v-if="currentFile?.width && (currentFile?.width >= 8000 || currentFile?.height >= 8000)"><i class="bi bi-badge-8k-fill"></i></span>
-            <span v-else-if="currentFile?.width && (currentFile?.width > 3800 || currentFile?.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
-            <span v-if="currentFile?.stereo"><i class="bi bi-badge-3d-fill"></i></span>
+            <span v-if="currentFile.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(currentFile.filesize) }}</span> <span v-if="currentFile.width && currentFile.height"><i class="bi bi-aspect-ratio"></i> {{ currentFile.width }}x{{ currentFile.height}}</span>
+            <span v-if="currentFile.width && (currentFile.width > 1900 || currentFile.height > 1900)"><i class="bi bi-badge-hd-fill"></i></span>
+            <span v-if="currentFile.width && (currentFile.width >= 8000 || currentFile.height >= 8000)"><i class="bi bi-badge-8k-fill"></i></span>
+            <span v-else-if="currentFile.width && (currentFile.width > 3800 || currentFile.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
+            <span v-if="currentFile.stereo"><i class="bi bi-badge-3d-fill"></i></span>
           </p>
-          <p><i class="bi bi-calendar"></i> {{ formatDate(currentFile?.created) }} (Created)</p>
-          <p v-if="currentFile?.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile?.downloaded_date) }} (Downloaded)</p>
-          <p v-if="currentFile?.duration"><i class="bi bi-clock"></i> {{ formatDuration(currentFile?.duration) }}</p>
-          <p v-if="currentFile?.folder"><i class="bi bi-folder"></i> {{ currentFile?.folder }}</p>
+          <p><i class="bi bi-calendar"></i> {{ formatDate(currentFile.created) }} (Created)</p>
+          <p v-if="currentFile.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile.downloaded_date) }} (Downloaded)</p>
+          <p v-if="currentFile.duration"><i class="bi bi-clock"></i> {{ formatDuration(currentFile.duration) }}</p>
+          <p v-if="currentFile.folder"><i class="bi bi-folder"></i> {{ currentFile.folder }}</p>
+          <div v-if="currentFile.may_exist" @click.stop.prevent="showDuplicateInfo(currentFile)" class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded" style="word-break: break-word">Possible duplicate file</div>
         </div>
       </div>
+      <div v-else class="modal-body">
+        <p>No file selected</p>  
+      </div>      
     </div>
   </div>
 </div>
