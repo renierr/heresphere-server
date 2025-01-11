@@ -42,7 +42,12 @@ self.addEventListener('fetch', event => {
                 const formData = await event.request.formData();
                 const title = formData.get('title');
                 const text = formData.get('text');
-                const url = formData.get('url');
+                let url = formData.get('url');
+
+                // mobile browser does not provider url, so we need to get it from the text
+                if (!url && text) {
+                   url = text;
+                }
 
                 /*
                 const allClients = await clients.matchAll({
