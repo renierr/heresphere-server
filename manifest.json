@@ -6,7 +6,10 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "theme_color": "#4A90E2",
+  "launch_handler":  {
+    "client_mode": ["navigate-existing", "auto"]
+  },
   "share_target": {
     "action": "/share-target",
     "method": "POST",
