@@ -23,15 +23,33 @@
   "shortcuts": [
     {
       "name": "Home",
-      "url": "/"
+      "url": "/",
+      "icons": [
+        {
+          "src": "/static/icons/home.svg",
+          "type": "image/svg+xml"
+        }
+      ]
     },
     {
       "name": "Library",
-      "url": "/library"
+      "url": "/library",
+      "icons": [
+        {
+          "src": "/static/icons/library.svg",
+          "type": "image/svg+xml"
+        }
+      ]
     },
     {
       "name": "Bookmarks",
-      "url": "/bookmarks"
+      "url": "/bookmarks",
+      "icons": [
+        {
+          "src": "/static/icons/bookmarks.svg",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ],
   "icons": [
