@@ -1,6 +1,7 @@
 // Install event
 self.addEventListener('install', event => {
     console.log('Service Worker installing.');
+    self.skipWaiting();
     event.waitUntil(
         caches.open('v1').then(cache => {
             return cache.addAll([
@@ -18,6 +19,7 @@ self.addEventListener('install', event => {
 // Activate event
 self.addEventListener('activate', event => {
     console.log('Service Worker activating.');
+    event.waitUntil(clients.claim());
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
@@ -32,24 +34,48 @@ self.addEventListener('activate', event => {
     );
 });
 
-self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
 
-    if (url.pathname === '/share-target') {
-        console.log('Service Worker: handling share target');
-        event.respondWith((async () => {
-            const clientPromise = self.clients.get(event.resultingClientId || event.clientId);
-            clientPromise.then(client => {
-                if (client) {
-                    client.postMessage({
+self.addEventListener('fetch', event => {
+    if (event.request.url.endsWith('/share-target')) {
+        event.respondWith(
+            (async () => {
+                const formData = await event.request.formData();
+                const title = formData.get('title');
+                const text = formData.get('text');
+                const url = formData.get('url');
+
+                const allClients = await clients.matchAll({
+                    type: 'window',
+                    includeUncontrolled: true
+                });
+
+                if (allClients.length > 0) {
+                    // Send data to the existing client
+                    allClients[0].postMessage({
                         type: 'SHARE_TARGET',
-                        title: url.searchParams.get('title'),
-                        text: url.searchParams.get('text'),
-                        sharedUrl: url.searchParams.get('url')
+                        title,
+                        text,
+                        sharedUrl: url
                     });
+                    allClients[0].focus();
                 }
-            });
-            return Response.redirect('/', 303);
-        })());
+
+                /*
+                const clientPromise = self.clients.get(event.resultingClientId || event.clientId);
+                clientPromise.then(client => {
+                   if (client) {
+                       client.postMessage({
+                           type: 'SHARE_TARGET',
+                           title,
+                           text,
+                           sharedUrl: url
+                       });
+                   }
+                });
+                */
+
+                return Response.redirect('/', 303);
+            })()
+        );
     }
 });

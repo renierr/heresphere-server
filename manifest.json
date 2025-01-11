@@ -7,6 +7,16 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
+  "share_target": {
+    "action": "/share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "/static/icons/icon-192x192.png",
@@ -31,14 +41,6 @@
       "sizes": "320x480",
       "type": "image/png"
     }
-  ],
-  "share_target": {
-    "action": "/share-target",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  }
+  ]
+
 }
