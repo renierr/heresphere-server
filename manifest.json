@@ -27,6 +27,7 @@
       "icons": [
         {
           "src": "/static/icons/home.svg",
+          "sizes": "96x96",
           "type": "image/svg+xml"
         }
       ]
@@ -37,6 +38,7 @@
       "icons": [
         {
           "src": "/static/icons/library.svg",
+          "sizes": "96x96",
           "type": "image/svg+xml"
         }
       ]
@@ -47,6 +49,7 @@
       "icons": [
         {
           "src": "/static/icons/bookmarks.svg",
+          "sizes": "96x96",
           "type": "image/svg+xml"
         }
       ]
