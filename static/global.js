@@ -6,6 +6,43 @@ if ('serviceWorker' in navigator) {
       console.log('Service Worker registration failed:', error);
     });
   });
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js').then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+            registration.update();
+
+            // Listen for the waiting service worker
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        newWorker.postMessage({action: 'skipWaiting'});
+                    }
+                });
+            });
+        }).catch(error => {
+            console.log('Service Worker registration failed:', error);
+        });
+
+        // Listen for the controlling service worker to change
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
+        });
+    });
+
+    navigator.serviceWorker.addEventListener('message', event => {
+        console.log('Service Worker message:', event.data);
+        if (event.data.type === 'SHARE_TARGET') {
+            const sharedUrl = event.data.sharedUrl;
+            if (sharedUrl) {
+                // Trigger the stream function with the shared URL
+                pwaPostVideoUrl(true, sharedUrl);
+            }
+        }
+    });
+}
+function pwaPostVideoUrl(isStream, videoUrl) {
+    console.log(`Streaming video from URL: ${videoUrl}`);
 }
 
 // Function to apply the theme
