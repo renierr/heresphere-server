@@ -11,9 +11,9 @@
     "client_mode": ["navigate-existing", "auto"]
   },
   "share_target": {
-    "action": "/share-target",
-    "method": "POST",
-    "enctype": "multipart/form-data",
+    "action": "/static/share.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
     "params": {
       "title": "title",
       "text": "text",
