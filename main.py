@@ -9,6 +9,8 @@ import time
 from enum import Enum
 from typing import Optional
 
+from werkzeug.exceptions import NotFound
+
 import cache
 import argparse
 
@@ -96,6 +98,9 @@ app.register_blueprint(thumbnail_bp)
 
 @app.errorhandler(Exception)
 def handle_exception(e):
+    if isinstance(e, NotFound):
+        return jsonify(ServerResponse(False, "Not Found")), 404
+
     if is_debug():
         logger.exception(f"An error occurred: {e}")
     else:
