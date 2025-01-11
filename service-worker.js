@@ -44,6 +44,7 @@ self.addEventListener('fetch', event => {
                 const text = formData.get('text');
                 const url = formData.get('url');
 
+                /*
                 const allClients = await clients.matchAll({
                     type: 'window',
                     includeUncontrolled: true
@@ -59,8 +60,8 @@ self.addEventListener('fetch', event => {
                     });
                     allClients[0].focus();
                 }
+                 */
 
-                /*
                 const clientPromise = self.clients.get(event.resultingClientId || event.clientId);
                 clientPromise.then(client => {
                    if (client) {
@@ -72,7 +73,6 @@ self.addEventListener('fetch', event => {
                        });
                    }
                 });
-                */
 
                 return Response.redirect('/', 303);
             })()
