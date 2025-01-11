@@ -1,3 +1,5 @@
+let previewVideoWarningAlreadyShown = false;
+
 function localStoreSettingsLoading() {
     const defaults = { cardLayout: true, pageSize: 12,
         filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '', showVideoPreview: true };
@@ -130,8 +132,9 @@ export const methods = {
         evt.target.play()
             .then(() => file.showPreview = true)
             .catch(error => {
-            if (error.name === 'NotAllowedError') {
+            if (error.name === 'NotAllowedError' && !previewVideoWarningAlreadyShown) {
                 this.showMessage('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
+                previewVideoWarningAlreadyShown = true;
             } else {
                 console.error('Error playing video:', error);
             }
