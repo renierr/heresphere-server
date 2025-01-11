@@ -34,8 +34,13 @@ if ('serviceWorker' in navigator) {
         }
     });
 }
+
 function pwaPostVideoUrl(isStream, videoUrl) {
-    console.log(`Streaming video from URL: ${videoUrl}`);
+    const vueInstance = window.vueInstance;
+    if (vueInstance) {
+        vueInstance.videoUrl = videoUrl;
+        vueInstance.postVideoUrl(true);
+    }
 }
 
 // Function to apply the theme
@@ -63,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // scroll back to top button
     const scrollButton = document.getElementById('scroll-to-top');
     scrollButton.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({top: 0, behavior: 'smooth'});
     });
     window.addEventListener('scroll', () => {
         if (window.scrollY > 100) {
@@ -89,14 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const hammer = new Hammer(selectElement);
-        hammer.get('swipe').set({ direction: Hammer.DIRECTION_VERTICAL });
+        hammer.get('swipe').set({direction: Hammer.DIRECTION_VERTICAL});
         hammer.on('swipe', (event) => {
             if (event.direction === Hammer.DIRECTION_UP) {
                 selectElement.selectedIndex = Math.max(0, selectElement.selectedIndex - 1);
             } else if (event.direction === Hammer.DIRECTION_DOWN) {
                 selectElement.selectedIndex = Math.min(selectElement.length - 1, selectElement.selectedIndex + 1);
             }
-            selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+            selectElement.dispatchEvent(new Event('change', {bubbles: true}));
         });
         selectElement.dataset.hammerApplied = 'true';
     };
@@ -114,6 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, {childList: true, subtree: true});
 });
 

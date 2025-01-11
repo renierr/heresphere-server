@@ -24,6 +24,7 @@ new Vue({
         removeKeyNavigationForPagingListener();
     },
     mounted: function () {
+        window.vueInstance = this;    // store vue instance in DOM
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
         this.fetchFiles();

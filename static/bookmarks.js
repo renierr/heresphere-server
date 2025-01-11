@@ -84,6 +84,7 @@ new Vue({
     watch: {
     },
     mounted: function () {
+        window.vueInstance = this;    // store vue instance in DOM
         // fetch bookmarks
         this.fetchBookmarks();
 
