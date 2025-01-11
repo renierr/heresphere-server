@@ -4,14 +4,22 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse
+from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, \
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, check_folder
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
 @cache(maxsize=128, ttl=3600)
 def library_subfolders() -> list:
     subfolders = []
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), VideoFolder.library.dir), followlinks=True):
+
+    folder, folder_state = check_folder(os.path.join(get_static_directory(), VideoFolder.library.dir))
+    if folder_state != FolderState.ACCESSIBLE:
+        push_text_to_client(f"Library folder not accessible: {folder} - state: {folder_state}")
+        logger.warning(f"Library folder not accessible: {folder} - state: {folder_state}")
+        return subfolders
+
+    for root, dirs, files in os.walk(folder, followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
         subfolder = os.path.relpath(root, os.path.join(get_static_directory(), VideoFolder.library.dir)).replace('\\', '/')
@@ -23,6 +31,12 @@ def library_subfolders() -> list:
 def list_files(directory) -> list:
     extracted_details = []
     base_path = directory.web_path
+
+    folder, folder_state = check_folder(os.path.join(get_static_directory(),  directory.dir))
+    if folder_state != FolderState.ACCESSIBLE:
+        push_text_to_client(f"Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
+        logger.warning(f"Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
+        return extracted_details
 
     for root, dirs, files in os.walk(os.path.join(get_static_directory(), directory.dir), followlinks=True):
         # Exclude directories that start with a dot
@@ -299,8 +313,13 @@ def cleanup():
     known_extensions = [fmt.extension for fmt in ThumbnailFormat]
     to_remove = []
     for directory in VideoFolder:
+        folder, folder_state = check_folder(os.path.join(static_dir, directory.dir))
+        if folder_state != FolderState.ACCESSIBLE:
+            logger.warning(f"Folder not accessible: {folder} - skipping cleanup - state: {folder_state}")
+            continue
+
         # get all files from .thumb sub folders
-        for root, dirs, files in os.walk(os.path.join(static_dir, directory.dir), followlinks=True):
+        for root, dirs, files in os.walk(folder, followlinks=True):
             if THUMBNAIL_DIR_NAME in dirs:
                 thumb_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
                 root_files = os.listdir(root)

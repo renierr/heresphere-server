@@ -3,11 +3,14 @@ import subprocess
 import json
 import threading
 from enum import Enum
+from typing import Optional
+
 from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
-from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, THUMBNAIL_DIR_NAME, ServerResponse
+from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, \
+    THUMBNAIL_DIR_NAME, ServerResponse, check_folder, FolderState
 
 
 class ThumbnailFormat(Enum):
@@ -122,7 +125,7 @@ def get_video_info(video_path, force=False):
         logger.error(f"Failed to get video info for {video_path}: {e}")
         return None
 
-def generate_thumbnails(library=False):
+def generate_thumbnails(library=False) -> ServerResponse:
     """
     Generate thumbnails for all videos in the static/videos or static/library folder
 
@@ -135,6 +138,13 @@ def generate_thumbnails(library=False):
     thumbnail_errors = []
     logger.debug(f"Generating thumbnails for {video_dir}")
     push_text_to_client(f"Generating thumbnails for {VideoFolder.library.dir if library else VideoFolder.videos.dir}")
+
+    _, folder_state = check_folder(video_dir)
+    if folder_state != FolderState.ACCESSIBLE:
+        msg = f"Folder not accessible: {video_dir} - skipping thumbnail generation - state: {folder_state}"
+        push_text_to_client(msg)
+        logger.warning(msg)
+        return ServerResponse(False, msg)
 
     for root, dirs, files in os.walk(video_dir, followlinks=True):
         # Exclude directories that start with a dot
@@ -154,8 +164,7 @@ def generate_thumbnails(library=False):
                         break
 
                 if missing:
-                    success = generate_thumbnail(video_path)
-                    if success:
+                    if generate_thumbnail(video_path):
                         generated_thumbnails.append(video_path)
                     else:
                         thumbnail_errors.append(video_path)
@@ -164,7 +173,7 @@ def generate_thumbnails(library=False):
     return ServerResponse(True, f"generated_thumbnails: {len(generated_thumbnails)}")
 
 
-def generate_thumbnail(video_path):
+def generate_thumbnail(video_path) -> Optional[bool]:
     """
     Generate thumbnail for video file using ffmpeg
     this method will generate a webp, jpg and webm thumbnails

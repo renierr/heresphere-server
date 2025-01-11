@@ -1,3 +1,4 @@
+import errno
 import math
 import os
 import json
@@ -7,6 +8,8 @@ from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Optional
+
+from loguru import logger
 
 DEBUG: bool = False
 url_map = {}
@@ -22,6 +25,13 @@ class VideoFolder(Enum):
     def __init__(self, directory, web_path):
         self.dir: str = directory
         self.web_path: str = web_path
+
+class FolderState(Enum):
+    ACCESSIBLE = 1
+    NOT_READABLE = 2
+    NOT_FOLDER = 3
+    NOT_MOUNTED = 4
+    CHECK_ERROR = 5
 
 @dataclass
 class ServerResponse:
@@ -142,3 +152,47 @@ def format_byte_size(size_bytes) -> str:
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
     return f"{s} {size_name[i]}"
+
+
+def check_folder(path) -> tuple[str,FolderState]:
+    """
+    Checks if provided path accessible and return a state as tuple first is the provided path second is the state.
+
+    Returns:
+        FolderState.NOT_FOLDER if the path is not a folder or symlink points to an available mount point,
+        FolderState.NOT_MOUNTED if the path is a symlink and  points to an unavailable mount point,
+        FolderState.NOT_READABLE if the path is not readable.
+        FolderState.NOT_FOLDER if the symlink points to a non-folder target.
+
+    :param path: path to check
+    :return: tuple of path and state
+    """
+
+    if not os.path.islink(path):
+        if not os.path.isdir(path):
+            return path, FolderState.NOT_FOLDER  # Target is not a folder
+        else:
+            # check if folder is readable
+            if os.access(path, os.R_OK):
+                return path, FolderState.ACCESSIBLE
+            else:
+                logger.error(f"Folder not readable: {path}")
+                return path, FolderState.NOT_READABLE
+
+    target_path = 'unknown'
+    try:
+        target_path = os.readlink(path)
+        # Try to stat the target. If the mount point is unavailable,
+        # this should raise an OSError with errno.ENXIO (No such device or address) or potentially other related errors.
+        os.stat(target_path)  # Crucial check
+        if not os.path.isdir(target_path):
+            return path, FolderState.NOT_FOLDER  # Target is not a folder
+
+        return path, FolderState.ACCESSIBLE  # Target is accessible
+    except OSError as e:
+        if e.errno in (errno.ENXIO, errno.ENOENT, errno.ESTALE): #errno.ESTALE is for NFS stale file handles
+            return path, FolderState.NOT_MOUNTED # Target is unavailable (likely unmounted)
+        else:
+            # Handle other OS errors if needed (e.g., permission issues)
+            logger.error(f"Unexpected OSError: {e} for link: {path} target: {target_path}")
+            return path, FolderState.CHECK_ERROR # Not related to mount point unavailability
