@@ -135,8 +135,6 @@ export const methods = {
             if (error.name === 'NotAllowedError' && !previewVideoWarningAlreadyShown) {
                 this.showMessage('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
                 previewVideoWarningAlreadyShown = true;
-            } else {
-                console.error('Error playing video:', error);
             }
         });
     },
