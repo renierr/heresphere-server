@@ -20,6 +20,20 @@
       "url": "url"
     }
   },
+  "shortcuts": [
+    {
+      "name": "Home",
+      "url": "/"
+    },
+    {
+      "name": "Library",
+      "url": "/library"
+    },
+    {
+      "name": "Bookmarks",
+      "url": "/bookmarks"
+    }
+  ],
   "icons": [
     {
       "src": "/static/icons/icon-192x192.png",
