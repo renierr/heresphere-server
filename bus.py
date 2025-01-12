@@ -31,7 +31,6 @@ def event_stream(client_queue: Queue, stop_event: Event):
                 continue
     except GeneratorExit:
         logger.debug("Client disconnected, stopping the generator.")
-        return
     finally:
         client_remove(client_queue, stop_event)
 
