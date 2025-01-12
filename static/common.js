@@ -284,7 +284,9 @@ export const methods = {
     playVideo(file) {
         const videoModalBody = document.getElementById('videoModalBody');
         const videoModalTitle = document.getElementById('videoModalLabel');
+        const videoModalFooter = document.getElementById('videoModalFooter');
 
+        videoModalFooter.innerHTML = '';
         videoModalTitle.textContent = file.title || 'Video Player';
         videoModalBody.innerHTML = `
             <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
