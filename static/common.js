@@ -281,11 +281,14 @@ export const methods = {
                 console.error('Error deleting bookmark:', error);
             });
     },
-    playVideo(filename) {
+    playVideo(file) {
         const videoModalBody = document.getElementById('videoModalBody');
+        const videoModalTitle = document.getElementById('videoModalLabel');
+
+        videoModalTitle.textContent = file.title || 'Video Player';
         videoModalBody.innerHTML = `
             <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
-                <source src="${filename}" type="video/mp4">
+                <source src="${file.filename}" type="video/mp4">
             </video-js>
         `;
         videojs('videoPlayer');

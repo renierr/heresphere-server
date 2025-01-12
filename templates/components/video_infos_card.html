@@ -29,7 +29,7 @@
         <p v-if="file.folder" class="mb-0"><i class="bi bi-folder"></i> {{ file.folder }}</p>
     </div>
     <div class="card-footer p-2 d-flex flex-wrap gap-2">
-        <button class="btn btn-outline-success btn-sm" @click="playVideo(file.filename)">
+        <button class="btn btn-outline-success btn-sm" @click="playVideo(file)">
             <i class="bi bi-play-fill"></i> Play
         </button>
         <button v-if="!file.partial" class="btn btn-outline-secondary btn-sm" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>

@@ -36,11 +36,13 @@ new Vue({
                         const video_url = data.videoUrl;
                         const audio_url = data.audioUrl;
                         const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+                        const videoModalTitle = document.getElementById('videoModalLabel');
                         const modalBody = document.getElementById('videoModalBody');
                         const modalFooter = document.getElementById('videoModalFooter');
                         if (modalBody && modalFooter && video_url) {
                             // strip trailing / from video url
                             const video_source = video_url.replace(/\/+$/, '');
+                            videoModalTitle.textContent = 'Video Streaming...';
                             modalBody.innerHTML = `
                                 <video-js id="videoPlayer" class="vjs-default-skin w-100 h-100" controls autoplay>
                                     <source src="${video_source}" type="video/webm">
