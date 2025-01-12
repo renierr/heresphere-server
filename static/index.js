@@ -35,6 +35,7 @@ new Vue({
                     if (stream) {
                         const video_url = data.videoUrl;
                         const audio_url = data.audioUrl;
+                        const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                         const modalBody = document.getElementById('videoModalBody');
                         const modalFooter = document.getElementById('videoModalFooter');
                         if (modalBody && modalFooter && video_url) {
@@ -51,23 +52,30 @@ new Vue({
                                 <a href="${video_source}" target="_blank">Extracted Video link</a>
                             `;
 
+                            const tempVideoUrl = this.videoUrl;
+                            const downloadButton = document.createElement('button');
+                            downloadButton.textContent = 'Trigger Download';
+                            downloadButton.classList.add('btn', 'btn-primary', 'btn-sm');
+                            downloadButton.addEventListener('click', () => {
+                                videoModal.hide();
+                                this.redownload({ url: tempVideoUrl });
+                            });
+                            modalFooter.appendChild(downloadButton);
+
                             if (navigator.share) {
                                 const shareButton = document.createElement('button');
                                 shareButton.textContent = 'Share Video';
-                                shareButton.classList.add('btn', 'btn-primary', 'btn-sm');
+                                shareButton.classList.add('btn', 'btn-secondary', 'btn-sm');
                                 shareButton.addEventListener('click', () => {
                                     navigator.share({
                                         title: 'Video Link',
-                                        text: this.videoUrl,
-                                        url: this.videoUrl,
+                                        url: tempVideoUrl,
                                     })
-                                        .then(() => console.log(`Successful shared ${this.videoUrl}`))
+                                        .then(() => console.log(`Successful shared ${tempVideoUrl}`))
                                         .catch((error) => console.log('Error sharing', error));
                                 });
                                 modalFooter.appendChild(shareButton);
                             }
-
-                            const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                             videoModal.show();
                             this.videoUrl = '';
                         } else {
