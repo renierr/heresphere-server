@@ -3,7 +3,7 @@ import base64
 from flask import Blueprint, jsonify, request
 
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
-from files import list_files, move_to_library, delete_file, move_inside_library
+from files import list_files, delete_file, move_file_for
 from globals import VideoFolder, ServerResponse
 
 api_bp = Blueprint('api', __name__)
@@ -27,7 +27,7 @@ def mtl():
     if not video_path:
         return jsonify(ServerResponse(False, "No video path provided")), 400
 
-    return jsonify(move_to_library(video_path, subfolder))
+    return jsonify(move_file_for(VideoFolder.videos, video_path, subfolder))
 
 
 @api_bp.route('/api/move_inside_library', methods=['POST'])
@@ -39,7 +39,7 @@ def mil():
     if not video_path:
         return jsonify(ServerResponse(False, "No video path provided")), 400
 
-    return jsonify(move_inside_library(video_path, subfolder))
+    return jsonify(move_file_for(VideoFolder.library, video_path, subfolder))
 
 
 @api_bp.route('/api/bookmarks', methods=['GET'])
