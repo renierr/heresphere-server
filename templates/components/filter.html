@@ -22,6 +22,14 @@
             <option value="filesize">Sort by Size</option>
             <option value="duration">Sort by Duration</option>
           </select>
+          <div class="btn-group ms-2" role="group" aria-label="Sort Direction">
+            <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: currentSortDir === 'asc' }" @click="currentSortDir = 'asc'">
+              <i class="bi bi-arrow-up"></i> Ascending
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: currentSortDir === 'desc' }" @click="currentSortDir = 'desc'">
+              <i class="bi bi-arrow-down"></i> Descending
+            </button>
+          </div>
         </div>
 
         <div class="d-flex flex-column flex-lg-row justify-content-between mb-2 gap-2">
