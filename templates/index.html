@@ -11,6 +11,7 @@
         <div class="form-floating flex-grow-1">
             <input id="videoInput" type="text" v-model="videoUrl" placeholder="video URL" class="form-control" @keyup.enter="postVideoUrl(false)">
             <label class="text-muted" for="videoInput">Video URL...</label>
+            <button v-if="videoUrl" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="videoUrl = ''"><i class="bi bi-x"></i></button>
         </div>
         <div class="">
             <button @click="postVideoUrl(false)" class="btn btn-sm btn-outline-primary">Download</button>
