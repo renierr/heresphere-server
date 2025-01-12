@@ -190,7 +190,7 @@ def check_folder(path) -> tuple[str,FolderState]:
 
         return path, FolderState.ACCESSIBLE  # Target is accessible
     except OSError as e:
-        if e.errno in (errno.ENXIO, errno.ENOENT, errno.ESTALE): #errno.ESTALE is for NFS stale file handles
+        if e.errno in (112, errno.ENXIO, errno.ENOENT, errno.ESTALE, errno.ESHUTDOWN): #errno.ESTALE is for NFS stale file handles, 112 is Host down
             return path, FolderState.NOT_MOUNTED # Target is unavailable (likely unmounted)
         else:
             # Handle other OS errors if needed (e.g., permission issues)
