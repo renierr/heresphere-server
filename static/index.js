@@ -47,8 +47,8 @@ new Vue({
                             `;
                             videojs('videoPlayer');
                             modalFooter.innerHTML = `
-                                <a href="${this.videoUrl}">Video URL provided</a>
-                                <a href="${video_source}">Extracted Video link</a>
+                                <a href="${this.videoUrl}" target="_blank">Video URL provided</a>
+                                <a href="${video_source}" target="_blank">Extracted Video link</a>
                             `;
                             const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                             videoModal.show();
