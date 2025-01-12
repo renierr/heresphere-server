@@ -142,7 +142,7 @@ new Vue({
                 .then(response => response.json())
                 .then(data => {
                     this.serverResult = data;
-                    this.fetchFiles();
+                    this.fetchFiles(true);
                 })
                 .catch(error => {
                     console.error('Error moving file:', error);

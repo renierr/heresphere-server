@@ -102,10 +102,11 @@ export const methods = {
             });
 
     },
-    fetchFiles: debounce(function () {
+    fetchFiles: debounce(function (restoreScrollPosition=false) {
             console.log('Fetching files');
             // if we are in library url path we should use library api
             const library = window.location.pathname.includes('/library');
+            const scrollPosition = window.scrollY;
 
             this.loading = true;
             const url = library ? '/api/library/list' : '/api/list';
@@ -122,6 +123,10 @@ export const methods = {
                         showPreview: false,
                     }));
                     this.loading = false;
+                    if (restoreScrollPosition) {
+                        console.log('Restoring scroll position', scrollPosition);
+                        setTimeout(() => window.scrollTo(0, scrollPosition));
+                    }
                 })
                 .catch(error => {
                     console.error('There was an error fetching the files:', error);
@@ -270,7 +275,7 @@ export const methods = {
             .then(response => response.json())
             .then((data) => {
                 this.serverResult = data;
-                this.fetchFiles();
+                this.fetchFiles(true);
             })
             .catch(error => {
                 console.error('Error deleting bookmark:', error);
