@@ -11,7 +11,7 @@
   <div class="accordion-item">
     <div id="filter-collapse" class="accordion-collapse collapse" :class="{ show: settings.filterAccordionOpen }">
       <div class="accordion-body p-1">
-        <div class="input-group d-flex justify-content-center align-items-center mb-2">
+        <div class="input-group d-flex justify-content-center align-items-center mb-2 gap-2">
           <select v-model="selectedFolder" class="form-select form-control w-auto">
             <option value="">All Folders</option>
             <option v-for="folder in uniqueFolders" :key="folder" :value="folder">{{ folder }}</option>
@@ -24,10 +24,10 @@
           </select>
           <div class="btn-group ms-2" role="group" aria-label="Sort Direction">
             <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: currentSortDir === 'asc' }" @click="currentSortDir = 'asc'">
-              <i class="bi bi-arrow-up"></i> Ascending
+              <i class="bi bi-arrow-up"></i>
             </button>
             <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: currentSortDir === 'desc' }" @click="currentSortDir = 'desc'">
-              <i class="bi bi-arrow-down"></i> Descending
+              <i class="bi bi-arrow-down"></i>
             </button>
           </div>
         </div>
