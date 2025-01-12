@@ -24,10 +24,10 @@ def download():
     data = request.get_json()
     # use sourceUrl except if heresphere is in name
     url = data.get("sourceUrl")
+    title = None
     if 'heresphere' in url:
         url = data.get("videoUrl")
-
-    title = data.get("title")
+        title = data.get("title")
 
     if not url:
         logger.error("No direct video URL provided in the request")
