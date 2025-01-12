@@ -372,11 +372,14 @@ export const computed = {
             return matchesFolder && matchesFilter && matchesResolution && matchesDuration;
         });
 
+        const sortCriteria = this.currentSort.split(' ');
         filtered = filtered.sort((a, b) => {
-            let modifier = 1;
-            if (this.currentSortDir === 'desc') modifier = -1;
-            if (a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
-            if (a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+            for (let criterion of sortCriteria) {
+                let modifier = 1;
+                if (this.currentSortDir === 'desc') modifier = -1;
+                if (a[criterion] < b[criterion]) return -1 * modifier;
+                if (a[criterion] > b[criterion]) return 1 * modifier;
+            }
             return 0;
         });
 
