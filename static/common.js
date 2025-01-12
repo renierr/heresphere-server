@@ -240,7 +240,8 @@ export const methods = {
             toastTitle.textContent = title;
             toastMessage.textContent = message;
         }
-        const toast = new bootstrap.Toast(toastElement, { autohide: !stayOpen });
+
+        const toast = new bootstrap.Toast(toastElement, { autohide: !options.stayOpen });
         toast.show();
     },
     confirmDeleteFile(filename) {
@@ -340,9 +341,9 @@ export const methods = {
             let message = file.may_exist.split('\n');
             message = message.map((line) => {
                 if (line.includes('id[')) {
-                    return `<h5 class="text-info">${line}</h5>`
+                    return `<h5>${line}</h5>`
                 } else {
-                    return `<p class="text-muted">${line}</p>`;
+                    return `<p>${line}</p>`;
                 }
             }).join('<br>');
             this.showMessage(message, {title: "Duplicates", stayOpen: true, asHtml: true});
