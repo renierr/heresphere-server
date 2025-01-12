@@ -36,16 +36,20 @@ new Vue({
                         const video_url = data.videoUrl;
                         const audio_url = data.audioUrl;
                         const modalBody = document.getElementById('videoModalBody');
-                        if (modalBody && video_url) {
+                        const modalFooter = document.getElementById('videoModalFooter');
+                        if (modalBody && modalFooter && video_url) {
                             // strip trailing / from video url
                             const video_source = video_url.replace(/\/+$/, '');
                             modalBody.innerHTML = `
-                                <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
+                                <video-js id="videoPlayer" class="vjs-default-skin w-100 h-100" controls autoplay>
                                     <source src="${video_source}" type="video/webm">
                                 </video-js>
-                                <p>If the video does not start, <a href="${video_source}">here is the link from source</a>.</p>
                             `;
                             videojs('videoPlayer');
+                            modalFooter.innerHTML = `
+                                <a href="${this.videoUrl}">Video URL provided</a>
+                                <a href="${video_source}">Extracted Video link</a>
+                            `;
                             const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                             videoModal.show();
                         } else {
