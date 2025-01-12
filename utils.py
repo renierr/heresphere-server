@@ -3,7 +3,9 @@ import re
 
 def get_title_from_url(url, max_bytes=4096):
     """
-    Retrieves title minimizing data transfer by checking during chunk download.
+    Retrieves title from given url
+    first tries to get title from head request
+    then from content - minimizing data transfer by checking during chunk download
 
     :param url: the URL of the webpage to get the title from
     :param max_bytes: the maximum number of bytes to download from the webpage - default is 4096
