@@ -161,6 +161,7 @@ def download_direct(url, progress_function, url_id, title):
         filename = re.sub(r'\W+', '_', title)
     elif extract_title:
         filename = re.sub(r'\W+', '_', extract_title)
+        title = extract_title
 
     logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
     url_map = get_url_map()
