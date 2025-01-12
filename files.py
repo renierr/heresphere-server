@@ -209,8 +209,8 @@ def move_to_library(video_path, subfolder):
 
     push_text_to_client(f"Move file to library: {video_path}")
     static_dir = get_static_directory()
-    if '/static/videos/' in video_path:
-        relative_path = video_path.replace('/static/videos/', '')
+    if VideoFolder.videos.web_path in video_path:
+        relative_path = video_path.replace(VideoFolder.videos.web_path, '')
         real_path = os.path.join(static_dir, VideoFolder.videos.dir, relative_path)
 
         if not os.path.exists(real_path):
@@ -226,25 +226,75 @@ def move_to_library(video_path, subfolder):
         if os.path.exists(library_path):
             return ServerResponse(False, f"Target exists in library: {base_name}")
 
-        # Move the video file
-        shutil.move(real_path, library_path)
-
-        # Move the thumbnails
-        thumbnail_dir = os.path.join(os.path.dirname(real_path), THUMBNAIL_DIR_NAME)
-        if os.path.exists(thumbnail_dir):
-            for fmt in ThumbnailFormat:
-                thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
-                if os.path.exists(thumbnail_path):
-                    library_thumbnail_dir = os.path.join(os.path.dirname(library_path), THUMBNAIL_DIR_NAME)
-                    os.makedirs(library_thumbnail_dir, exist_ok=True)
-                    shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
-
-
-        list_files.cache__clear()
-        push_text_to_client(f"File moved to library: {base_name}")
-        return ServerResponse(True, f"moved {base_name} to library")
+        move_file_with_thumbnails(real_path, library_path)
+        return ServerResponse(True, f"moved {base_name} to {subfolder}")
     else:
         return ServerResponse(False, "Invalid video path")
+
+
+def move_inside_library(video_path, subfolder):
+    """
+    Move a video file from inside the library folder to another library folder
+    all thumbnails will be moved as well
+
+    :param video_path: full path to video file
+    :param subfolder: subfolder in library
+    :return: json object with success and library_path
+    """
+
+    push_text_to_client(f"Move file inside library: {video_path} to {subfolder}")
+    static_dir = get_static_directory()
+    if VideoFolder.library.web_path in video_path:
+        relative_path = video_path.replace(VideoFolder.library.web_path, '')
+        real_path = os.path.join(static_dir, VideoFolder.library.dir, relative_path)
+
+        if not os.path.exists(real_path):
+            return ServerResponse(False, "Video file does not exist")
+
+        base_name = os.path.basename(real_path)
+
+        if subfolder and subfolder not in library_subfolders():
+            return ServerResponse(False, "Invalid subfolder name")
+
+        library_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
+
+        if os.path.exists(library_path):
+            return ServerResponse(False, f"Target exists in library: {base_name}")
+
+        move_file_with_thumbnails(real_path, library_path)
+        return ServerResponse(True, f"moved {base_name} inside to {subfolder}")
+    else:
+        return ServerResponse(False, "Invalid video path")
+
+
+def move_file_with_thumbnails(file_path, target_path) -> None:
+    """
+    Move a file and all thumbnails to a new location
+    push a message to the client and clear the list cache
+
+    :param file_path: file path to move
+    :param target_path: target path to move to
+    :return: None
+    """
+
+    # Move the video file
+    shutil.move(file_path, target_path)
+
+    # Move the thumbnails
+    base_name = os.path.basename(file_path)
+    thumbnail_dir = os.path.join(os.path.dirname(file_path), THUMBNAIL_DIR_NAME)
+    if os.path.exists(thumbnail_dir):
+        for fmt in ThumbnailFormat:
+            thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
+            if os.path.exists(thumbnail_path):
+                library_thumbnail_dir = os.path.join(os.path.dirname(target_path), THUMBNAIL_DIR_NAME)
+                os.makedirs(library_thumbnail_dir, exist_ok=True)
+                shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
+
+
+    list_files.cache__clear()
+    push_text_to_client(f"File and all thumbnails moved: {base_name}")
+
 
 
 def delete_file(url):

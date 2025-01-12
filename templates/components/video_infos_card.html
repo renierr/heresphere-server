@@ -37,5 +37,8 @@
         <button v-if="!file.partial" class="btn btn-outline-danger btn-sm" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
         <button @click="confirmDeleteFile(file.filename)" class="btn btn-outline-danger btn-sm">Delete</button>
         {% endif %}
+        {% if option_move_library %}
+        <button @click="confirmMoveInsideLibrary(file)" class="btn btn-outline-danger btn-sm">Move To Folder</button>
+        {% endif %}
     </div>
 </div>

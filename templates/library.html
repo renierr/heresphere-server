@@ -8,7 +8,9 @@
     {% include "components/filter.html" %}
 
     {% include "components/loading.html" %}
+    {% with option_move_library = true %}
     {% include "components/list_files.html" %}
+    {% endwith %}
     {% include "components/page_functions.html" %}
     <script type="module" src="/static/library.js"></script>
 {% endblock %}
