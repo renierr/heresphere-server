@@ -33,8 +33,8 @@ new Vue({
             this.newBookmarkUrl = bookmark.url;
         },
         saveBookmark() {
-            if (!this.newBookmarkTitle || !this.newBookmarkUrl) {
-                this.showMessage('Both title and URL are required.');
+            if (!this.newBookmarkUrl) {
+                this.showMessage('Bookmark URL is required.');
                 return;
             }
 
@@ -65,7 +65,7 @@ new Vue({
                 this.showMessage('URL is required.');
                 return;
             }
-            const utf8Bytes = new TextEncoder().encode(file);
+            const utf8Bytes = new TextEncoder().encode(url);
             const encodedUrl = btoa(String.fromCharCode(...utf8Bytes));
             fetch(`/api/bookmarks?url=${encodeURIComponent(encodedUrl)}`, {
                 method: 'DELETE',

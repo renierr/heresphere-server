@@ -3,6 +3,7 @@ import os
 
 from cache import cache
 from globals import get_static_directory, ServerResponse
+from utils import get_title_from_url
 
 
 @cache(maxsize=128, ttl=3600)
@@ -12,7 +13,7 @@ def list_bookmarks():
     if os.path.exists(bookmarks_file):
         with open(bookmarks_file, 'r', encoding='utf-8') as f:
             bookmarks = json.load(f)
-    return sorted(bookmarks, key=lambda x: x['title'].lower())
+    return sorted(bookmarks, key=lambda x: (x['title'] or '').lower())
 
 
 def write_bookmarks(bookmarks):
@@ -23,8 +24,11 @@ def write_bookmarks(bookmarks):
 
 
 def save_bookmark(title, url):#
-    if not title or not url:
-        return ServerResponse(False, "Title or URL missing")
+    if not url:
+        return ServerResponse(False, "URL missing")
+
+    if not title:
+        title = get_title_from_url(url)
 
     bookmarks = list_bookmarks()
     bookmark = next((b for b in bookmarks if b['url'] == url), None)
@@ -32,10 +36,11 @@ def save_bookmark(title, url):#
     if bookmark:
         bookmark['title'] = title
     else:
-        bookmarks.append({"title": title, "url": url})
+        bookmark = {"title": title, "url": url}
+        bookmarks.append(bookmark)
 
     write_bookmarks(bookmarks)
-    return ServerResponse(True, "Bookmark added")
+    return  ServerResponse(True, "Bookmark saved")
 
 
 def delete_bookmark(url):
@@ -48,5 +53,6 @@ def delete_bookmark(url):
         return ServerResponse(False, "Bookmark not found")
     else:
         write_bookmarks(bookmarks)
+        list_bookmarks.cache__clear()
 
     return ServerResponse(True, "Bookmark deleted")
