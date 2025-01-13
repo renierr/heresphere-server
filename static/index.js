@@ -77,6 +77,18 @@ new Vue({
                                         .catch((error) => console.log('Error sharing', error));
                                 });
                                 modalFooter.appendChild(shareButton);
+                                const shareExtractedButton = document.createElement('button');
+                                shareExtractedButton.textContent = 'Share Extracted Video';
+                                shareExtractedButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+                                shareExtractedButton.addEventListener('click', () => {
+                                    navigator.share({
+                                        title: 'Extracted Video Link',
+                                        url: video_source,
+                                    })
+                                      .then(() => console.log(`Successful shared ${tempVideoUrl}`))
+                                      .catch((error) => console.log('Error sharing', error));
+                                });
+                                modalFooter.appendChild(shareExtractedButton);
                             }
                             videoModal.show();
                             this.videoUrl = '';
