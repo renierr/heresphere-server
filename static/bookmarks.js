@@ -38,6 +38,11 @@ new Vue({
                 return;
             }
 
+            // add http:// if not present in url
+            if (!this.newBookmarkUrl.startsWith('http')) {
+                this.newBookmarkUrl = 'http://' + this.newBookmarkUrl;
+            }
+
             const newBookmark = {
                 title: this.newBookmarkTitle,
                 url: this.newBookmarkUrl,
