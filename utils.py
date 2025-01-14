@@ -81,6 +81,13 @@ def check_folder(path) -> tuple[str,FolderState]:
     target_path = 'unknown'
     try:
         target_path = os.readlink(path)
+
+        # Preliminary checks - faster checks first
+        if not os.path.exists(target_path):
+            return path, FolderState.NOT_MOUNTED  # Target does not exist
+        if not os.access(target_path, os.R_OK):
+            return path, FolderState.NOT_READABLE  # Target is not readable
+
         # Try to stat the target. If the mount point is unavailable,
         # this should raise an OSError with errno.ENXIO (No such device or address) or potentially other related errors.
         os.stat(target_path)  # Crucial check
