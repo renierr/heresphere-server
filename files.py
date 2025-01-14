@@ -16,8 +16,8 @@ def library_subfolders() -> list:
 
     folder, folder_state = check_folder(os.path.join(get_static_directory(), VideoFolder.library.dir))
     if folder_state != FolderState.ACCESSIBLE:
-        push_text_to_client(f"Library folder not accessible: {folder} - state: {folder_state}")
-        logger.warning(f"Library folder not accessible: {folder} - state: {folder_state}")
+        push_text_to_client(f"(For Subfolder) Library folder not accessible: {folder} - state: {folder_state}")
+        logger.warning(f"(For Subfolder) Library folder not accessible: {folder} - state: {folder_state}")
         return subfolders
 
     for root, dirs, files in os.walk(folder, followlinks=True):
@@ -35,8 +35,8 @@ def list_files(directory) -> list:
 
     folder, folder_state = check_folder(os.path.join(get_static_directory(),  directory.dir))
     if folder_state != FolderState.ACCESSIBLE:
-        push_text_to_client(f"Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
-        logger.warning(f"Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
+        push_text_to_client(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
+        logger.warning(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
         return extracted_details
 
     for root, dirs, files in os.walk(folder, followlinks=True):
