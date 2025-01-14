@@ -5,7 +5,8 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache
 from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, \
-    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, check_folder
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState
+from utils import check_folder
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 

@@ -10,7 +10,8 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
 from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, \
-    THUMBNAIL_DIR_NAME, ServerResponse, check_folder, FolderState
+    THUMBNAIL_DIR_NAME, ServerResponse, FolderState
+from utils import check_folder
 
 
 class ThumbnailFormat(Enum):
