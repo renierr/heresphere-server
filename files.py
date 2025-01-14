@@ -39,7 +39,7 @@ def list_files(directory) -> list:
         logger.warning(f"Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
         return extracted_details
 
-    for root, dirs, files in os.walk(os.path.join(get_static_directory(), directory.dir), followlinks=True):
+    for root, dirs, files in os.walk(folder, followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
 
@@ -48,7 +48,7 @@ def list_files(directory) -> list:
             if 'part-Frag' in filename or filename.endswith('.ytdl'):
                 continue
 
-            subfolder = os.path.relpath(root, os.path.join(get_static_directory(), directory.dir)).replace('\\', '/')
+            subfolder = os.path.relpath(root, folder).replace('\\', '/')
             if subfolder == '.':
                 subfolder = ''
             common_details = extract_file_details(root, filename, base_path, subfolder)
