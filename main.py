@@ -22,7 +22,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
-from bus import client_remove, client_add, event_stream, push_text_to_client
+from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
 from globals import save_url_map, load_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse
 from thumbnail import thumbnail_bp
 from videos import video_bp
@@ -202,6 +202,7 @@ def sse():
     client_add(client_queue, stop_event)
 
     def cleanup_client():
+        stop_event.set()
         client_remove(client_queue, stop_event)
 
     # send server time on first request
@@ -271,12 +272,14 @@ def start_server() -> Optional[str]:
     if not os.path.exists(youtube_dir) and not os.path.islink(youtube_dir):
         os.makedirs(youtube_dir, exist_ok=True)
 
+    clean_client_task()
+
     # Get the server's IP address
     hostname = socket.gethostname()
     server_ip = socket.gethostbyname(hostname)
     logger.info(f"Serving most likely on: http://{hostname}:{UI_PORT} or http://{server_ip}:{UI_PORT}")
     #app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0', threaded=True)
-    serve(app, host='0.0.0.0', port=UI_PORT, threads=100)
+    serve(app, host='0.0.0.0', port=UI_PORT, threads=20)
 
 
 if __name__ == '__main__':
