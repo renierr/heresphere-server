@@ -185,25 +185,19 @@ new Vue({
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
-        const eventSource = open_sse_connection();
-        const serverOutput = [];
-        eventSource.onmessage = event => {
-            let progressExp = event.data.match(/(\d+.\d+)% complete/);
-            let progressId = event.data.match(/Downloading...\[(\d+)]/);
+        this.openAndHandleSSEConnection((evt) => {
+            let progressExp = evt.data.match(/(\d+.\d+)% complete/);
+            let progressId = evt.data.match(/Downloading...\[(\d+)]/);
             if (progressId) {
                 this.downloadProgress = this.downloadProgress || {};
                 this.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
             }
-            serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);
-            if (serverOutput.length > 100) {
-                serverOutput.shift();
-            }
-            this.serverOutput = serverOutput.slice().reverse().join('\n');
-            if (event.data.includes('Download finished') ||
-                event.data.includes('Generate thumbnails finished') ||
-                event.data.includes(' 0.0% complete')) {
+
+            if (evt.data.includes('Download finished') ||
+              evt.data.includes('Generate thumbnails finished') ||
+              evt.data.includes(' 0.0% complete')) {
                 this.fetchFiles();
             }
-        };
+        });
     },
 });

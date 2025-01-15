@@ -93,17 +93,10 @@ new Vue({
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
-        const eventSource = open_sse_connection();
-        const serverOutput = [];
-        eventSource.onmessage = event => {
-            serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);
-            if (serverOutput.length > 100) {
-                serverOutput.shift();
-            }
-            this.serverOutput = serverOutput.slice().reverse().join('\n');
-            if (event.data.includes('Generate thumbnails finished')) {
+        this.openAndHandleSSEConnection((evt) => {
+            if (evt.data.includes('Generate thumbnails finished')) {
                 this.fetchFiles();
             }
-        };
+        });
     }
 });

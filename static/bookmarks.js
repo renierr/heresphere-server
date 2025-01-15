@@ -14,6 +14,7 @@ new Vue({
     methods: {
         toggleInfoAccordion: methods.toggleInfoAccordion,
         showMessage: methods.showMessage,
+        openAndHandleSSEConnection: methods.openAndHandleSSEConnection,
         fetchBookmarks() {
             this.loading = true;
             fetch('/api/bookmarks')
@@ -90,17 +91,7 @@ new Vue({
     },
     mounted: function () {
         window.vueInstance = this;    // store vue instance in DOM
-        // fetch bookmarks
         this.fetchBookmarks();
-
-        const eventSource = open_sse_connection();
-        const serverOutput = [];
-        eventSource.onmessage = event => {
-            serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);
-            if (serverOutput.length > 100) {
-                serverOutput.shift();
-            }
-            this.serverOutput = serverOutput.slice().reverse().join('\n');
-        };
+        this.openAndHandleSSEConnection();
     }
 });
