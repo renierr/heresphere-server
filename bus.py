@@ -11,7 +11,7 @@ def get_clients():
 def clean_client_task():
     def cleanup():
         while True:
-            time.sleep(60)  # Run cleanup every 60 seconds
+            time.sleep(30)  # Run cleanup every 30 seconds
             for client_queue, stop_event in clients[:]:
                 client_queue.put("Heartbeat to clean stale clients.")
                 if stop_event.is_set() and (client_queue, stop_event) in clients:
@@ -45,7 +45,7 @@ def event_stream(client_queue: Queue, stop_event: threading.Event):
             except Empty:
                 continue
     except GeneratorExit:
-        logger.debug("Client disconnected, stopping the generator.")
+        logger.debug(f"Client {client_queue} disconnected, stopping the generator.")
     finally:
         client_remove(client_queue, stop_event)
 
