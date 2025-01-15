@@ -93,7 +93,7 @@ new Vue({
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
-        const eventSource = new EventSource('/sse');
+        const eventSource = open_sse_connection();
         const serverOutput = [];
         eventSource.onmessage = event => {
             serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);

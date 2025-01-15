@@ -185,7 +185,7 @@ new Vue({
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
-        const eventSource = new EventSource('/sse');
+        const eventSource = open_sse_connection();
         const serverOutput = [];
         eventSource.onmessage = event => {
             let progressExp = event.data.match(/(\d+.\d+)% complete/);
