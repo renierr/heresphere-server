@@ -11,7 +11,7 @@ def get_clients():
 def clean_client_task():
     def cleanup():
         while True:
-            time.sleep(30)  # Run cleanup every 30 seconds
+            time.sleep(10)  # Run cleanup every 10 seconds
             for client_queue, stop_event in clients[:]:
                 client_queue.put("Heartbeat to clean stale clients.")
                 if stop_event.is_set() and (client_queue, stop_event) in clients:
