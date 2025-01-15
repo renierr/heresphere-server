@@ -22,7 +22,7 @@ def cache(maxsize=128, ttl=None, bypass_cache_param=None):
                         del local_cache._timestamps[args]
 
             result = func(*args, **kwargs)
-            if result:
+            if result is not None:
                 local_cache._cache[args] = result
                 local_cache._timestamps[args] = current_time
             return result
