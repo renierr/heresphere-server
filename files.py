@@ -89,7 +89,7 @@ def list_files(directory) -> list:
             else:
                 uids[uid] = details.get('filename')
 
-    extracted_details.sort(key=lambda x: x['created'], reverse=True)
+    extracted_details.sort(key=lambda x: x.get('created',0), reverse=True)
     return extracted_details
 
 
