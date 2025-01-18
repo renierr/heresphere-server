@@ -39,8 +39,8 @@
             <button v-if="file.url" class="btn btn-outline-secondary btn-sm m-1" @click="redownload(file)">Download again (id={{ file.url_id }})</button>
             {% endif %}
             <button v-if="!file.partial" class="btn btn-outline-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
-            {% if option_move %}
             <button v-if="!file.partial" class="btn btn-outline-warning btn-sm m-1" @click="confirmRenameFile(file)">Rename</button>
+            {% if option_move %}
             <button v-if="!file.partial" class="btn btn-outline-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
             <button @click="confirmDeleteFile(file.filename)" class="btn btn-outline-danger btn-sm m-1">Delete</button>
             {% endif %}
