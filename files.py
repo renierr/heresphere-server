@@ -49,7 +49,8 @@ def list_files(directory) -> list:
                 continue
 
             # ignore symbolic links for files, cause not mounted dirs are files on os.walk
-            if os.path.islink(filename):
+            checkf = os.path.join(root, filename)
+            if os.path.islink(checkf):
                 continue
 
             subfolder = os.path.relpath(root, folder).replace('\\', '/')
