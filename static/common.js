@@ -382,6 +382,61 @@ export const methods = {
         };
         return eventSource;
     },
+    confirmRenameFile(file) {
+        const modalConfirmExtras = document.getElementById('confirmModalExtras');
+        const currentName = file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.');;
+        modalConfirmExtras.innerHTML = `
+            <div class="d-flex align-items-center flex-column flex-md-row">
+                <input id="fileName" class="form-control" type="text" />
+            </div>
+            `;
+        document.getElementById('fileName').value = currentName;
+        this.confirmData = {
+            title: 'Rename file',
+            message: `Rename the title for the following file:`,
+            file: file.filename,
+            submit: 'Rename',
+            action: (confData) => {
+                let newName = document.getElementById('fileName').value;
+                if (newName === currentName) {
+                    this.showMessage('New name is the same as the current name');
+                    return;
+                }
+                this.renameFile(confData, newName);
+            },
+        }
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+        // clear extras on modal close
+        modal._element.addEventListener('hidden.bs.modal', () => {
+            modalConfirmExtras.innerHTML = '';
+        });
+    },
+    renameFile(confData, newName) {
+        if (!confData && !confData.file) {
+            this.showMessage('Wrong number of parameters for move to library');
+            return;
+        }
+        const file = confData.file;
+        this.confirmData = {};
+        fetch('/api/rename', {
+            method: 'POST',
+            body: JSON.stringify({ video_path: file, newName: newName }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.serverResult = data;
+                this.fetchFiles(true);
+            })
+            .catch(error => {
+                console.error('Error renaming file:', error);
+                this.serverResult = 'Error renaming file: ' + error;
+            });
+
+    },
 };
 
 export const computed = {
