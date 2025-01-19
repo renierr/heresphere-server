@@ -549,7 +549,7 @@ function keyNavigationForPaging(event, vueContext) {
     if (vueContext.totalPages === 1) return;
 
     // check if currently an input is focused
-    if (document.activeElement.tagName === 'INPUT') return;
+    if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
 
     if (event.key === 'ArrowLeft') {
         vueContext.changePage(vueContext.currentPage - 1);
@@ -572,10 +572,10 @@ export const removeKeyNavigationForPagingListener = () => {
 
 let swipeNavigationForPagingHandler;
 export const addSwipeNavigationForPagingListener = (vueContext) => {
-    if (document.activeElement.tagName === 'INPUT') return;
     const hammer = new Hammer(document.body);
     hammer.get('swipe').set({ threshold: 50 });
     hammer.on('swipe', (event) => {
+        if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
         if (event.direction === Hammer.DIRECTION_LEFT) {
             vueContext.changePage(vueContext.currentPage + 1);
         } else if (event.direction === Hammer.DIRECTION_RIGHT) {
