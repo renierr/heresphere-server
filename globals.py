@@ -13,6 +13,7 @@ url_map = {}
 url_counter: int = 1
 
 THUMBNAIL_DIR_NAME: str = '.thumb'
+UNKNOWN_VIDEO_EXTENSION: str = '.unknown_video'
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title'])
 
 class VideoFolder(Enum):

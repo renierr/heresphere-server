@@ -5,8 +5,8 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache
 from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, \
-    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState
-from utils import check_folder
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION
+from utils import check_folder, get_mime_type
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
 
 
@@ -56,6 +56,13 @@ def list_files(directory) -> list:
             subfolder = os.path.relpath(root, folder).replace('\\', '/')
             if subfolder == '.':
                 subfolder = ''
+
+            # for unknown files special handling
+            if filename.endswith(UNKNOWN_VIDEO_EXTENSION):
+                common_details = generic_file_details(root, filename, base_path, subfolder)
+                extracted_details.append(common_details)
+                continue
+
             common_details = extract_file_details(root, filename, base_path, subfolder)
 
             # only for videos directory
@@ -98,6 +105,22 @@ def list_files(directory) -> list:
     return extracted_details
 
 
+def generic_file_details(root, filename, base_path, subfolder) -> dict:
+    realfile = os.path.join(root, filename)
+    if not os.path.exists(realfile):
+        return {}
+    mimetype, encoding = get_mime_type(realfile)
+    result = {
+        'mimetype': mimetype,
+        'unknown': True,
+        'title': os.path.splitext(filename)[0],
+        'filename': f"{base_path}{subfolder + '/' if subfolder else ''}{filename}",
+        'filesize': os.path.getsize(realfile),
+        'folder' : subfolder,
+        'created': os.path.getctime(realfile)
+    }
+    return result
+
 def extract_file_details(root, filename, base_path, subfolder) -> dict:
     """
     Extract details from a file in the videos directory
@@ -110,7 +133,6 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
     """
 
     realfile = os.path.join(root, filename)
-
     if not os.path.exists(realfile):
         return {}
 

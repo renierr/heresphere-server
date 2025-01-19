@@ -2,9 +2,9 @@ import errno
 import os
 import requests
 import re
-
+import mimetypes
+from pathlib import Path
 from loguru import logger
-
 from globals import FolderState
 
 
@@ -102,3 +102,35 @@ def check_folder(path) -> tuple[str,FolderState]:
             # Handle other OS errors if needed (e.g., permission issues)
             logger.error(f"Unexpected OSError: {e} for link: {path} target: {target_path}")
             return path, FolderState.CHECK_ERROR # Not related to mount point unavailability
+
+
+
+def get_mime_type(file_path):
+    """
+    Determines the MIME type of a file based on its extension and content.
+
+    :param file_path: path to file
+    :return: A tuple containing the MIME type (string) and encoding (string), or
+        (None, None) if the MIME type cannot be determined.
+        Raises FileNotFoundError if the file does not exist.
+    """
+
+    file_path = Path(file_path) # Convert to Path object for easier handling
+    if not file_path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    mime_type, encoding = mimetypes.guess_type(str(file_path))
+
+    # For more robust mime type detection (especially for files without extensions or with unusual extensions)
+    if mime_type is None:
+        try:
+            import magic # python-magic library (install with: pip install python-magic)
+            mime = magic.Magic(mime=True) #Detect MIME from file content
+            mime_type = mime.from_file(str(file_path))
+        except ImportError:
+            print("python-magic is not installed. Using only extension-based MIME type detection.")
+        except magic.MagicException as e:
+            print(f"Error during magic detection: {e}")
+
+    return mime_type, encoding
+
