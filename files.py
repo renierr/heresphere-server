@@ -8,7 +8,7 @@ from cache import cache
 from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, \
     VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION
 from utils import check_folder, get_mime_type
-from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails
+from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails, update_file_info
 
 
 @cache(maxsize=128, ttl=3600)
@@ -399,26 +399,22 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
 
     base_name = os.path.basename(real_path)
     url_id, url_info = find_url_info(base_name)
-    #url_map = get_url_map()
     if url_info:
         url_info['title'] = new_title
         save_url_map()
 
-    json_path = os.path.join(os.path.dirname(real_path), THUMBNAIL_DIR_NAME, base_name) + ThumbnailFormat.JSON.extension
-    if os.path.exists(json_path):
-        with open(json_path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            infos = data.get('infos', {})
 
-        if infos:
-            infos['title'] = new_title
-            infos.get('url_info', {})['title'] = new_title
-            with open(json_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+    # title update dict
+    title_update = {
+        'title': new_title,
+        'url_info': {
+            'title': new_title
+        }
+    }
+    update_file_info(real_path, title_update)
 
     # clear the cache and push/return info
     get_basic_save_video_info.cache__evict(real_path)
-    get_video_info.cache__evict(real_path)
     list_files.cache__evict(vid_folder)
     push_text_to_client(f"File renamed: {base_name}")
     return ServerResponse(True, f"File {base_name} renamed")

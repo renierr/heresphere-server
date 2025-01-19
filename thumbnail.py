@@ -328,3 +328,26 @@ def generate_thumbnail_for_path(video_path):
         return ServerResponse(True, f"Generate thumbnails finished for {base_name}")
     else:
         return ServerResponse(False, "Failed to generate thumbnail")
+
+def update_file_info(file_path: str, updated_dict: dict) -> None:
+    """
+    Change the file info for a video file in the json file
+
+    :param file_path: full path to video file
+    :param updated_dict: info to update
+    :return: none
+    """
+    base_name = os.path.basename(file_path)
+    json_path = os.path.join(os.path.dirname(file_path), THUMBNAIL_DIR_NAME, base_name) + ThumbnailFormat.JSON.extension
+    if os.path.exists(json_path):
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            infos = data.get('infos', {})
+
+        if infos:
+            infos.update(updated_dict)
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            get_video_info.cache__evict(file_path)
+
+
