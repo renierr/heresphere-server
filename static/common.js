@@ -390,7 +390,8 @@ export const methods = {
                 <input id="fileName" class="form-control" type="text" />
             </div>
             `;
-        document.getElementById('fileName').value = currentName;
+        const nameInput = document.getElementById('fileName');
+        nameInput.value = currentName;
         this.confirmData = {
             title: 'Rename file',
             message: `Rename the title for the following file:`,
@@ -411,6 +412,14 @@ export const methods = {
         modal._element.addEventListener('hidden.bs.modal', () => {
             modalConfirmExtras.innerHTML = '';
         });
+        nameInput.addEventListener('keydown', (evt) => {
+            if (evt.key === 'Enter') {
+                evt.preventDefault();
+                modal.hide();
+                this.confirmData.action(this.confirmData)
+            }
+        });
+
     },
     renameFile(confData, newName) {
         if (!confData && !confData.file) {
@@ -539,10 +548,13 @@ function keyNavigationForPaging(event, vueContext) {
     // only if paging present
     if (vueContext.totalPages === 1) return;
 
+    // check if currently an input is focused
+    if (document.activeElement.tagName === 'INPUT') return;
+
     if (event.key === 'ArrowLeft') {
-        vueContext.changePage(this.currentPage - 1);
+        vueContext.changePage(vueContext.currentPage - 1);
     } else if (event.key === 'ArrowRight') {
-        vueContext.changePage(this.currentPage + 1);
+        vueContext.changePage(vueContext.currentPage + 1);
     }
 }
 
@@ -560,6 +572,7 @@ export const removeKeyNavigationForPagingListener = () => {
 
 let swipeNavigationForPagingHandler;
 export const addSwipeNavigationForPagingListener = (vueContext) => {
+    if (document.activeElement.tagName === 'INPUT') return;
     const hammer = new Hammer(document.body);
     hammer.get('swipe').set({ threshold: 50 });
     hammer.on('swipe', (event) => {
