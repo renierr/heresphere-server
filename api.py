@@ -3,7 +3,7 @@ import base64
 from flask import Blueprint, jsonify, request
 
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
-from files import list_files, delete_file, move_file_for
+from files import list_files, delete_file, move_file_for, rename_file_title
 from globals import VideoFolder, ServerResponse
 
 api_bp = Blueprint('api', __name__)
@@ -41,6 +41,16 @@ def mil():
 
     return jsonify(move_file_for(VideoFolder.library, video_path, subfolder))
 
+@api_bp.route('/api/rename', methods=['POST'])
+def rf():
+    data = request.get_json()
+    video_path = data.get("video_path")
+    new_title = data.get("newName")
+
+    if not video_path or not new_title:
+        return jsonify(ServerResponse(False, "No video path or title provided")), 400
+
+    return jsonify(rename_file_title(video_path, new_title))
 
 @api_bp.route('/api/bookmarks', methods=['GET'])
 def gb():

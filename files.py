@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 
@@ -186,18 +187,18 @@ def parse_youtube_filename(filename) -> tuple:
 
 
 @cache(maxsize=4096, ttl=7200)
-def get_basic_save_video_info(filename) -> VideoInfo:
+def get_basic_save_video_info(file_path) -> VideoInfo:
     """
     Get basic video information from a file,
     including created date, size, duration, width, height, resolution, stereo, uid and title
 
-    :param filename: the filename to which information should be extracted
+    :param file_path: the full file path to which information should be extracted
     :return: VideoInfo object with filled data
     """
 
-    size = os.path.getsize(filename)
-    created = os.path.getctime(filename)
-    video_info = get_video_info(filename)
+    size = os.path.getsize(file_path)
+    created = os.path.getctime(file_path)
+    video_info = get_video_info(file_path)
     if video_info is not None:
         duration = int(float(video_info['format'].get('duration', 0))) if 'format' in video_info else 0
         width = video_info['streams'][0].get('width', 0) if 'streams' in video_info and len(
@@ -306,7 +307,7 @@ def delete_file(url):
     if VideoFolder.videos.web_path not in url:
         return ServerResponse(False, "Invalid URL")
 
-    real_path = get_real_path_from_url(url)
+    real_path, vid_folder = get_real_path_from_url(url)
     if not real_path:
         return ServerResponse(False, "File not found")
 
@@ -319,7 +320,7 @@ def delete_file(url):
             if os.path.exists(thumbnail_path):
                 os.remove(thumbnail_path)
     os.remove(real_path)
-    list_files.cache__evict(VideoFolder.videos)
+    list_files.cache__evict(vid_folder)
     push_text_to_client(f"File deleted: {base_name}")
     return ServerResponse(True, f"File {base_name} deleted")
 
@@ -377,3 +378,47 @@ def cleanup():
     list_files.cache__clear()
     return ServerResponse(True, "Cleanup finished")
 
+
+def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
+    """
+    Rename a file title
+
+    :param video_path: url to video file
+    :param new_title: the new title for the file
+    :return: json object with success and library_path
+    """
+
+    push_text_to_client(f"Rename file for: {video_path}")
+
+    if not new_title:
+        return ServerResponse(False, "Invalid new title name")
+
+    real_path, vid_folder = get_real_path_from_url(video_path)
+    if not real_path:
+        return ServerResponse(False, "File not found")
+
+    base_name = os.path.basename(real_path)
+    url_id, url_info = find_url_info(base_name)
+    #url_map = get_url_map()
+    if url_info:
+        url_info['title'] = new_title
+        save_url_map()
+
+    json_path = os.path.join(os.path.dirname(real_path), THUMBNAIL_DIR_NAME, base_name) + ThumbnailFormat.JSON.extension
+    if os.path.exists(json_path):
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            infos = data.get('infos', {})
+
+        if infos:
+            infos['title'] = new_title
+            infos.get('url_info', {})['title'] = new_title
+            with open(json_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+
+    # clear the cache and push/return info
+    get_basic_save_video_info.cache__evict(real_path)
+    get_video_info.cache__evict(real_path)
+    list_files.cache__evict(vid_folder)
+    push_text_to_client(f"File renamed: {base_name}")
+    return ServerResponse(True, f"File {base_name} renamed")

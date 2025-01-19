@@ -314,7 +314,7 @@ def generate_thumbnail_for_path(video_path):
     :return: json object with success and message
     """
 
-    real_path = get_real_path_from_url(video_path)
+    real_path, _ = get_real_path_from_url(video_path)
     if not real_path:
         return ServerResponse(False, "Invalid video path")
 

@@ -103,23 +103,26 @@ def remove_ansi_codes(text) -> str:
     ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', text)
 
-def get_real_path_from_url(url) -> Optional[str]:
+def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
     if not url:
-        return None
+        return None, None
 
     static_dir = get_static_directory()
+    vid_folder = None
     if VideoFolder.library.web_path in url:
         relative_path = url.replace(VideoFolder.library.web_path, '')
         real_path = os.path.join(static_dir, VideoFolder.library.dir, relative_path)
+        vid_folder = VideoFolder.library
     else:
         relative_path = url.replace(VideoFolder.videos.web_path, '')
         real_path = os.path.join(static_dir, VideoFolder.videos.dir, relative_path)
+        vid_folder = VideoFolder.videos
 
     real_path = os.path.normpath(real_path)
     if not os.path.exists(real_path):
-        return None
+        return None, None
 
-    return real_path
+    return real_path, vid_folder
 
 
 def format_duration(duration) -> str:
