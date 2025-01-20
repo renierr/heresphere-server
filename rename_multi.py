@@ -11,51 +11,52 @@ def video_folder_type(folder_name):
     except KeyError:
         raise argparse.ArgumentTypeError(f"Invalid folder name: {folder_name}")
 
-print('This small script will rename all file titles (not filenames) in the video folder to a new (better) name.')
-print('By removing all _ in Title and other tweaks.\n')
+def multi_rename(folder: VideoFolder):
+    print('This small script will rename all file titles (not filenames) in the video folder to a new (better) name.')
+    print('By removing all _ in Title and other tweaks.\n')
 
-parser = argparse.ArgumentParser(description='Rename file titles in the specified video folder.')
-parser.add_argument('folder', type=video_folder_type, help='The folder to process')
-try:
-    args = parser.parse_args()
-except Exception as e:
-    parser.print_help()
-    print(f"Parsing error: {e}")
-    exit(1)
+    files = list_files(VideoFolder.videos)
+    count = 0
+    # find rename candidates
+    for file in files:
+        filename = file.get('filename')
+        if filename is None:
+            continue
 
-if not args.folder:
-    parser.print_help()
-    exit(1)
+        title = file.get('title')
+        original_title = title
+        if title is None:
+            continue
 
-folder = args.folder
+        # remove everything before ___ characters inclusive
+        title = title.split('____')[-1]
+        # remove [] and everything inside
+        title = re.sub(r'\[.*?\]', '', title)
+        # remove _ from title
+        title = title.replace('_', ' ')
+        # trim title
+        title = title.strip()
 
-files = list_files(VideoFolder.videos)
-count = 0;
-# find rename candidates
-for file in files:
-    filename = file.get('filename')
-    if filename is None:
-        continue
+        if title == original_title:
+            continue
 
-    title = file.get('title')
-    original_title = title
-    if title is None:
-        continue
+        print(f"Will rename Title: {original_title} -> {title}")
+        rename_file_title(filename, title)
+        count += 1
 
-    # remove everything before ___ characters inclusive
-    title = title.split('____')[-1]
-    # remove [] and everything inside
-    title = re.sub(r'\[.*?\]', '', title)
-    # remove _ from title
-    title = title.replace('_', ' ')
-    # trim title
-    title = title.strip()
+    print(f"Renamed {count} files.")
 
-    if title == original_title:
-        continue
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Rename file titles in the specified video folder.')
+    parser.add_argument('folder', type=video_folder_type, help='The folder to process')
+    try:
+        args = parser.parse_args()
+    except Exception as e:
+        parser.print_help()
+        print(f"Parsing error: {e}")
+        exit(1)
 
-    print(f"Will rename Title: {original_title} -> {title}")
-    rename_file_title(filename, title)
-    count += 1
-
-print(f"Renamed {count} files.")
+    if not args.folder:
+        parser.print_help()
+        exit(1)
+    multi_rename(args.folder)
