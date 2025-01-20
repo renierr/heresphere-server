@@ -15,7 +15,7 @@ def multi_rename(folder: VideoFolder):
     print('This small script will rename all file titles (not filenames) in the video folder to a new (better) name.')
     print('By removing all _ in Title and other tweaks.\n')
 
-    files = list_files(VideoFolder.videos)
+    files = list_files(folder)
     count = 0
     # find rename candidates
     for file in files:
@@ -44,6 +44,7 @@ def multi_rename(folder: VideoFolder):
         rename_file_title(filename, title)
         count += 1
 
+    list_files.cache__clear()
     print(f"Renamed {count} files.")
 
 if __name__ == "__main__":
