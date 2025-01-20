@@ -468,7 +468,8 @@ export const computed = {
 
         let filtered = this.files.filter(file => {
             const matchesFolder = this.selectedFolder ? file.folder === this.selectedFolder : true;
-            const matchesFilter = this.filter ? file.filename.toLowerCase().includes(this.filter.toLowerCase()) : true;
+            const titleCompareValue = (file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.')).toLowerCase();
+            const matchesFilter = this.filter ? titleCompareValue.includes(this.filter.toLowerCase()) : true;
             const matchesResolution = this.selectedResolution ? this.checkResolution(file) : true;
             const matchesDuration = this.selectedDuration ? this.checkDuration(file) : true;
             return matchesFolder && matchesFilter && matchesResolution && matchesDuration;
