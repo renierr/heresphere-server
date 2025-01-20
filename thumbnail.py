@@ -342,12 +342,14 @@ def update_file_info(file_path: str, updated_dict: dict) -> None:
     if os.path.exists(json_path):
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            infos = data.get('infos', {})
+            infos = data.get('infos')
+            # add info to existing infos if None
+            if infos is None:
+                infos = {}
+                data['infos'] = infos
 
-        if infos:
-            infos.update(updated_dict)
-            with open(json_path, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-            get_video_info.cache__evict(file_path)
-
+        infos.update(updated_dict)
+        with open(json_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        get_video_info.cache__evict(file_path)
 
