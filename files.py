@@ -144,6 +144,7 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
         'title': os.path.splitext(filename)[0],
         'filename': f"{base_path}{subfolder + '/' if subfolder else ''}{filename}",
         'folder' : subfolder,
+        'favorite': False,
     }
     if partial:
         result.update({
@@ -154,6 +155,11 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
         thumbnail = thumbnails.get(ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
         preview = thumbnails.get(ThumbnailFormat.WEBM)
         info = get_basic_save_video_info(realfile)
+        video_info = get_video_info(realfile)
+        favorite = False
+        if video_info is not None:
+            favorite = video_info.get('infos', {}).get('favorite', False)
+
         result.update({
             'preview': preview,
             'thumbnail': thumbnail,
@@ -165,6 +171,7 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
             'resolution': info.resolution,
             'stereo': info.stereo,
             'uid': info.uid,
+            'favorite': favorite,
         })
         if info.title:
             result['title'] = info.title
@@ -418,3 +425,34 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     list_files.cache__evict(vid_folder)
     push_text_to_client(f"File renamed: {base_name}")
     return ServerResponse(True, f"File {base_name} renamed")
+
+
+def toggle_favorite(video_path: str) -> ServerResponse:
+    """
+    Toggle the favorite status of a video file
+
+    :param video_path: url to video file
+    :return: json object with success
+    """
+
+    push_text_to_client(f"Toggle favorite for: {video_path}")
+    real_path, vid_folder = get_real_path_from_url(video_path)
+    if not real_path:
+        return ServerResponse(False, "File not found")
+
+    base_name = os.path.basename(real_path)
+    video_info = get_video_info(real_path) or {}
+    infos = video_info.get('infos', {})
+    current_favorite = infos.get('favorite', False)
+
+    # title update dict
+    favorite_update = {
+        'favorite':  not current_favorite,
+    }
+    update_file_info(real_path, favorite_update)
+
+    # clear the cache and push/return info
+    get_basic_save_video_info.cache__evict(real_path)
+    list_files.cache__evict(vid_folder)
+    push_text_to_client(f"File favorite changed to {not current_favorite}: {base_name}")
+    return ServerResponse(True, f"File {base_name} favorite changed")

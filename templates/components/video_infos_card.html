@@ -16,6 +16,9 @@
             <span v-else-if="file.width && (file.width > 3800 || file.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
             <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
         </div>
+        <div class="icon-overlay position-absolute top-0 end-0 text-primary fs-3 lh-1 rounded" data-bs-toggle="tooltip" title="Toggle Favorite">
+            <span @click.stop.prevent="toggleFavorite(file)"><i v-if="file.favorite" class="link-warning bi bi-star-fill"></i><i v-else class="bi bi-star"></i></span>
+        </div>
     </div>
     <div class="card-body flex-grow-1">
         <h5 class="card-title text-truncate" data-bs-toggle="tooltip" :title="file.title">

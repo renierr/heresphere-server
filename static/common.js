@@ -445,6 +445,27 @@ export const methods = {
                 this.serverResult = 'Error renaming file: ' + error;
             });
     },
+    toggleFavorite(file) {
+        this.confirmData = {};
+        fetch('/api/toggle_favorite', {
+            method: 'POST',
+            body: JSON.stringify({ video_path: file.filename }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+          .then(response => response.json())
+          .then(data => {
+              this.serverResult = data;
+              file.favorit = !file.favorit;
+              this.$set(this.files, this.files.indexOf(file), file);
+              this.fetchFiles(true);
+          })
+          .catch(error => {
+              console.error('Error favorite toggle for file:', error);
+              this.serverResult = 'Error favorite toggle for file: ' + error;
+          });
+    },
 
 };
 
