@@ -1,8 +1,8 @@
-<div v-else-if = "cardLayout" >
+<div v-else>
   <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
   {% include "components/paging.html" %}
 
-  <div class="container">
+  <div v-if="cardLayout" class="container">
     <div class="row">
       <div v-for="file in filteredFiles" :key="file.filename" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 position-relative">
         {% include "components/file_progress.html" %}
@@ -10,12 +10,7 @@
       </div>
     </div>
   </div>
-</div>
-
-<div v-else>
-  <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
-  {% include "components/paging.html" %}
-  <ul class="list-group list-group-flush">
+  <ul v-else class="list-group list-group-flush">
     <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-0 position-relative">
       {% include "components/file_progress.html" %}
       {% include "components/video_infos.html" %}
