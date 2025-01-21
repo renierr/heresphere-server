@@ -10,11 +10,12 @@
       </div>
     </div>
   </div>
-  <ul v-else class="list-group list-group-flush">
-    <li v-for="file in filteredFiles" :key="file.filename" class="list-group-item mb-2 border-1 p-0 position-relative">
+  <div v-else class="container">
+    <div class="row">
+      <div v-for="file in filteredFiles" :key="file.filename" class="col-12 p-0 mb-4 position-relative border border-1 rounded">
       {% include "components/file_progress.html" %}
       {% include "components/video_infos.html" %}
-    </li>
-  </ul>
+    </div>
+  </div>
 </div>
-
+  
