@@ -445,21 +445,6 @@ export const methods = {
                 this.serverResult = 'Error renaming file: ' + error;
             });
     },
-    suggestFilesRename_experiment() {
-        let suggestedRenames = [];
-        this.files.forEach(file => {
-            const title = file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.');
-            const cleanTitle = title.replace(/[_]+/g, ' ').trim();
-            if (title !== cleanTitle) {
-                suggestedRenames.push({ title: file.title, suggestTitle: cleanTitle });
-            }
-        });
-        let message = '';
-        suggestedRenames.forEach(file => {
-            message += `<p>${file.title} -><br>${file.suggestTitle}</p>`;
-        });
-        this.showMessage(`<div style="max-height: 500px; overflow-y: auto"><p>Suggested renames:</p> ${message}</div>`, {stayOpen: true, asHtml: true});
-    },
 
 };
 
