@@ -77,6 +77,7 @@ def generate_heresphere_json_item(server_path, file_base64):
         relative_path = filename.replace(VideoFolder.library.web_path, '')
         real_path = os.path.join(static_dir, VideoFolder.library.dir, relative_path)
 
+    real_path = os.path.normpath(real_path)
     folders = os.path.dirname(relative_path)
 
     if not os.path.exists(real_path):
