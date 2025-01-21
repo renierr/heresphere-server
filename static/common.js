@@ -446,7 +446,6 @@ export const methods = {
             });
     },
     toggleFavorite(file) {
-        this.confirmData = {};
         fetch('/api/toggle_favorite', {
             method: 'POST',
             body: JSON.stringify({ video_path: file.filename }),
@@ -457,9 +456,7 @@ export const methods = {
           .then(response => response.json())
           .then(data => {
               this.serverResult = data;
-              file.favorit = !file.favorit;
-              this.$set(this.files, this.files.indexOf(file), file);
-              this.fetchFiles(true);
+              file.favorite = !file.favorite;
           })
           .catch(error => {
               console.error('Error favorite toggle for file:', error);
