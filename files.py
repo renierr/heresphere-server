@@ -154,11 +154,8 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
         thumbnails = get_thumbnails(realfile)
         thumbnail = thumbnails.get(ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
         preview = thumbnails.get(ThumbnailFormat.WEBM)
-        info = get_basic_save_video_info(realfile)
-        video_info = get_video_info(realfile)
-        favorite = False
-        if video_info is not None:
-            favorite = video_info.get('infos', {}).get('favorite', False)
+        info, infos = get_basic_save_video_info(realfile)
+        favorite = infos.get('favorite', False)
 
         result.update({
             'preview': preview,
@@ -194,13 +191,13 @@ def parse_youtube_filename(filename) -> tuple:
 
 
 @cache(maxsize=4096, ttl=7200)
-def get_basic_save_video_info(file_path) -> VideoInfo:
+def get_basic_save_video_info(file_path) -> tuple[VideoInfo, dict]:
     """
     Get basic video information from a file,
     including created date, size, duration, width, height, resolution, stereo, uid and title
 
     :param file_path: the full file path to which information should be extracted
-    :return: VideoInfo object with filled data
+    :return: tuple of VideoInfo object with filled data and dict of infos from json
     """
 
     size = os.path.getsize(file_path)
@@ -230,7 +227,9 @@ def get_basic_save_video_info(file_path) -> VideoInfo:
         stereo = ''
         uid = None
         title = None
-    return VideoInfo(created, size, duration, width, height, resolution, stereo, uid, title)
+        infos = {}
+
+    return VideoInfo(created, size, duration, width, height, resolution, stereo, uid, title), infos
 
 def move_file_for(source_folder: VideoFolder, video_path: str, subfolder: str) -> ServerResponse:
     """

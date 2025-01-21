@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 from files import list_files, get_basic_save_video_info, library_subfolders
 from globals import get_static_directory, VideoFolder
-from thumbnail import ThumbnailFormat, get_thumbnails
+from thumbnail import ThumbnailFormat, get_thumbnails, get_video_info
 
 heresphere_bp = Blueprint('heresphere', __name__)
 
@@ -94,8 +94,9 @@ def generate_heresphere_json_item(server_path, file_base64):
     thumbnail_video = f"{server_path}{urllib.parse.quote(thumbnail_video_url)}"
 
     # get video info from the file
-    info = get_basic_save_video_info(real_path)
+    info, infos = get_basic_save_video_info(real_path)
     date_added = datetime.fromtimestamp(info.created).strftime('%Y-%m-%d')
+    favorite = infos.get('favorite', False)
 
     title = info.title
     if not title:
@@ -134,7 +135,7 @@ def generate_heresphere_json_item(server_path, file_base64):
         "favorites": 0,
         "comments": [],
         "rating": 0,
-        "isFavorite": False,
+        "isFavorite": favorite,
         "writeFavorite": False,
     }
 
