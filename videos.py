@@ -128,7 +128,7 @@ def get_stream(url):
         return None, None, None
 
 
-def download_yt(url, progress_function, url_id):
+def download_yt(url, progress_function, url_id) -> str:
     vid, filename, title = get_yt_dl_video_info(url)
     filename = f"{vid}___{filename}"
     logger.debug(f"Downloading YouTube video {filename}")
@@ -144,17 +144,13 @@ def download_yt(url, progress_function, url_id):
         'updatetime': False,
     }
 
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        logger.debug(f"Downloaded YouTube video {filename}")
-    except Exception as e:
-        logger.error(f"Error downloading YouTube video: {e}")
-        return None
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    logger.debug(f"Downloaded YouTube video {filename}")
     return f"/static/videos/youtube/{filename_with_ext(filename)}"
 
 
-def download_direct(url, progress_function, url_id, title):
+def download_direct(url, progress_function, url_id, title) -> str:
     _, filename, extract_title = get_yt_dl_video_info(url)
 
     if title:
@@ -176,13 +172,9 @@ def download_direct(url, progress_function, url_id, title):
         'impersonate': ImpersonateTarget('chrome'),
     }
 
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-        logger.debug(f"Downloaded direct video {filename}")
-    except Exception as e:
-        logger.error(f"Error downloading direct video: {e}")
-        return None
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    logger.debug(f"Downloaded direct video {filename}")
     return f"/static/videos/direct/{filename_with_ext(filename, False)}"
 
 
@@ -199,26 +191,26 @@ def download_video(url, title):
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
 
+    url_info = url_map[url_id]
     push_text_to_client(f"Downloading video {url_id}...")
     try:
         if is_youtube_url(url):
             video_url = download_yt(url, download_progress, url_id)
         else:
             video_url = download_direct(url, download_progress, url_id, title)
-        url_info = url_map[url_id]
+        url_info['failed'] = False
         url_info['video_url'] = video_url
         save_url_map()
-        # only generate thumbnails if vieo meaning if yt-dlp created a file with extension .unknown_video it is not a video
+        # only generate thumbnails if video meaning if yt-dlp created a file with extension .unknown_video it is not a video
         if video_url and not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):
             generate_thumbnail_for_path(video_url)
-        if video_url is None:
-            push_text_to_client(f"Download failed [{url_id}]")
         list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}"
+        url_info['failed'] = True
         logger.error(error_message)
-        push_text_to_client(f"Download failed: {e}")
+        push_text_to_client(f"Download failed [{url_id}] - {e}")
 
 last_call_time = 0
 last_zero_percent = ''
