@@ -42,7 +42,7 @@ new Vue({
                         if (modalBody && modalFooter && video_url) {
                             // strip trailing / from video url
                             const video_source = video_url.replace(/\/+$/, '');
-                            videoModalTitle.textContent = 'Video Streaming...';
+                            videoModalTitle.textContent = data.title || 'Video Streaming...';
                             modalBody.innerHTML = `
                                 <video-js id="videoPlayer" class="vjs-default-skin w-100 h-100" controls autoplay>
                                     <source src="${video_source}" type="video/webm">
