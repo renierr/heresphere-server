@@ -69,10 +69,10 @@ def filename_with_ext(filename, youtube=True):
     return None
 
 
-def is_youtube_url(url):
+def is_youtube_url(url: str):
     """Check if the provided URL is a valid YouTube URL."""
     pattern = r'^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$'
-    return bool(re.match(pattern, url))
+    return bool(re.match(pattern, url.strip()))
 
 
 def get_yt_dl_video_info(url):
@@ -211,6 +211,8 @@ def download_video(url, title):
         # only generate thumbnails if vieo meaning if yt-dlp created a file with extension .unknown_video it is not a video
         if video_url and not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):
             generate_thumbnail_for_path(video_url)
+        if video_url is None:
+            push_text_to_client(f"Download failed [{url_id}]")
         list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:

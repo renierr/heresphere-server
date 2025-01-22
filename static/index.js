@@ -193,6 +193,13 @@ new Vue({
                 this.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
             }
 
+            if (evt.data.includes('Download failed')) {
+                let progressId = evt.data.match(/Download failed \[(\d+)]/);
+                if (progressId) {
+                    this.downloadProgress[progressId[1]] = 0;
+                }
+            }
+
             if (evt.data.includes('Download finished') ||
               evt.data.includes('Generate thumbnails finished') ||
               evt.data.includes(' 0.0% complete')) {
