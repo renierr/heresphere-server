@@ -185,11 +185,12 @@ def download_video(url, title):
         url_id = str(get_url_counter())
         increment_url_counter()
         url_map[url_id] = {'url': url, 'filename': None, 'video_url': None,
-                           'title': title,
+                           'title': title, 'failed': False,
                            'downloaded_date': int(datetime.now().timestamp())}
     else:
         url_map[url_id]['url'] = url
         url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
+        url_map[url_id]['failed'] = False
 
     url_info = url_map[url_id]
     push_text_to_client(f"Downloading video {url_id}...")
@@ -198,7 +199,6 @@ def download_video(url, title):
             video_url = download_yt(url, download_progress, url_id)
         else:
             video_url = download_direct(url, download_progress, url_id, title)
-        url_info['failed'] = False
         url_info['video_url'] = video_url
         save_url_map()
         # only generate thumbnails if video meaning if yt-dlp created a file with extension .unknown_video it is not a video
@@ -210,6 +210,7 @@ def download_video(url, title):
         error_message = f"Failed to download video: {e}"
         url_info['failed'] = True
         logger.error(error_message)
+        list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download failed [{url_id}] - {e}")
 
 last_call_time = 0
