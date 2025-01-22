@@ -160,9 +160,8 @@ def download_direct(url, progress_function, url_id, title, old_filename) -> str:
         title = extract_title
 
     # add unique id to filename like current date - only if we do not know it from url map already
-    if old_filename is None or filename != old_filename:
-        filename = f"{filename}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-
+    print(f"file: {filename} - {old_filename}")
+    filename = old_filename if old_filename and old_filename.startswith(filename) else f"{filename}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
     logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
     url_map = get_url_map()
     url_map[url_id]['filename'] = filename
