@@ -64,7 +64,7 @@ def find_url_info(filename) -> Tuple[Optional[str], Optional[dict]]:
     for idnr, url_info in url_map.items():
         filename_check = os.path.splitext(filename.rstrip('.part'))[0]
         filename_info = url_info.get('filename', None)
-        if filename and filename_info and filename_check.startswith(filename_info):
+        if filename and filename_info and filename_check == filename_info:
             return idnr, url_info
     return None, None
 
