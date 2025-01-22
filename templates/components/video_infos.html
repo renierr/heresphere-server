@@ -7,7 +7,7 @@
         <span v-if="file.showPreview" class="video-preview-indicator text-primary fs-3">
             <i class="bi bi-play-circle-fill"></i>
         </span>
-        <div class="icon-overlay position-absolute top-0 end-0 text-primary fs-3 lh-1 rounded" data-bs-toggle="tooltip" title="Toggle Favorite">
+        <div v-if="!file.partial" class="icon-overlay position-absolute top-0 end-0 text-primary fs-3 lh-1 rounded" data-bs-toggle="tooltip" title="Toggle Favorite">
             <span @click.stop.prevent="toggleFavorite(file)"><i v-if="file.favorite" class="link-warning bi bi-star-fill"></i><i v-else class="bi bi-star"></i></span>
         </div>
     </div>
