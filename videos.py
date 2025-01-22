@@ -159,6 +159,9 @@ def download_direct(url, progress_function, url_id, title) -> str:
         filename = re.sub(r'\W+', '_', extract_title)
         title = extract_title
 
+    # add unique id to filename like current date
+    filename = f"{filename}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+
     logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
     url_map = get_url_map()
     url_map[url_id]['filename'] = filename
