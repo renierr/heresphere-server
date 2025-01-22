@@ -150,7 +150,7 @@ def download_yt(url, progress_function, url_id) -> str:
     return f"/static/videos/youtube/{filename_with_ext(filename)}"
 
 
-def download_direct(url, progress_function, url_id, title) -> str:
+def download_direct(url, progress_function, url_id, title, old_filename) -> str:
     _, filename, extract_title = get_yt_dl_video_info(url)
 
     if title:
@@ -159,8 +159,9 @@ def download_direct(url, progress_function, url_id, title) -> str:
         filename = re.sub(r'\W+', '_', extract_title)
         title = extract_title
 
-    # add unique id to filename like current date
-    filename = f"{filename}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    # add unique id to filename like current date - only if we do not know it from url map already
+    if old_filename is None or filename != old_filename:
+        filename = f"{filename}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
 
     logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
     url_map = get_url_map()
@@ -201,7 +202,7 @@ def download_video(url, title):
         if is_youtube_url(url):
             video_url = download_yt(url, download_progress, url_id)
         else:
-            video_url = download_direct(url, download_progress, url_id, title)
+            video_url = download_direct(url, download_progress, url_id, title, url_info.get('filename', None))
         url_info['video_url'] = video_url
         save_url_map()
         # only generate thumbnails if video meaning if yt-dlp created a file with extension .unknown_video it is not a video
