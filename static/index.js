@@ -71,7 +71,7 @@ new Vue({
                                 shareButton.classList.add('btn', 'btn-secondary', 'btn-sm');
                                 shareButton.addEventListener('click', () => {
                                     navigator.share({
-                                        title: 'Video Link',
+                                        title: title,
                                         url: tempVideoUrl,
                                     })
                                         .then(() => console.log(`Successful shared ${tempVideoUrl}`))
