@@ -71,6 +71,9 @@ def generate_heresphere_json_item(server_path, file_base64, data):
     :return: json object in the Heresphere format for a single item
     """
 
+    if 'scan' in file_base64:
+        return {}
+
     filename = base64.urlsafe_b64decode(file_base64.encode()).decode()
     base_name = os.path.basename(filename)
     static_dir = get_static_directory()
@@ -89,14 +92,10 @@ def generate_heresphere_json_item(server_path, file_base64, data):
 
     # see if it needMediaSource
     data = data or {}
-    needs_media_source = data.get('needsMediaSource', True)
     is_favorite = data.get('isFavorite', None)
 
     if is_favorite is not None:
         set_favorite(real_path, is_favorite)
-
-    if not needs_media_source:
-        return {}
 
     thumbnails = get_thumbnails(real_path)
     thumbnail_url = thumbnails[ThumbnailFormat.JPG]
