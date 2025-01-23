@@ -42,7 +42,8 @@ new Vue({
                         if (modalBody && modalFooter && video_url) {
                             // strip trailing / from video url
                             const video_source = video_url.replace(/\/+$/, '');
-                            videoModalTitle.textContent = data.title || 'Video Streaming...';
+                            const title = data.title || 'Video Streaming...';
+                            videoModalTitle.textContent = title;
                             modalBody.innerHTML = `
                                 <video-js id="videoPlayer" class="vjs-default-skin w-100 h-100" controls autoplay>
                                     <source src="${video_source}" type="video/webm">
@@ -82,7 +83,7 @@ new Vue({
                                 shareExtractedButton.classList.add('btn', 'btn-secondary', 'btn-sm');
                                 shareExtractedButton.addEventListener('click', () => {
                                     navigator.share({
-                                        title: 'Extracted Video Link',
+                                        title: title,
                                         url: video_source,
                                     })
                                       .then(() => console.log(`Successful shared ${tempVideoUrl}`))
