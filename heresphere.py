@@ -71,6 +71,7 @@ def generate_heresphere_json_item(server_path, file_base64, data):
     :return: json object in the Heresphere format for a single item
     """
 
+    print(f"Heresphere JSON for {file_base64} - {data} - {server_path}")
     if 'scan' in file_base64:
         return {}
 
