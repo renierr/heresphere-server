@@ -71,7 +71,6 @@ def generate_heresphere_json_item(server_path, file_base64, data):
     :return: json object in the Heresphere format for a single item
     """
 
-    print(f"Heresphere JSON for {file_base64} - {data} - {server_path}")
     if 'scan' in file_base64:
         return {}
 
@@ -96,7 +95,7 @@ def generate_heresphere_json_item(server_path, file_base64, data):
     is_favorite = data.get('isFavorite', None)
 
     if is_favorite is not None:
-        set_favorite(real_path, is_favorite)
+        set_favorite(filename, is_favorite)
 
     thumbnails = get_thumbnails(real_path)
     thumbnail_url = thumbnails[ThumbnailFormat.JPG]
