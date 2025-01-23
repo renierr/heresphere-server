@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Blueprint, jsonify, request
 
 from bus import push_text_to_client
-from files import list_files, get_basic_save_video_info, library_subfolders
+from files import list_files, get_basic_save_video_info, library_subfolders, toggle_favorite, set_favorite
 from globals import get_static_directory, VideoFolder
 from thumbnail import ThumbnailFormat, get_thumbnails, get_video_info
 
@@ -18,17 +18,10 @@ def heresphere():
     response.headers['heresphere-json-version'] = '1'
     return response
 
-@heresphere_bp.route('/heresphere/<file_base64>', methods=['GET'])
+@heresphere_bp.route('/heresphere/<file_base64>', methods=['POST', 'GET'])
 def heresphere_file(file_base64):
-    return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
-
-@heresphere_bp.route('/heresphere/<file_base64>', methods=['POST'])
-def heresphere_file_write(file_base64):
-    # TODO implement real logic later
-    data = request.get_json()
-    push_text_to_client(f"Heresphere write triggered, received JSON: {data} ")
-    print(f"Heresphere write triggered, received JSON: {data} ")
-    return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
+    data = request.get_json(force=True, silent=True)
+    return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64, data))
 
 
 def generate_heresphere_json(server_path):
@@ -67,13 +60,14 @@ def generate_heresphere_json(server_path):
 
     return result_json
 
-def generate_heresphere_json_item(server_path, file_base64):
+def generate_heresphere_json_item(server_path, file_base64, data):
     """
     Generate the JSON for a single item for the Heresphere VR player
     Heresphere VR player will make a request for each item in the library
 
     :param server_path: root path of the server
     :param file_base64: base64 encoded filename which is the path to the video file
+    :param data: optional data from the request as JSON
     :return: json object in the Heresphere format for a single item
     """
 
@@ -91,6 +85,17 @@ def generate_heresphere_json_item(server_path, file_base64):
     folders = os.path.dirname(relative_path)
 
     if not os.path.exists(real_path):
+        return {}
+
+    # see if it needMediaSource
+    data = data or {}
+    needs_media_source = data.get('needsMediaSource', True)
+    is_favorite = data.get('isFavorite', None)
+
+    if is_favorite is not None:
+        set_favorite(real_path, is_favorite)
+
+    if not needs_media_source:
         return {}
 
     thumbnails = get_thumbnails(real_path)

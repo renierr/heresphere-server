@@ -426,15 +426,16 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     return ServerResponse(True, f"File {base_name} renamed")
 
 
-def toggle_favorite(video_path: str) -> ServerResponse:
+def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
     """
-    Toggle the favorite status of a video file
+    Set the favorite status of a video file
 
     :param video_path: url to video file
+    :param favorite: favorite status to set to (True/False) or None to toggle
     :return: json object with success
     """
 
-    push_text_to_client(f"Toggle favorite for: {video_path}")
+    push_text_to_client(f"Set favorite for: {video_path}")
     real_path, vid_folder = get_real_path_from_url(video_path)
     if not real_path:
         return ServerResponse(False, "File not found")
@@ -444,14 +445,27 @@ def toggle_favorite(video_path: str) -> ServerResponse:
     infos = video_info.get('infos', {})
     current_favorite = infos.get('favorite', False)
 
+    if favorite is None:
+        favorite = not current_favorite
+
     # title update dict
     favorite_update = {
-        'favorite':  not current_favorite,
+        'favorite': favorite,
     }
     update_file_info(real_path, favorite_update)
 
     # clear the cache and push/return info
     get_basic_save_video_info.cache__evict(real_path)
     list_files.cache__evict(vid_folder)
-    push_text_to_client(f"File favorite changed to {not current_favorite}: {base_name}")
+    push_text_to_client(f"File favorite changed to {favorite}: {base_name}")
     return ServerResponse(True, f"File {base_name} favorite changed")
+
+
+def toggle_favorite(video_path: str) -> ServerResponse:
+    """
+    Toggle the favorite status of a video file
+
+    :param video_path: url to video file
+    :return: json object with success
+    """
+    return set_favorite(video_path)
