@@ -4,6 +4,8 @@ import os
 import urllib.parse
 from datetime import datetime
 from flask import Blueprint, jsonify, request
+
+from bus import push_text_to_client
 from files import list_files, get_basic_save_video_info, library_subfolders
 from globals import get_static_directory, VideoFolder
 from thumbnail import ThumbnailFormat, get_thumbnails, get_video_info
@@ -16,8 +18,16 @@ def heresphere():
     response.headers['heresphere-json-version'] = '1'
     return response
 
-@heresphere_bp.route('/heresphere/<file_base64>', methods=['POST', 'GET'])
+@heresphere_bp.route('/heresphere/<file_base64>', methods=['GET'])
 def heresphere_file(file_base64):
+    return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
+
+@heresphere_bp.route('/heresphere/<file_base64>', methods=['POST'])
+def heresphere_file_write(file_base64):
+    # TODO implement real logic later
+    data = request.get_json()
+    push_text_to_client(f"Heresphere write triggered, received JSON: {data} ")
+    print(f"Heresphere write triggered, received JSON: {data} ")
     return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64))
 
 
@@ -137,7 +147,7 @@ def generate_heresphere_json_item(server_path, file_base64):
         "comments": [],
         "rating": 0,
         "isFavorite": favorite,
-        "writeFavorite": False,
+        "writeFavorite": True,
     }
 
     if folders:
