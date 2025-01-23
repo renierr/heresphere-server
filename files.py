@@ -437,7 +437,6 @@ def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
 
     push_text_to_client(f"Set favorite for: {video_path} - {favorite}")
     real_path, vid_folder = get_real_path_from_url(video_path)
-    print(f"fav real path: {real_path}")
     if not real_path:
         return ServerResponse(False, "File not found")
 
