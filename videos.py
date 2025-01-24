@@ -163,15 +163,21 @@ def download_direct(url, progress_function, url_id, title, old_filename) -> str:
 
 
 def download_video(url, title):
-    download_random_id = secrets.token_urlsafe(4)
+    download_random_id = datetime.now().strftime('%Y%m%d%H%M%S')
     url_map = get_url_map()
-    url_map[download_random_id] = {'url': url, 'title': title, 'failed': False}
 
     push_text_to_client(f"Downloading video {download_random_id}")
     try:
         youtube_video = is_youtube_url(url)
         subfolder = 'youtube' if youtube_video else 'direct'
 
+        # check for existing id in db and use it as download_id
+        with get_downloads_db() as db:
+            existing_download = db.find_by_original_url(url)
+            if existing_download:
+                download_random_id = existing_download.get('file_name', '').split('____')[0]
+
+        url_map[download_random_id] = {'url': url, 'title': title, 'failed': False}
         ydl_opts = {
             'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
             'restrictfilenames': True,
@@ -189,12 +195,13 @@ def download_video(url, title):
         if not filename:
             raise ValueError("No filename found in the download result")
 
+        basename = os.path.basename(filename)
         video_url = '/' + filename.replace('\\', '/')
         title = download_result.get('title', None) or title
         url_map[download_random_id]['title'] = title
 
-        #with get_downloads_db() as db:
-        #    next_download = db.next_download(url, video_url, filename, title)
+        with get_downloads_db() as db:
+            db.store_download(url=url, video_url=video_url, filename=basename, title=title)
 
         # only generate thumbnails if download is a video check for file with extension ".unknown_video" this is not a video
         if not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):

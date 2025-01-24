@@ -123,18 +123,16 @@ class DownloadsDatabase(Database):
         params = [original_url]
         return self.fetch_one(query, params)
 
-    def next_download(self, url, video_url, filename, title) -> dict:
+    def store_download(self, *, url, video_url, filename, title) -> dict:
         download_date = int(datetime.now().timestamp())
         query = '''
         INSERT OR REPLACE INTO downloads (id, video_url, file_name, original_url, title, download_date)
         VALUES (
             (SELECT id FROM downloads WHERE original_url = ?),
-            ?, ?, ?, 
-            CASE WHEN ? IS NOT NULL THEN ? ELSE title END,
-            ?
+            ?, ?, ?, ?, ?
         )
         '''
-        params = [url, video_url, filename, url, title, title, download_date]
+        params = [url, video_url, filename, url, title, download_date]
 
         cursor = self.execute_query(query, params)
         return result_as_dict(cursor)
