@@ -1,6 +1,5 @@
 import math
 import os
-import json
 import re
 import sys
 from collections import namedtuple

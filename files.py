@@ -1,4 +1,3 @@
-import json
 import os
 import shutil
 
@@ -394,8 +393,8 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     # clear the cache and push/return info
     get_basic_save_video_info.cache__evict(real_path)
     list_files.cache__evict(vid_folder)
-    push_text_to_client(f"File renamed: {base_name}")
-    return ServerResponse(True, f"File {base_name} renamed")
+    push_text_to_client(f"File renamed: {video_path}")
+    return ServerResponse(True, f"File {video_path} renamed")
 
 
 def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
