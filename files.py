@@ -6,8 +6,8 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache
 from database import get_downloads_db
-from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, \
-    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION
+from globals import get_static_directory, VideoInfo, get_real_path_from_url, get_url_map, \
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path
 from utils import check_folder, get_mime_type
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails, update_file_info
 
@@ -313,37 +313,33 @@ def delete_file(url):
 def cleanup():
     """
     Cleanup the tracking map by removing entries that no longer exist.
-    Also cleanup thumbnails that no longer have a corresponding video file.
+    Also, cleanup thumbnails that no longer have a corresponding video file.
 
     :return: object with success and message
     """
-    url_map = get_url_map()
-    static_dir = get_static_directory()
+
+    get_url_map().clear()
 
     to_remove = []
-    for url_id, url_info in url_map.items():
-        filename = url_info.get('filename')
-        logger.debug(f"Checking file: {filename}")
-        if filename:
-            youtube_dir = os.path.join(static_dir, VideoFolder.videos.dir, 'youtube')
-            direct_dir = os.path.join(static_dir, VideoFolder.videos.dir, 'direct')
-            youtube_files = os.listdir(youtube_dir)
-            direct_files = os.listdir(direct_dir)
-            if not any(f.startswith(filename) for f in youtube_files) and not any(f.startswith(filename) for f in direct_files):
-                to_remove.append(url_id)
-
-    logger.debug(f"to removed: {to_remove}")
-    for url_id in to_remove:
-        del url_map[url_id]
-
-    save_url_map()
+    with get_downloads_db() as db:
+        all = db.fetch_all('select * from downloads')
+        for row in all:
+            pk = row.get('id')
+            video_url = row.get('video_url')
+            if video_url:
+                check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
+                logger.debug(f"Checking file: {check_file}")
+                if not os.path.exists(check_file):
+                    to_remove.append(pk)
+                    db.delete_key(pk)
+    logger.debug(f"removed orphan db entries: {to_remove}")
     push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
 
     # cleanup thumbnails from .thumb directory that no longer have a corresponding video file for both videos and library directory
     known_extensions = [fmt.extension for fmt in ThumbnailFormat]
     to_remove = []
     for directory in VideoFolder:
-        folder, folder_state = check_folder(os.path.join(static_dir, directory.dir))
+        folder, folder_state = check_folder(os.path.join(get_static_directory(), directory.dir))
         if folder_state != FolderState.ACCESSIBLE:
             logger.warning(f"Folder not accessible: {folder} - skipping cleanup - state: {folder_state}")
             continue
@@ -383,12 +379,8 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     if not real_path:
         return ServerResponse(False, "File not found")
 
-    base_name = os.path.basename(real_path)
-    url_id, url_info = find_url_info(base_name)
-    if url_info:
-        url_info['title'] = new_title
-        save_url_map()
-
+    with get_downloads_db() as db:
+        db.change_title(video_path, new_title)
 
     # title update dict
     title_update = {

@@ -23,7 +23,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
-from globals import save_url_map, load_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
+from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
 from migrate import migrate
 from thumbnail import thumbnail_bp
 from videos import video_bp
@@ -226,12 +226,6 @@ def cl():
 
 def start_server() -> Optional[str]:
     global ffmpeg_version_info, ffprobe_version_info
-
-    # Load url_map on startup
-    load_url_map()
-
-    # Register save_url_map to be called on application exit
-    atexit.register(save_url_map)
 
     if not is_debug():
         sys.stdout = open(os.devnull, 'w')

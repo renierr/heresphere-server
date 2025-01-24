@@ -9,7 +9,7 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
-from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, \
+from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, \
     THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map
 from utils import check_folder
 

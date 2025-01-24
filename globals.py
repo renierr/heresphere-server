@@ -47,45 +47,6 @@ def is_debug() -> bool:
 def get_url_map() -> dict:
     return url_map
 
-def get_url_counter() -> int:
-    return url_counter
-
-def increment_url_counter() -> int:
-    global url_counter
-    url_counter += 1
-    return url_counter
-
-def find_url_id(url) -> Optional[str]:
-    for url_id, url_info in url_map.items():
-        if url_info.get('url') == url:
-            return url_id
-    return None
-
-def find_url_info(filename) -> Tuple[Optional[str], Optional[dict]]:
-    for idnr, url_info in url_map.items():
-        filename_check = os.path.splitext(filename.rstrip('.part'))[0]
-        filename_info = url_info.get('filename', None)
-        if filename and filename_info and filename_check == filename_info:
-            return idnr, url_info
-    return None, None
-
-def save_url_map() -> None:
-    return
-    file_path = os.path.join(get_data_directory(), URL_MAP_JSON)
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(url_map, f, indent=2, ensure_ascii=False)
-
-def load_url_map() -> None:
-    return
-    global url_counter
-    file_path = os.path.join(get_data_directory(), URL_MAP_JSON)
-    if os.path.exists(file_path):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            loaded_url_map = json.load(f)
-            url_map.update(loaded_url_map)
-            if loaded_url_map:
-                url_counter = max(int(key) for key in loaded_url_map.keys()) + 1
-
 
 def get_application_path() -> str:
     if getattr(sys, 'frozen', False):

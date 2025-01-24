@@ -1,14 +1,13 @@
 import os
 import shutil
 
-from database import get_downloads_db, get_migration_db
-from globals import get_data_directory, URL_MAP_JSON, get_application_path, get_url_map, load_url_map
+from database import get_migration_db
+from globals import get_data_directory, URL_MAP_JSON, get_application_path
 
 
 def migrate():
     migrate_tracking()
     migrate_url_map()
-    from_url_map_to_database()
     rename_db_from_videos_to_download()
 
 def already_migrated(migration_name):
@@ -47,26 +46,6 @@ def migrate_url_map():
         # move file to data folder
         shutil.move(root_map_path, map_path)
         print("Migrated URL map file")
-
-def from_url_map_to_database():
-    if not already_migrated('url_map_to_db'):
-        track_migration('url_map_to_db')
-        load_url_map()
-        url_map = get_url_map()
-        with get_downloads_db() as db:
-            for value in url_map.values():
-                original_url = value.get('url')
-                video_url = value.get('video_url')
-                file_name = value.get('filename')
-                title = value.get('title')
-                favorite = value.get('favorite', False)
-                failed = value.get('failed', False)
-                download_date = value.get('downloaded_date', None)
-
-                if not original_url or not video_url or not file_name:
-                    continue
-                db.upsert(video_url=video_url, file_name=file_name, original_url=original_url, title=title, favorite=favorite, failed=failed, download_date=download_date)
-        print("Migrated URL map to DB")
 
 
 def rename_db_from_videos_to_download():

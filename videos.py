@@ -13,8 +13,8 @@ from yt_dlp import ImpersonateTarget
 from database import get_downloads_db
 from files import list_files
 from bus import push_text_to_client
-from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
-    find_url_info, remove_ansi_codes, save_url_map, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION
+from globals import get_url_map, get_application_path, \
+    remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION
 from thumbnail import generate_thumbnail_for_path
 
 root_path = get_application_path()

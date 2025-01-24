@@ -137,6 +137,23 @@ class DownloadsDatabase(Database):
         cursor = self.execute_query(query, params)
         return result_as_dict(cursor)
 
+    def change_title(self, video_path, title):
+        query = '''
+            UPDATE downloads
+            SET title = ?
+            WHERE video_url = ?
+        '''
+        params = [title, video_path]
+        self.execute_query(query, params)
+
+    def delete_key(self, pk):
+        query = '''
+            DELETE FROM downloads
+            WHERE id = ?
+        '''
+        params = [pk]
+        self.execute_query(query, params)
+
 
 
 download_db: Optional[DownloadsDatabase] = None
