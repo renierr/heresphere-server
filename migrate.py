@@ -65,7 +65,7 @@ def from_url_map_to_database():
 
                 if not original_url or not video_url or not file_name:
                     continue
-                db.upsert_video(original_url, video_url, file_name, title, favorite, failed, download_date)
+                db.upsert(video_url=video_url, file_name=file_name, original_url=original_url, title=title, favorite=favorite, failed=failed, download_date=download_date)
         print("Migrated URL map to DB")
 
 
