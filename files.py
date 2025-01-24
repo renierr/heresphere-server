@@ -5,6 +5,7 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
+from database import get_video_db
 from globals import get_static_directory, find_url_info, VideoInfo, get_real_path_from_url, get_url_map, save_url_map, \
     VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION
 from utils import check_folder, get_mime_type
@@ -453,6 +454,8 @@ def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
         'favorite': favorite,
     }
     update_file_info(real_path, favorite_update)
+    with get_video_db() as db:
+        db.set_favorite(video_path, favorite)
 
     # clear the cache and push/return info
     get_basic_save_video_info.cache__evict(real_path)
