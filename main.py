@@ -23,7 +23,8 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
-from globals import save_url_map, load_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse
+from globals import save_url_map, load_url_map, get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
+from migrate import migrate
 from thumbnail import thumbnail_bp
 from videos import video_bp
 from api import api_bp
@@ -272,6 +273,10 @@ def start_server() -> Optional[str]:
     if not os.path.exists(youtube_dir) and not os.path.islink(youtube_dir):
         os.makedirs(youtube_dir, exist_ok=True)
 
+    data_dir = get_data_directory()
+    if not os.path.exists(data_dir) and not os.path.islink(data_dir):
+        os.makedirs(data_dir, exist_ok=True)
+
     clean_client_task()
 
     # Get the server's IP address
@@ -283,6 +288,8 @@ def start_server() -> Optional[str]:
 
 
 if __name__ == '__main__':
+    migrate()
+
     result = start_server()
     if result:
         logger.error(f"Server could not start: {result}")

@@ -12,6 +12,7 @@ DEBUG: bool = False
 url_map = {}
 url_counter: int = 1
 
+URL_MAP_JSON = 'url_map.json'
 THUMBNAIL_DIR_NAME: str = '.thumb'
 UNKNOWN_VIDEO_EXTENSION: str = '.unknown_video'
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title', 'infos'])
@@ -68,12 +69,14 @@ def find_url_info(filename) -> Tuple[Optional[str], Optional[dict]]:
             return idnr, url_info
     return None, None
 
-def save_url_map(file_path='url_map.json') -> None:
+def save_url_map() -> None:
+    file_path = os.path.join(get_data_directory(), URL_MAP_JSON)
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(url_map, f, indent=2, ensure_ascii=False)
 
-def load_url_map(file_path='url_map.json') -> None:
+def load_url_map() -> None:
     global url_counter
+    file_path = os.path.join(get_data_directory(), URL_MAP_JSON)
     if os.path.exists(file_path):
         with open(file_path, 'r', encoding='utf-8') as f:
             loaded_url_map = json.load(f)
@@ -97,6 +100,10 @@ def get_application_path() -> str:
 def get_static_directory() -> str:
     application_path = get_application_path()
     return os.path.join(application_path, 'static')
+
+def get_data_directory() -> str:
+    application_path = get_application_path()
+    return os.path.join(application_path, 'data')
 
 
 def remove_ansi_codes(text) -> str:
