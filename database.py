@@ -26,7 +26,7 @@ class Database:
         self.connection.commit()
         return cursor
 
-    def fetch_all(self, query, params=None):
+    def fetch_all(self, query, params=None) -> list:
         if params is None:
             params = []
         cursor = self.execute_query(query, params)
@@ -34,13 +34,13 @@ class Database:
         columns = [column[0] for column in cursor.description]
         return [dict(zip(columns, row)) for row in rows]
 
-    def fetch_one(self, query, params=None):
+    def fetch_one(self, query, params=None) -> dict:
         if params is None:
             params = []
         cursor = self.execute_query(query, params)
         row = cursor.fetchone()
         if row is None:
-            return None
+            return {}
         columns = [column[0] for column in cursor.description]
         return dict(zip(columns, row))
 
