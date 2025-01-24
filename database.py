@@ -68,7 +68,7 @@ class MigrateDatabase(Database):
 
 class DownloadsDatabase(Database):
     def __init__(self):
-        db_path = os.path.join(get_data_directory(), 'videos.db')
+        db_path = os.path.join(get_data_directory(), 'downloads.db')
         super().__init__(db_path)
 
     def upsert_video(self, video_url, file_name, original_url=None, title=None, favorite=False, failed=False, download_date=None):
@@ -91,12 +91,20 @@ class DownloadsDatabase(Database):
         params = [favorite, video_path]
         self.execute_query(query, params)
 
-    def get_video_by_path(self, video_path):
+    def get_download_by_path(self, video_path):
         query = '''
             SELECT * FROM downloads
             WHERE video_url = ?
         '''
         params = [video_path]
+        return self.fetch_one(query, params)
+
+    def find_download_by_original_url(self, original_url):
+        query = '''
+            SELECT * FROM downloads
+            WHERE original_url = ?
+        '''
+        params = [original_url]
         return self.fetch_one(query, params)
 
 
