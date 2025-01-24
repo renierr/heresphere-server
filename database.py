@@ -66,16 +66,16 @@ class MigrateDatabase(Database):
         params = [migration_name]
         return self.fetch_one(query, params)
 
-class VideoDatabase(Database):
+class DownloadsDatabase(Database):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'videos.db')
         super().__init__(db_path)
 
     def upsert_video(self, video_url, file_name, original_url=None, title=None, favorite=False, failed=False, download_date=None):
         query = '''
-        INSERT OR REPLACE INTO videos (id, video_url, file_name, original_url, title, favorite, failed, download_date)
+        INSERT OR REPLACE INTO downloads (id, video_url, file_name, original_url, title, favorite, failed, download_date)
         VALUES (
-            (SELECT id FROM videos WHERE video_url = ?),
+            (SELECT id FROM downloads WHERE video_url = ?),
             ?, ?, ?, ?, ?, ?, ?
         )
         '''
@@ -84,7 +84,7 @@ class VideoDatabase(Database):
 
     def set_favorite(self, video_path, favorite):
         query = '''
-            UPDATE videos
+            UPDATE downloads
             SET favorite = ?
             WHERE video_url = ?
         '''
@@ -93,19 +93,19 @@ class VideoDatabase(Database):
 
     def get_video_by_path(self, video_path):
         query = '''
-            SELECT * FROM videos
+            SELECT * FROM downloads
             WHERE video_url = ?
         '''
         params = [video_path]
         return self.fetch_one(query, params)
 
 
-video_db: Optional[VideoDatabase] = None
-def init_video_database():
-    global video_db
-    video_db = VideoDatabase()
-    video_db.execute_query('''
-        CREATE TABLE IF NOT EXISTS videos (
+download_db: Optional[DownloadsDatabase] = None
+def init_downloads_database():
+    global download_db
+    download_db = DownloadsDatabase()
+    download_db.execute_query('''
+        CREATE TABLE IF NOT EXISTS downloads (
             id INTEGER PRIMARY KEY,
             video_url TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
             file_name TEXT NOT NULL,
@@ -117,10 +117,10 @@ def init_video_database():
         )
     ''')
 
-def get_video_db() -> VideoDatabase:
-    if video_db is None:
-        init_video_database()
-    return video_db
+def get_downloads_db() -> DownloadsDatabase:
+    if download_db is None:
+        init_downloads_database()
+    return download_db
 
 migrate_db: Optional[MigrateDatabase] = None
 def init_migration_database():

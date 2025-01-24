@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from database import get_video_db, get_migration_db
+from database import get_downloads_db, get_migration_db
 from globals import get_data_directory, URL_MAP_JSON, get_application_path, get_url_map, load_url_map
 
 
@@ -9,6 +9,7 @@ def migrate():
     migrate_tracking()
     migrate_url_map()
     from_url_map_to_database()
+    rename_db_from_videos_to_download()
 
 def already_migrated(migration_name):
     with get_migration_db() as db:
@@ -19,6 +20,8 @@ def track_migration(migration_name):
         db.upsert_migration(migration_name)
 
 def migrate_tracking():
+    # make sure data fodler exists
+    os.makedirs(get_data_directory(), exist_ok=True)
     if not already_migrated('tracking'):
         track_migration('tracking')
         print("Migrated tracking")
@@ -50,7 +53,7 @@ def from_url_map_to_database():
         track_migration('url_map_to_db')
         load_url_map()
         url_map = get_url_map()
-        with get_video_db() as db:
+        with get_downloads_db() as db:
             for value in url_map.values():
                 original_url = value.get('url')
                 video_url = value.get('video_url')
@@ -66,3 +69,11 @@ def from_url_map_to_database():
         print("Migrated URL map to DB")
 
 
+def rename_db_from_videos_to_download():
+    if not already_migrated('rename_db_from_videos_to_downloads'):
+        track_migration('rename_db_from_videos_to_downloads')
+        db_path = os.path.join(get_data_directory(), 'videos.db')
+        new_db_path = os.path.join(get_data_directory(), 'downloads.db')
+        if os.path.exists(db_path):
+            os.rename(db_path, new_db_path)
+            print("Renamed videos.db to download.db")
