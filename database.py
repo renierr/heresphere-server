@@ -27,12 +27,22 @@ class Database:
         return cursor
 
     def fetch_all(self, query, params=None):
+        if params is None:
+            params = []
         cursor = self.execute_query(query, params)
-        return cursor.fetchall()
+        rows = cursor.fetchall()
+        columns = [column[0] for column in cursor.description]
+        return [dict(zip(columns, row)) for row in rows]
 
     def fetch_one(self, query, params=None):
+        if params is None:
+            params = []
         cursor = self.execute_query(query, params)
-        return cursor.fetchone()
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        columns = [column[0] for column in cursor.description]
+        return dict(zip(columns, row))
 
     def __enter__(self):
         self.connect()
