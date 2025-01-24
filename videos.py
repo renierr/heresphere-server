@@ -1,5 +1,6 @@
 import os
 import re
+import secrets
 import threading
 import time
 
@@ -9,6 +10,7 @@ from flask import Blueprint, request, jsonify
 from loguru import logger
 from yt_dlp import ImpersonateTarget
 
+from database import get_downloads_db
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, find_url_id, get_url_counter, increment_url_counter, get_application_path, \
@@ -128,28 +130,6 @@ def get_stream(url) -> tuple:
         return None, None, None
 
 
-def download_yt(url, progress_function, url_id) -> str:
-    vid, filename, title = get_yt_dl_video_info(url)
-    filename = f"{vid}___{filename}"
-    logger.debug(f"Downloading YouTube video {filename}")
-    url_map = get_url_map()
-    url_map[url_id]['filename'] = filename
-    url_map[url_id]['title'] = title
-
-    ydl_opts = {
-        'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
-        'outtmpl': os.path.join('static', VideoFolder.videos.dir, 'youtube', filename) + '.%(ext)s',
-        'progress_hooks': [progress_function],
-        'nocolor': True,
-        'updatetime': False,
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    logger.debug(f"Downloaded YouTube video {filename}")
-    return f"/static/videos/youtube/{filename_with_ext(filename)}"
-
-
 def download_direct(url, progress_function, url_id, title, old_filename) -> str:
     _, filename, extract_title = get_yt_dl_video_info(url)
 
@@ -168,7 +148,8 @@ def download_direct(url, progress_function, url_id, title, old_filename) -> str:
     url_map[url_id]['title'] = title
 
     ydl_opts = {
-        'outtmpl': os.path.join('static', VideoFolder.videos.dir, 'direct', filename) + '.%(ext)s',
+        'restrictfilenames': True,
+        'outtmpl': os.path.join('static', VideoFolder.videos.dir, 'direct') + '/%(title)s.%(ext)s',
         'progress_hooks': [progress_function],
         'nocolor': True,
         'updatetime': False,
@@ -182,39 +163,52 @@ def download_direct(url, progress_function, url_id, title, old_filename) -> str:
 
 
 def download_video(url, title):
+    download_random_id = secrets.token_urlsafe(4)
     url_map = get_url_map()
-    url_id = find_url_id(url)
-    if url_id is None:
-        url_id = str(get_url_counter())
-        increment_url_counter()
-        url_map[url_id] = {'url': url, 'filename': None, 'video_url': None,
-                           'title': title, 'failed': False,
-                           'downloaded_date': int(datetime.now().timestamp())}
-    else:
-        url_map[url_id]['url'] = url
-        url_map[url_id]['downloaded_date'] = int(datetime.now().timestamp())
-        url_map[url_id]['failed'] = False
+    url_map[download_random_id] = {'url': url, 'title': title, 'failed': False}
 
-    url_info = url_map[url_id]
-    push_text_to_client(f"Downloading video {url_id}...")
+    push_text_to_client(f"Downloading video {download_random_id}")
     try:
-        if is_youtube_url(url):
-            video_url = download_yt(url, download_progress, url_id)
-        else:
-            video_url = download_direct(url, download_progress, url_id, title, url_info.get('filename', None))
-        url_info['video_url'] = video_url
-        save_url_map()
-        # only generate thumbnails if video meaning if yt-dlp created a file with extension .unknown_video it is not a video
-        if video_url and not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):
+        youtube_video = is_youtube_url(url)
+        subfolder = 'youtube' if youtube_video else 'direct'
+
+        ydl_opts = {
+            'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
+            'restrictfilenames': True,
+            'outtmpl': os.path.join('static', VideoFolder.videos.dir, subfolder) + f"/{download_random_id}____%(title)s.%(ext)s",
+            'progress_hooks': [download_progress],
+            'nocolor': True,
+            'updatetime': False,
+            'impersonate': ImpersonateTarget('chrome'),
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            download_result = ydl.extract_info(url, download=True, extra_info={'video_id': download_random_id})
+
+        filename = download_result.get('requested_downloads', {})[0].get('filename', None)
+        if not filename:
+            raise ValueError("No filename found in the download result")
+
+        video_url = '/' + filename.replace('\\', '/')
+        title = download_result.get('title', None) or title
+        url_map[download_random_id]['title'] = title
+
+        #with get_downloads_db() as db:
+        #    next_download = db.next_download(url, video_url, filename, title)
+
+        # only generate thumbnails if download is a video check for file with extension ".unknown_video" this is not a video
+        if not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):
             generate_thumbnail_for_path(video_url)
         list_files.cache__evict(VideoFolder.videos)
+        logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         error_message = f"Failed to download video: {e}"
-        url_info['failed'] = True
+        url_map[download_random_id]['failed'] = True
         logger.error(error_message)
         list_files.cache__evict(VideoFolder.videos)
-        push_text_to_client(f"Download failed [{url_id}] - {e}")
+        push_text_to_client(f"Download failed [{download_random_id}] - {e}")
+
 
 last_call_time = 0
 last_zero_percent = ''
@@ -225,12 +219,11 @@ def download_progress(d):
     current_time = time.time()
 
     output = ''
-    fname = os.path.splitext(os.path.basename(d['filename']))[0]
-    idnr, _ = find_url_info(fname)
+    video_id = d.get('info_dict', {}).get('video_id', None)
     if d['status'] == 'downloading':
         # Throttle the output to prevent spamming the client - let 0.0% through to indicate new file download
         percent = remove_ansi_codes(d.get('_percent_str', ''))
-        message = f"Downloading...[{idnr}] - {percent} complete"
+        message = f"Downloading...[{video_id}] - {percent} complete"
         logger.debug(message)
         if ' 0.0%' in percent:
             global last_zero_percent
@@ -243,7 +236,8 @@ def download_progress(d):
         last_call_time = current_time
         output = f"{message} at {remove_ansi_codes(d['_speed_str'])}, ETA {remove_ansi_codes(d['_eta_str'])}"
     elif d['status'] == 'finished':
-        output = f"Downloading...[{idnr}] - 100.0% complete: {fname}"
+        fname = os.path.splitext(os.path.basename(d['filename']))[0]
+        output = f"Downloading...[{video_id}] - 100.0% complete: {fname}"
     push_text_to_client(output)
 
 

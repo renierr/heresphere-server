@@ -70,11 +70,13 @@ def find_url_info(filename) -> Tuple[Optional[str], Optional[dict]]:
     return None, None
 
 def save_url_map() -> None:
+    return
     file_path = os.path.join(get_data_directory(), URL_MAP_JSON)
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(url_map, f, indent=2, ensure_ascii=False)
 
 def load_url_map() -> None:
+    return
     global url_counter
     file_path = os.path.join(get_data_directory(), URL_MAP_JSON)
     if os.path.exists(file_path):

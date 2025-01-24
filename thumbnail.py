@@ -10,7 +10,7 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
 from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, find_url_info, \
-    THUMBNAIL_DIR_NAME, ServerResponse, FolderState
+    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map
 from utils import check_folder
 
 
@@ -100,9 +100,10 @@ def get_video_info(video_path, force=False):
         info['infos'] = infos
 
         # find title from url map
-        idnr, url_info = find_url_info(os.path.basename(video_path))
+        download_id = os.path.basename(video_path).split('____')[0]
+        url_info = get_url_map().get(download_id, {})
         if url_info:
-            infos['download_id'] = idnr
+            infos['download_id'] = download_id
             infos['url_info'] = url_info
             title = url_info.get('title')
             if title:
@@ -316,9 +317,11 @@ def generate_thumbnail_for_path(video_path):
 
     real_path, _ = get_real_path_from_url(video_path)
     if not real_path:
+        logger.debug(f"Invalid video path: {video_path}")
         return ServerResponse(False, "Invalid video path")
 
     if not os.path.exists(real_path):
+        logger.debug(f"Video file does not exist: {real_path}")
         return ServerResponse(False, "Video file does not exist")
 
     base_name = os.path.basename(real_path)

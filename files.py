@@ -69,17 +69,12 @@ def list_files(directory) -> list:
 
             # only for videos directory
             if directory == VideoFolder.videos:
-                url_id, url_info = find_url_info(filename)
+                download_id = filename.split('____')[0]
+                url_info = get_url_map().get(download_id, {})
                 common_details.update({
-                    'url_id': url_id,
-                    **({k: url_info.get(k) for k in ['url', 'video_url', 'downloaded_date', 'failed']} if url_info else {})
+                    'url_id': download_id,
+                    **({k: url_info.get(k) for k in ['url', 'failed']} if url_info else {})
                 })
-
-                if filename.count('___') == 1:
-                    yt_id, _ = parse_youtube_filename(filename)
-                    common_details.update({
-                        'yt_id': yt_id,
-                    })
             extracted_details.append(common_details)
 
     # check for duplicates
@@ -141,7 +136,6 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
     partial = filename.endswith('.part')
     result = {
         'partial': partial,
-        'yt_id': None,
         'title': os.path.splitext(filename)[0],
         'filename': f"{base_path}{subfolder + '/' if subfolder else ''}{filename}",
         'folder' : subfolder,
@@ -174,21 +168,6 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
         if info.title:
             result['title'] = info.title
     return result
-
-
-def parse_youtube_filename(filename) -> tuple:
-    """
-    Parse a YouTube filename into id and title
-    The stored filename is in the format: id___title.ext
-
-    :param filename: filename to parse
-    :return: id, title
-    """
-    parts = filename.split('___')
-    id_part = parts[0]
-    title_part = parts[1]
-
-    return id_part, title_part
 
 
 @cache(maxsize=4096, ttl=7200)

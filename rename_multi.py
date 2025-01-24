@@ -29,7 +29,7 @@ def multi_rename(folder: VideoFolder):
             continue
 
         # remove everything before ___ characters inclusive
-        title = title.split('____')[-1]
+        title = title.split('___')[-1]
         # remove [] and everything inside
         title = re.sub(r'\[.*?\]', '', title)
         # remove _ from title

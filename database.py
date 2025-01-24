@@ -1,7 +1,17 @@
 import sqlite3
 import os
+from datetime import datetime
 from typing import Optional
 from globals import get_data_directory
+
+
+def result_as_dict(cursor) -> dict:
+    row = cursor.fetchone()
+    if row is None:
+        return {}
+    columns = [column[0] for column in cursor.description]
+    return dict(zip(columns, row))
+
 
 class Database:
     def __init__(self, db_path):
@@ -38,11 +48,7 @@ class Database:
         if params is None:
             params = []
         cursor = self.execute_query(query, params)
-        row = cursor.fetchone()
-        if row is None:
-            return {}
-        columns = [column[0] for column in cursor.description]
-        return dict(zip(columns, row))
+        return result_as_dict(cursor)
 
     def __enter__(self):
         self.connect()
@@ -101,7 +107,7 @@ class DownloadsDatabase(Database):
         params = [favorite, video_path]
         self.execute_query(query, params)
 
-    def find_by_path(self, video_path):
+    def find_by_path(self, video_path) -> dict:
         query = '''
             SELECT * FROM downloads
             WHERE video_url = ?
@@ -109,13 +115,30 @@ class DownloadsDatabase(Database):
         params = [video_path]
         return self.fetch_one(query, params)
 
-    def find_by_original_url(self, original_url):
+    def find_by_original_url(self, original_url) -> dict:
         query = '''
             SELECT * FROM downloads
             WHERE original_url = ?
         '''
         params = [original_url]
         return self.fetch_one(query, params)
+
+    def next_download(self, url, video_url, filename, title) -> dict:
+        download_date = int(datetime.now().timestamp())
+        query = '''
+        INSERT OR REPLACE INTO downloads (id, video_url, file_name, original_url, title, download_date)
+        VALUES (
+            (SELECT id FROM downloads WHERE original_url = ?),
+            ?, ?, ?, 
+            CASE WHEN ? IS NOT NULL THEN ? ELSE title END,
+            ?
+        )
+        '''
+        params = [url, video_url, filename, url, title, title, download_date]
+
+        cursor = self.execute_query(query, params)
+        return result_as_dict(cursor)
+
 
 
 download_db: Optional[DownloadsDatabase] = None
