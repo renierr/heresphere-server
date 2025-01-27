@@ -12,7 +12,7 @@ def migrate():
 
 def already_migrated(migration_name):
     with get_migration_db() as db:
-        return db.get_migration(migration_name) is not None
+        return bool(db.get_migration(migration_name))
 
 def track_migration(migration_name):
     with get_migration_db() as db:
