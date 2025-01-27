@@ -321,8 +321,8 @@ def cleanup():
 
     to_remove = []
     with get_downloads_db() as db:
-        all = db.fetch_all('select * from downloads')
-        for row in all:
+        all_downloads = db.fetch_all('select * from downloads')
+        for row in all_downloads:
             pk = row.get('id')
             video_url = row.get('video_url')
             if video_url:
