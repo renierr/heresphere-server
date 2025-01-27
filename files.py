@@ -105,7 +105,7 @@ def generic_file_details(root, filename, base_path, subfolder) -> dict:
     realfile = os.path.join(root, filename)
     if not os.path.exists(realfile):
         return {}
-    mimetype, encoding = get_mime_type(realfile)
+    mimetype, _ = get_mime_type(realfile)
     result = {
         'mimetype': mimetype,
         'unknown': True,

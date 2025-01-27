@@ -8,7 +8,6 @@ from globals import get_data_directory, URL_MAP_JSON, get_application_path
 def migrate():
     migrate_tracking()
     migrate_url_map()
-    rename_db_from_videos_to_download()
 
 def already_migrated(migration_name):
     with get_migration_db() as db:
@@ -46,13 +45,3 @@ def migrate_url_map():
         # move file to data folder
         shutil.move(root_map_path, map_path)
         print("Migrated URL map file")
-
-
-def rename_db_from_videos_to_download():
-    if not already_migrated('rename_db_from_videos_to_downloads'):
-        track_migration('rename_db_from_videos_to_downloads')
-        db_path = os.path.join(get_data_directory(), 'videos.db')
-        new_db_path = os.path.join(get_data_directory(), 'downloads.db')
-        if os.path.exists(db_path):
-            os.rename(db_path, new_db_path)
-            print("Renamed videos.db to download.db")
