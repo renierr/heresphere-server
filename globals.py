@@ -47,7 +47,6 @@ def is_debug() -> bool:
 def get_url_map() -> dict:
     return url_map
 
-
 def get_application_path() -> str:
     if getattr(sys, 'frozen', False):
         application_path = os.path.dirname(sys.executable)
