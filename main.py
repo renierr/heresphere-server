@@ -232,7 +232,7 @@ def populate_url_map() -> None:
             if filename:
                 download_id = filename.split(ID_NAME_SEPERATOR)[0]
                 if download_id:
-                    dat = {'url': downloads.get('original_url'), 'title': downloads.get('title'), 'failed': False}
+                    dat = {'url': downloads.get('original_url'), 'title': downloads.get('title'), 'failed': downloads.get('failed')}
                     url_map[download_id] = dat
 
 def start_server() -> Optional[str]:
