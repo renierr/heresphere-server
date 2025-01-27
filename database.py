@@ -2,7 +2,7 @@ import sqlite3
 import os
 from datetime import datetime
 from typing import Optional
-from globals import get_data_directory
+from globals import get_data_directory, ID_NAME_SEPERATOR
 
 
 def result_as_dict(cursor) -> dict:
@@ -122,6 +122,17 @@ class DownloadsDatabase(Database):
         '''
         params = [original_url]
         return self.fetch_one(query, params)
+
+    def next_download(self, url) -> str:
+        download_random_id = datetime.now().strftime('%Y%m%d%H%M%S')
+        existing_download = self.find_by_original_url(url)
+        if existing_download:
+            download_random_id = existing_download.get('file_name', '').split(ID_NAME_SEPERATOR)[0]
+        else:
+            name = f"{download_random_id}{ID_NAME_SEPERATOR}downloading"
+            self.upsert(video_url=name, original_url=url, file_name=name, download_date=int(datetime.now().timestamp()))
+
+        return download_random_id
 
     def store_download(self, *, url, video_url, filename, title) -> dict:
         download_date = int(datetime.now().timestamp())

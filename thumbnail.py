@@ -10,7 +10,7 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
 from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, \
-    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map
+    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map, ID_NAME_SEPERATOR
 from utils import check_folder
 
 
@@ -100,7 +100,7 @@ def get_video_info(video_path, force=False):
         info['infos'] = infos
 
         # find title from url map
-        download_id = os.path.basename(video_path).split('____')[0]
+        download_id = os.path.basename(video_path).split(ID_NAME_SEPERATOR)[0]
         url_info = get_url_map().get(download_id, {})
         if url_info:
             infos['download_id'] = download_id

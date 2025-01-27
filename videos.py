@@ -1,6 +1,5 @@
 import os
 import re
-import secrets
 import threading
 import time
 
@@ -14,7 +13,7 @@ from database import get_downloads_db
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, get_application_path, \
-    remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION
+    remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR
 from thumbnail import generate_thumbnail_for_path
 
 root_path = get_application_path()
@@ -130,58 +129,22 @@ def get_stream(url) -> tuple:
         return None, None, None
 
 
-def download_direct(url, progress_function, url_id, title, old_filename) -> str:
-    _, filename, extract_title = get_yt_dl_video_info(url)
-
-    if title:
-        filename = re.sub(r'\W+', '_', title)
-    elif extract_title:
-        filename = re.sub(r'\W+', '_', extract_title)
-        title = extract_title
-
-    # add unique id to filename like current date - only if we do not know it from url map already
-    print(f"file: {filename} - {old_filename}")
-    filename = old_filename if old_filename and old_filename.startswith(filename) else f"{filename}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-    logger.debug(f"Downloading direct video {filename} extracted title: {extract_title} title: {title}")
-    url_map = get_url_map()
-    url_map[url_id]['filename'] = filename
-    url_map[url_id]['title'] = title
-
-    ydl_opts = {
-        'restrictfilenames': True,
-        'outtmpl': os.path.join('static', VideoFolder.videos.dir, 'direct') + '/%(title)s.%(ext)s',
-        'progress_hooks': [progress_function],
-        'nocolor': True,
-        'updatetime': False,
-        'impersonate': ImpersonateTarget('chrome'),
-    }
-
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    logger.debug(f"Downloaded direct video {filename}")
-    return f"/static/videos/direct/{filename_with_ext(filename, False)}"
-
-
 def download_video(url, title):
-    download_random_id = datetime.now().strftime('%Y%m%d%H%M%S')
+    download_random_id = None
     url_map = get_url_map()
 
-    push_text_to_client(f"Downloading video {download_random_id}")
     try:
+        with get_downloads_db() as db:
+            download_random_id = db.next_download(url)
+
+        push_text_to_client(f"Downloading video {download_random_id}")
         youtube_video = is_youtube_url(url)
         subfolder = 'youtube' if youtube_video else 'direct'
-
-        # check for existing id in db and use it as download_id
-        with get_downloads_db() as db:
-            existing_download = db.find_by_original_url(url)
-            if existing_download:
-                download_random_id = existing_download.get('file_name', '').split('____')[0]
-
         url_map[download_random_id] = {'url': url, 'title': title, 'failed': False}
         ydl_opts = {
             'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
             'restrictfilenames': True,
-            'outtmpl': os.path.join('static', VideoFolder.videos.dir, subfolder) + f"/{download_random_id}____%(title)s.%(ext)s",
+            'outtmpl': os.path.join('static', VideoFolder.videos.dir, subfolder) + f"/{download_random_id}{ID_NAME_SEPERATOR}%(title)s.%(ext)s",
             'progress_hooks': [download_progress],
             'nocolor': True,
             'updatetime': False,

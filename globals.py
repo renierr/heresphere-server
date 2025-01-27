@@ -11,6 +11,7 @@ DEBUG: bool = False
 url_map = {}
 url_counter: int = 1
 
+ID_NAME_SEPERATOR = '____'
 URL_MAP_JSON = 'url_map.json'
 THUMBNAIL_DIR_NAME: str = '.thumb'
 UNKNOWN_VIDEO_EXTENSION: str = '.unknown_video'
