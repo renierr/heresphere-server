@@ -165,6 +165,15 @@ class DownloadsDatabase(Database):
         params = [pk]
         self.execute_query(query, params)
 
+    def mark_failed(self, url):
+        query = '''
+        UPDATE downloads
+        SET failed = 1
+        WHERE downloads.original_url = ?
+        '''
+        params = [url]
+        self.execute_query(query, params)
+
 
 
 download_db: Optional[DownloadsDatabase] = None

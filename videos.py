@@ -173,9 +173,10 @@ def download_video(url, title):
         logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
-        error_message = f"Failed to download video: {e}"
+        logger.error( f"Failed to download video: {e}")
         url_map[download_random_id]['failed'] = True
-        logger.error(error_message)
+        with get_downloads_db() as db:
+            db.mark_failed(url)
         list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download failed [{download_random_id}] - {e}")
 
