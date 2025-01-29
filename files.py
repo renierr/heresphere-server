@@ -150,6 +150,9 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
         preview = thumbnails.get(ThumbnailFormat.WEBM)
         info = get_basic_save_video_info(realfile)
         favorite = info.infos.get('favorite', False)
+        url_info = info.infos.get('url_info', {})
+        download_date = url_info.get('downloaded_date', None)
+        url = url_info.get('url', None)
 
         result.update({
             'preview': preview,
@@ -163,6 +166,8 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
             'stereo': info.stereo,
             'uid': info.uid,
             'favorite': favorite,
+            'download_date': download_date,
+            'url': url,
         })
         if info.title:
             result['title'] = info.title

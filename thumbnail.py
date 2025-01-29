@@ -108,6 +108,9 @@ def get_video_info(video_path, force=False):
             title = url_info.get('title')
             if title:
                 infos['title'] = title
+            url = url_info.get('url')
+            if url:
+                infos['original_url'] = url
 
         # generate unique info string from specific fields
         format_info = info.get('format', {})
