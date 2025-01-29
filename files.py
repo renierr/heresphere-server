@@ -68,7 +68,7 @@ def list_files(directory) -> list:
 
             # only for videos directory
             if directory == VideoFolder.videos:
-                download_id = filename.split('____')[0]
+                download_id = filename.split('____')[0][:14]
                 url_info = get_url_map().get(download_id, {})
                 common_details.update({
                     'url_id': download_id,
