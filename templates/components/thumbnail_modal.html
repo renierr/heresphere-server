@@ -18,7 +18,7 @@
             <span v-if="currentFile.stereo"><i class="bi bi-badge-3d-fill"></i></span>
           </p>
           <p><i class="bi bi-calendar"></i> {{ formatDate(currentFile.created) }} (Created)</p>
-          <p v-if="currentFile.downloaded_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile.downloaded_date) }} (Downloaded)</p>
+          <p v-if="currentFile.download_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile.download_date) }} (Downloaded)</p>
           <p v-if="currentFile.duration"><i class="bi bi-clock"></i> {{ formatDuration(currentFile.duration) }}</p>
           <p v-if="currentFile.folder"><i class="bi bi-folder"></i> {{ currentFile.folder }}</p>
           <div v-if="currentFile.may_exist" @click.stop.prevent="showDuplicateInfo(currentFile)" class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded" style="word-break: break-word">Possible duplicate file</div>

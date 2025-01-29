@@ -72,7 +72,7 @@ def list_files(directory) -> list:
                 url_info = get_url_map().get(download_id, {})
                 common_details.update({
                     'url_id': download_id,
-                    **({k: url_info.get(k) for k in ['url', 'failed']} if url_info else {})
+                    **({k: url_info.get(k) for k in ['url', 'failed', 'download_date']} if url_info else {})
                 })
             extracted_details.append(common_details)
 
