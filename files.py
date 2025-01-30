@@ -30,7 +30,7 @@ def library_subfolders() -> list:
     return subfolders
 
 @cache(maxsize=128, ttl=18000)
-def list_files(directory) -> list:
+def list_files(directory: VideoFolder) -> list:
     extracted_details = []
     base_path = directory.web_path
 
@@ -101,7 +101,16 @@ def list_files(directory) -> list:
     return extracted_details
 
 
-def generic_file_details(root, filename, base_path, subfolder) -> dict:
+def generic_file_details(root: str, filename: str, base_weburl: str, subfolder: str) -> dict:
+    """
+    Extract details from a file in given directory
+
+    :param root: root of the directory
+    :param filename: the file to get details from
+    :param base_weburl: base weburl of the file (url part)
+    :param subfolder: subfolder of the file
+    :return:  dictionary with extracted details
+    """
     realfile = os.path.join(root, filename)
     if not os.path.exists(realfile):
         return {}
@@ -110,20 +119,20 @@ def generic_file_details(root, filename, base_path, subfolder) -> dict:
         'mimetype': mimetype,
         'unknown': True,
         'title': os.path.splitext(filename)[0],
-        'filename': f"{base_path}{subfolder + '/' if subfolder else ''}{filename}",
+        'filename': f"{base_weburl}{subfolder + '/' if subfolder else ''}{filename}",
         'filesize': os.path.getsize(realfile),
         'folder' : subfolder,
         'created': os.path.getctime(realfile)
     }
     return result
 
-def extract_file_details(root, filename, base_path, subfolder) -> dict:
+def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: str) -> dict:
     """
     Extract details from a file in the videos directory
 
     :param root: the root directory
     :param filename: the filename
-    :param base_path: base path of the file
+    :param base_weburl: base weburl of the file (url part)
     :param subfolder: subfolder of the file
     :return: dictionary with extracted details
     """
@@ -136,7 +145,7 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
     result = {
         'partial': partial,
         'title': os.path.splitext(filename)[0],
-        'filename': f"{base_path}{subfolder + '/' if subfolder else ''}{filename}",
+        'filename': f"{base_weburl}{subfolder + '/' if subfolder else ''}{filename}",
         'folder' : subfolder,
         'favorite': False,
     }
@@ -175,7 +184,7 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
 
 
 @cache(maxsize=4096, ttl=7200)
-def get_basic_save_video_info(file_path) -> VideoInfo:
+def get_basic_save_video_info(file_path: str) -> VideoInfo:
     """
     Get basic video information from a file,
     including created date, size, duration, width, height, resolution, stereo, uid and title
@@ -251,7 +260,7 @@ def move_file_for(source_folder: VideoFolder, video_path: str, subfolder: str) -
         return ServerResponse(False, "Invalid video path")
 
 
-def move_file_with_thumbnails(file_path, target_path) -> None:
+def move_file_with_thumbnails(file_path: str, target_path: str) -> None:
     """
     Move a file and all thumbnails to a new location
     push a message to the client and clear the list cache
@@ -281,10 +290,10 @@ def move_file_with_thumbnails(file_path, target_path) -> None:
 
 
 
-def delete_file(url):
+def delete_file(url: str) -> ServerResponse:
     """
     Delete a file from the videos directory and all thumbnails
-    only allow delete from videos directory
+    only allow to delete from videos directory
 
     :param url: url path to file
     :return: object with success and message
@@ -293,7 +302,7 @@ def delete_file(url):
     if not url:
         return ServerResponse(False, "URL missing")
 
-    # only allow delete from videos directory
+    # only allow to delete from videos directory
     if VideoFolder.videos.web_path not in url:
         return ServerResponse(False, "Invalid URL")
 
@@ -314,7 +323,7 @@ def delete_file(url):
     push_text_to_client(f"File deleted: {base_name}")
     return ServerResponse(True, f"File {base_name} deleted")
 
-def cleanup():
+def cleanup() -> ServerResponse:
     """
     Cleanup the tracking map by removing entries that no longer exist.
     Also, cleanup thumbnails that no longer have a corresponding video file.
