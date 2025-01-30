@@ -162,6 +162,7 @@ def download_video(url, title):
         video_url = '/' + filename.replace('\\', '/')
         title = download_result.get('title', None) or title
         url_map[download_random_id]['title'] = title
+        url_map[download_random_id]['download_date'] = datetime.now().timestamp()
 
         with get_downloads_db() as db:
             db.store_download(url=url, video_url=video_url, filename=basename, title=title)
