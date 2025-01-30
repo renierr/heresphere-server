@@ -151,7 +151,7 @@ def extract_file_details(root, filename, base_path, subfolder) -> dict:
         info = get_basic_save_video_info(realfile)
         favorite = info.infos.get('favorite', False)
         url_info = info.infos.get('url_info', {})
-        download_date = info.infos.get('download_date', url_info.get('downloaded_date', None))
+        download_date = info.infos.get('download_date', url_info.get('downloaded_date', url_info.get('download_date', None)))
         url = url_info.get('url', None)
 
         result.update({

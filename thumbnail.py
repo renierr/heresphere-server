@@ -111,6 +111,9 @@ def get_video_info(video_path, force=False):
             url = url_info.get('url')
             if url:
                 infos['original_url'] = url
+            download_date = url_info.get('download_date')
+            if download_date:
+                infos['download_date'] = download_date
 
         # generate unique info string from specific fields
         format_info = info.get('format', {})
