@@ -97,7 +97,7 @@ def generate_heresphere_json_item(server_path, file_base64, data):
         set_favorite(filename, is_favorite)
 
     thumbnails = get_thumbnails(real_path)
-    thumbnail_url = thumbnails[ThumbnailFormat.JPG]
+    thumbnail_url = thumbnails.get(ThumbnailFormat.JPG)
     if thumbnail_url is None:
         thumbnail_url = "/static/images/placeholder.png"
     thumbnail = f"{server_path}{urllib.parse.quote(thumbnail_url)}"

@@ -2,9 +2,9 @@ import os
 import subprocess
 import json
 import threading
+import glob
 from enum import Enum
 from typing import Optional
-
 from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
@@ -273,20 +273,6 @@ def generate_thumbnail(video_path) -> Optional[bool]:
         logger.error(f"Failed to generate thumbnail for {video_path}: {e}")
         return False
 
-def get_thumbnail(filename, *formats):
-    """
-    Get the thumbnail url for a video file in a specific format
-
-    :param filename: full path to video file
-    :param formats: ThumbnailFormat objects ordered by priority on which to return the thumbnail
-    :return:
-    """
-    thumbs = get_thumbnails(filename)
-    for fmt in formats:
-        if thumbs[fmt]:
-            return thumbs[fmt]
-    return None
-
 @cache(maxsize=4096, ttl=3600)
 def get_thumbnails(filename):
     """
@@ -299,13 +285,28 @@ def get_thumbnails(filename):
 
     base_name = os.path.basename(filename)
     thumbnail_directory = os.path.join(os.path.dirname(filename), THUMBNAIL_DIR_NAME)
+
     # check for all thumbnail formats if there exist here
-    result = {}
-    for fmt in ThumbnailFormat:
-        result[fmt] = None
-        if os.access(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}"), os.F_OK):
-            p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-            result[fmt] = f"/static/{p}/{base_name}{fmt.extension}"
+
+    #result = {}
+    #for fmt in ThumbnailFormat:
+    #    result[fmt] = None
+    #    if os.access(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}"), os.F_OK):
+    #        p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
+    #        result[fmt] = f"/static/{p}/{base_name}{fmt.extension}"
+
+    thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
+    existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
+    p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
+    result = {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
+
+
+    # List all files in the thumbnail directory with wildcard pattern
+    #thumbnail_files = glob.glob(os.path.join(thumbnail_directory, f"{base_name}.*"))
+    #existing_extensions = {os.path.splitext(file)[1] for file in thumbnail_files}
+    #p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
+    #result = {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in ThumbnailFormat if fmt.extension in existing_extensions}
+
     return result
 
 
