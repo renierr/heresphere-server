@@ -285,12 +285,19 @@ def get_thumbnails(filename):
 
     base_name = os.path.basename(filename)
     thumbnail_directory = os.path.join(os.path.dirname(filename), THUMBNAIL_DIR_NAME)
+    relative_path = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
 
     # check for all thumbnail formats if there exist here
-    thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
-    existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
-    p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-    return {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
+    #thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
+    #existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
+    #p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
+    #return {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
+
+    return {
+        fmt: f"/static/{relative_path}/{base_name}{fmt.extension}"
+        for fmt in ThumbnailFormat
+        if os.access(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}"), os.F_OK)
+    }
 
 
 def generate_thumbnail_for_path(video_path):
