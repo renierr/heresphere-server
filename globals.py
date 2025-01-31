@@ -93,7 +93,7 @@ def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
         vid_folder = VideoFolder.videos
 
     real_path = os.path.normpath(real_path)
-    if not os.path.exists(real_path):
+    if not os.access(real_path, os.F_OK):
         return None, None
 
     return real_path, vid_folder

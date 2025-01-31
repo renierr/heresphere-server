@@ -112,7 +112,7 @@ def generic_file_details(root: str, filename: str, base_weburl: str, subfolder: 
     :return:  dictionary with extracted details
     """
     realfile = os.path.join(root, filename)
-    if not os.path.exists(realfile):
+    if not os.access(realfile, os.F_OK):
         return {}
     mimetype, _ = get_mime_type(realfile)
     result = {
@@ -138,7 +138,7 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
     """
 
     realfile = os.path.join(root, filename)
-    if not os.path.exists(realfile):
+    if not os.access(realfile, os.F_OK):
         return {}
 
     partial = filename.endswith('.part')
@@ -342,7 +342,7 @@ def cleanup() -> ServerResponse:
             if video_url:
                 check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
                 logger.debug(f"Checking file: {check_file}")
-                if not os.path.exists(check_file):
+                if not os.access(check_file, os.F_OK):
                     to_remove.append(pk)
                     db.delete_key(pk)
     logger.debug(f"removed orphan db entries: {to_remove}")
