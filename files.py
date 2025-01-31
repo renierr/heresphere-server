@@ -155,7 +155,7 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
         })
     else:
         thumbnails = get_thumbnails(realfile)
-        thumbnail = thumbnails.get(ThumbnailFormat.WEBP, ThumbnailFormat.JPG)
+        thumbnail = thumbnails.get(ThumbnailFormat.WEBP, thumbnails.get(ThumbnailFormat.JPG))
         preview = thumbnails.get(ThumbnailFormat.WEBM)
         info = get_basic_save_video_info(realfile)
         favorite = info.infos.get('favorite', False)
