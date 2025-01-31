@@ -287,23 +287,10 @@ def get_thumbnails(filename):
     thumbnail_directory = os.path.join(os.path.dirname(filename), THUMBNAIL_DIR_NAME)
 
     # check for all thumbnail formats if there exist here
-
-    #thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
-    #existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
-    #p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-    #result = {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
-
-
-    # List all files in the thumbnail directory with wildcard pattern
-    thumbnail_paths = {fmt: f"{base_name}{fmt.extension}" for fmt in ThumbnailFormat}
-    all_thumbnail_files = os.listdir(thumbnail_directory)
+    thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
+    existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
     p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-    result = {}
-    for fmt, path in thumbnail_paths.items():
-        if path in all_thumbnail_files:
-            result[fmt] = f"/static/{p}/{base_name}{fmt.extension}"
-
-    return result
+    return {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
 
 
 def generate_thumbnail_for_path(video_path):
