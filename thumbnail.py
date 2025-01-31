@@ -288,24 +288,20 @@ def get_thumbnails(filename):
 
     # check for all thumbnail formats if there exist here
 
-    #result = {}
-    #for fmt in ThumbnailFormat:
-    #    result[fmt] = None
-    #    if os.access(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}"), os.F_OK):
-    #        p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-    #        result[fmt] = f"/static/{p}/{base_name}{fmt.extension}"
-
-    thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
-    existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
-    p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-    result = {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
+    #thumbnail_paths = {fmt: os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}") for fmt in ThumbnailFormat}
+    #existing_thumbnails = {fmt: path for fmt, path in thumbnail_paths.items() if os.access(path, os.F_OK)}
+    #p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
+    #result = {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in existing_thumbnails}
 
 
     # List all files in the thumbnail directory with wildcard pattern
-    #thumbnail_files = glob.glob(os.path.join(thumbnail_directory, f"{base_name}.*"))
-    #existing_extensions = {os.path.splitext(file)[1] for file in thumbnail_files}
-    #p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
-    #result = {fmt: f"/static/{p}/{base_name}{fmt.extension}" for fmt in ThumbnailFormat if fmt.extension in existing_extensions}
+    thumbnail_paths = {fmt: f"{base_name}{fmt.extension}" for fmt in ThumbnailFormat}
+    all_thumbnail_files = os.listdir(thumbnail_directory)
+    p = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
+    result = {}
+    for fmt, path in thumbnail_paths.items():
+        if path in all_thumbnail_files:
+            result[fmt] = f"/static/{p}/{base_name}{fmt.extension}"
 
     return result
 
