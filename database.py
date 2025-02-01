@@ -174,7 +174,42 @@ class DownloadsDatabase(Database):
         params = [url]
         self.execute_query(query, params)
 
+class SimilarityDatabase(Database):
+    def __init__(self):
+        db_path = os.path.join(get_data_directory(), 'similarity.db')
+        super().__init__(db_path)
 
+    def upsert_similarity(self, *, video_path, image_path, features):
+        query = '''
+        INSERT OR IGNORE INTO features (video_path, image_path, features) VALUES (?, ?, ?)
+        '''
+        params = [video_path, image_path, features.tobytes()]
+        self.execute_query(query, params)
+
+    def get_features(self, video_path) -> dict:
+        query = '''
+            SELECT features FROM features WHERE video_path = ?
+        '''
+        params = [video_path]
+        return self.fetch_one(query, params)
+
+similarity_db: Optional[SimilarityDatabase] = None
+def init_similarity_database():
+    global similarity_db
+    similarity_db = SimilarityDatabase()
+    similarity_db.execute_query('''
+        CREATE TABLE IF NOT EXISTS features (
+            id INTEGER PRIMARY KEY,
+            video_path TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
+            image_path TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
+            features BLOB NOT NULL
+        )
+    ''')
+
+def get_similarity_db() -> SimilarityDatabase:
+    if similarity_db is None:
+        init_similarity_database()
+    return similarity_db
 
 download_db: Optional[DownloadsDatabase] = None
 def init_downloads_database():
