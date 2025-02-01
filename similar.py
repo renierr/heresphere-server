@@ -160,7 +160,7 @@ if __name__ == '__main__':
             if similarity_matrix[i][j] > similarity_threshold:
                 group.append((video_paths[j], int(similarity_matrix[i][j] * 100)))
                 visited.add(j)
-
+        group.sort(key=lambda x: x[1], reverse=True)
         grouped_videos.append(group)
 
     for group_id, videos in enumerate(grouped_videos):
