@@ -49,24 +49,20 @@ def extract_frames_from_webp(webp_path):
             frames.append(frame_path)
     return frames
 
-def combine_features(features_list) -> np.ndarray:
-    return np.mean(features_list, axis=0)
-
 def build_similarity_features(thumbnail_file: str) -> np.ndarray:
     base_model = init_video_compare_model()
     frames = extract_frames_from_webp(thumbnail_file)
     features_list = [extract_features(frame, base_model) for frame in frames]
-    return combine_features(features_list)
+    return np.mean(features_list, axis=0)
 
-def get_similar_images(provided_video_path, similarity_threshold=0.4):
-
-    similar_images = []
+def get_similars(provided_video_path, similarity_threshold=0.4) -> list:
+    similars = []
     with (get_similarity_db() as db):
         features_row = db.get_features(provided_video_path)
         if features_row:
             combined_features = np.frombuffer(features_row['features'], dtype=np.float32)
         else:
-            raise ValueError(f"Features for the provided image {provided_video_path} not found in the database")
+            return []
 
         all_features = db.fetch_all('SELECT * FROM features')
 
@@ -74,18 +70,14 @@ def get_similar_images(provided_video_path, similarity_threshold=0.4):
             video_path = row.get('video_path')
             features_blob = row.get('features')
             stored_features = np.frombuffer(features_blob, dtype=np.float32)
-
-            # Compute cosine similarity
             similarity = cosine_similarity([combined_features], [stored_features])[0][0]
-
             if similarity > similarity_threshold:
-                similar_images.append((video_path, similarity))
-
+                similars.append((video_path, similarity))
 
     # Sort similar images by similarity score in descending order
-    similar_images.sort(key=lambda x: x[1], reverse=True)
+    similars.sort(key=lambda x: x[1], reverse=True)
 
-    return similar_images
+    return similars
 
 
 def test_fill_db_with_features(folder: VideoFolder) -> tuple:
@@ -115,22 +107,23 @@ def test_fill_db_with_features(folder: VideoFolder) -> tuple:
                             combined_features = build_similarity_features(thumbnail_file)
                             db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
                     features.append(combined_features)
-        return video_paths, features
+    return video_paths, features
 
 
 
 if __name__ == '__main__':
     # Example usage
     similarity_threshold = 0.4
-    provided_image_path = '/static/videos/direct/test.mp4'
-    similar_images = get_similar_images(provided_image_path, similarity_threshold)
+    provided_image_path = '/static/videos/direct/20250131231949____L0tt1e_M@gne.mp4'
+    similar_images = get_similars(provided_image_path, similarity_threshold)
     print(f"Similar to [{provided_image_path}] :")
     for img_path, similarity in similar_images:
         print(f" - {img_path} (similarity: {similarity})")
 
     print("\n\nGrouping similar videos")
     # Example usage with all grouping
-    video_paths, features = test_fill_db_with_features(VideoFolder.library)
+    video_paths, features = test_fill_db_with_features(VideoFolder.videos)
+    print(f"Found {len(video_paths)} videos")
     features_array = np.array(features)
     similarity_matrix = cosine_similarity(features_array)
 
