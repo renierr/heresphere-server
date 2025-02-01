@@ -56,7 +56,9 @@ def build_similarity_features(thumbnail_file: str) -> np.ndarray:
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     """
-    Find similar videos to the provided video path
+    Find similar videos to the provided video path.
+    Currently only compares the similarity of the thumbnail images.
+    Current video path is not included in the result
 
     :param provided_video_path: for which to find similar videos
     :param similarity_threshold: threshold for similarity default 0.4
@@ -74,6 +76,8 @@ def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
 
         for row in all_features:
             video_path = row.get('video_path')
+            if video_path == provided_video_path:
+                continue
             features_blob = row.get('features')
             stored_features = np.frombuffer(features_blob, dtype=np.float32)
             similarity = cosine_similarity([combined_features], [stored_features])[0][0]
