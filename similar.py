@@ -126,7 +126,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple:
 
 if __name__ == '__main__':
     # Example usage
-    similarity_threshold = 0.4
+    similarity_threshold = 0.8
     provided_image_path = '/static/videos/direct/20250131231949____L0tt1e_M@gne.mp4'
     similar_images = find_similar(provided_image_path, similarity_threshold)
     print(f"Similar to [{provided_image_path}] :")
@@ -161,7 +161,8 @@ if __name__ == '__main__':
                 group.append((video_paths[j], int(similarity_matrix[i][j] * 100)))
                 visited.add(j)
         group.sort(key=lambda x: x[1], reverse=True)
-        grouped_videos.append(group)
+        if len(group) > 1:
+            grouped_videos.append(group)
 
     for group_id, videos in enumerate(grouped_videos):
         print(f"Group {group_id}:")
