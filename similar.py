@@ -80,11 +80,18 @@ def get_similars(provided_video_path, similarity_threshold=0.4) -> list:
     return similars
 
 
-def test_fill_db_with_features(folder: VideoFolder) -> tuple:
-    video_dir = os.path.join(get_static_directory(), folder.dir)
-    features = []
-    video_paths = []
+def fill_db_with_features(folder: VideoFolder) -> tuple:
+    """
+    Fill the database with features for all videos in the given folder (generator function)
+    Yields a tuple with the state of the processing, the video path and the features
+    state: 'start' - starting processing a video
+           'existing' - video already has features in the database
+           'new' - video has been processed and features added to the database
 
+    :param folder: VideoFolder to process
+    :return: tuple with state, video path and features
+    """
+    video_dir = os.path.join(get_static_directory(), folder.dir)
     for root, dirs, files in os.walk(video_dir, followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -93,23 +100,19 @@ def test_fill_db_with_features(folder: VideoFolder) -> tuple:
             if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
                 relative_path = os.path.relpath(root, get_static_directory()).replace('\\', '/')
                 video_path = f"/static/{relative_path}/{filename}"
-                print(f"Processing video: {video_path}")
                 thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
                 thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBP.extension}")
                 if os.access(thumbnail_file, os.F_OK):
-                    video_paths.append(video_path)
-                    # Check if features already exist in the database
+                    yield 'start', video_path, None
                     with get_similarity_db() as db:
                         features_row = db.get_features(video_path)
                         if features_row:
                             combined_features = np.frombuffer(features_row['features'], dtype=np.float32)
+                            yield 'exising', video_path, combined_features
                         else:
                             combined_features = build_similarity_features(thumbnail_file)
                             db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
-                    features.append(combined_features)
-    return video_paths, features
-
-
+                            yield 'new', video_path, combined_features
 
 if __name__ == '__main__':
     # Example usage
@@ -122,8 +125,14 @@ if __name__ == '__main__':
 
     print("\n\nGrouping similar videos")
     # Example usage with all grouping
-    video_paths, features = test_fill_db_with_features(VideoFolder.videos)
-    print(f"Found {len(video_paths)} videos")
+    video_paths = []
+    features = []
+    for state, local_video_path, local_features in fill_db_with_features(VideoFolder.library):
+        if state != 'start':
+            video_paths.append(local_video_path)
+            features.append(local_features)
+
+    print(f"Found {len(video_paths)} videos with length {len(features)}")
     features_array = np.array(features)
     similarity_matrix = cosine_similarity(features_array)
 
