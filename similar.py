@@ -153,17 +153,17 @@ if __name__ == '__main__':
         if i in visited:
             continue
 
-        group = [video_path]
+        group = [(video_path, 0)]
         visited.add(i)
 
         for j in range(i + 1, len(video_paths)):
             if similarity_matrix[i][j] > similarity_threshold:
-                group.append(video_paths[j])
+                group.append((video_paths[j], int(similarity_matrix[i][j] * 100)))
                 visited.add(j)
 
         grouped_videos.append(group)
 
     for group_id, videos in enumerate(grouped_videos):
         print(f"Group {group_id}:")
-        for video in videos:
-            print(f" - {video}")
+        for video, score in videos:
+            print(f" - ({score}) {video}")
