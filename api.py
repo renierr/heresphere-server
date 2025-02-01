@@ -5,6 +5,7 @@ from flask import Blueprint, jsonify, request
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
 from files import list_files, delete_file, move_file_for, rename_file_title, toggle_favorite
 from globals import VideoFolder, ServerResponse
+from similar import find_similar
 
 api_bp = Blueprint('api', __name__)
 
@@ -83,4 +84,15 @@ def df():
     decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
     return jsonify(delete_file(decoded_url))
 
+@api_bp.route('/api/similar', methods=['POST'])
+def similar():
+    data = request.get_json()
+    video_path = data.get("video_path")
 
+    if not video_path:
+        return jsonify(ServerResponse(False, "No video path")), 400
+
+    similar = find_similar(video_path, 0.3)
+    # convert tuple to video path and score
+    similar = [{'video_path': x[0], 'score': x[1]} for x in similar]
+    return jsonify(similar)

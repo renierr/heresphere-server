@@ -2,7 +2,6 @@ import os
 import numpy as np
 from PIL import Image
 from keras.src.saving import load_model
-from pyexpat import features
 from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from tensorflow.keras.preprocessing import image
 from sklearn.metrics.pairwise import cosine_similarity
@@ -55,7 +54,14 @@ def build_similarity_features(thumbnail_file: str) -> np.ndarray:
     features_list = [extract_features(frame, base_model) for frame in frames]
     return np.mean(features_list, axis=0)
 
-def get_similars(provided_video_path, similarity_threshold=0.4) -> list:
+def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
+    """
+    Find similar videos to the provided video path
+
+    :param provided_video_path: for which to find similar videos
+    :param similarity_threshold: threshold for similarity default 0.4
+    :return: list of similar videos with similarity score (tuple)
+    """
     similars = []
     with (get_similarity_db() as db):
         features_row = db.get_features(provided_video_path)
@@ -72,7 +78,7 @@ def get_similars(provided_video_path, similarity_threshold=0.4) -> list:
             stored_features = np.frombuffer(features_blob, dtype=np.float32)
             similarity = cosine_similarity([combined_features], [stored_features])[0][0]
             if similarity > similarity_threshold:
-                similars.append((video_path, similarity))
+                similars.append((video_path, int(similarity * 100)))
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
@@ -118,7 +124,7 @@ if __name__ == '__main__':
     # Example usage
     similarity_threshold = 0.4
     provided_image_path = '/static/videos/direct/20250131231949____L0tt1e_M@gne.mp4'
-    similar_images = get_similars(provided_image_path, similarity_threshold)
+    similar_images = find_similar(provided_image_path, similarity_threshold)
     print(f"Similar to [{provided_image_path}] :")
     for img_path, similarity in similar_images:
         print(f" - {img_path} (similarity: {similarity})")

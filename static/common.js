@@ -100,7 +100,24 @@ export const methods = {
                 console.error('Error generating thumbnail:', error);
                 this.serverResult = 'Error generating thumbnails';
             });
-
+    },
+    showSimilar(file) {
+        fetch('/api/similar', {
+            method: 'POST',
+            body: JSON.stringify({ video_path: file.filename }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                const message = `Similar files (${data.length})<ul>${data.map(d => `<li>${d.video_path} (${d.score})</li>`).join('')}</ul>`;
+                this.showMessage(message, {title: 'Similar files', stayOpen: true, asHtml: true});
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.serverResult = 'Error calling similars';
+            });
     },
     fetchFiles: debounce(function (restoreScrollPosition=false) {
             console.log('Fetching files');

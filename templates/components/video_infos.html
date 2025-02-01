@@ -48,7 +48,7 @@
             <button v-if="!file.partial && !file.unknown" class="btn btn-outline-danger btn-sm m-1" @click="confirmMoveToLibrary(file.filename)">Move To Library</button>
             <button @click="confirmDeleteFile(file.filename)" class="btn btn-outline-danger btn-sm m-1">Delete</button>
             {% endif %}
-
+            <button v-if="!file.partial && !file.unknown" class="btn btn-outline-secondary btn-sm" @click="showSimilar(file)">Show Similar</button>
         </div>
     </div>
 </div>
