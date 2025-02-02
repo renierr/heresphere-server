@@ -3,22 +3,17 @@ import shutil
 import threading
 
 from bus import push_text_to_client
-from database.migrate_database import get_migration_db
 from globals import get_data_directory, URL_MAP_JSON, get_application_path, VideoFolder
+from migrate.migrate_downloads import migrate_download_db_to_videos
+from migrate.migrate_utils import already_migrated, track_migration
 
 
 def migrate():
     migrate_tracking()
     migrate_url_map()
+    migrate_download_db_to_videos()
     #migrate_fill_ai_features()
 
-def already_migrated(migration_name):
-    with get_migration_db() as db:
-        return bool(db.get_migration(migration_name))
-
-def track_migration(migration_name):
-    with get_migration_db() as db:
-        db.upsert_migration(migration_name)
 
 def migrate_tracking():
     if not already_migrated('tracking'):

@@ -67,6 +67,16 @@ class VideoDatabase(Database):
         session = self.get_session()
         return session.query(Videos).all()
 
+    def upsert_download(self, data):
+        session = self.get_session()
+        video = session.query(Downloads).filter_by(video_url=data['video_url']).first()
+        if video:
+            for key, value in data.items():
+                setattr(video, key, value)
+        else:
+            video = Downloads(**data)
+            session.add(video)
+
 video_db: Optional[VideoDatabase] = None
 def init_video_database():
     global video_db
