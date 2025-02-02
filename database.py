@@ -11,10 +11,16 @@ from globals import get_data_directory, ID_NAME_SEPERATOR
 
 
 # Create a base class for declarative class definitions
-TableBase = declarative_base()
+SqlalchemyBase = declarative_base()
 
 # Define a mixin class that provides a __repr__ method and a to_dict method
 class ReprMixin:
+    """
+    Mixin class that provides a __repr__ method and a to_dict method
+
+    The to_dict method returns a dictionary representation of the object
+    The __repr__ method returns a string representation of the object
+    """
     def to_dict(self):
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
 
@@ -22,8 +28,22 @@ class ReprMixin:
         attrs = ', '.join(f"{key}={value!r}" for key, value in self.to_dict().items())
         return f"<{self.__class__.__name__}({attrs})>"
 
+# Create a new base class that extends both TableBase and ReprMixin
+class TableBase(ReprMixin, SqlalchemyBase):
+    """
+    Base class for declarative class definitions that extends both TableBase and ReprMixin
+    """
+    __abstract__ = True
+
 # Base class for databases with common methods
 class Database:
+    """
+    Base class for databases with common methods
+
+    The __enter__ and __exit__ methods allow the database to be used as a context manager
+    The new_session method creates a new session
+    The get_session method returns the current session or creates a new one if needed
+    """
     def __init__(self, db_path):
         self.db_path = db_path
         self.engine = create_engine(f'sqlite:///{db_path}')

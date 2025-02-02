@@ -1,15 +1,13 @@
 import os
 from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 from typing import Optional
-from database import DatabaseOld, Database, ReprMixin
+from database import Database
 from globals import get_data_directory
 from database import TableBase
 
-
-class Videos(ReprMixin, TableBase):
+# videos table
+class Videos(TableBase):
     __tablename__ = 'videos'
     id = Column(Integer, primary_key=True, autoincrement=True)
     path = Column(String, nullable=False, unique=True)
@@ -23,6 +21,9 @@ class Videos(ReprMixin, TableBase):
     favorite = Column(Integer, nullable=False, default=0)
 
 class VideoDatabase(Database):
+    """
+    Database class for storing video data
+    """
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'videos.db')
         super().__init__(db_path)
