@@ -10,7 +10,7 @@ from globals import get_data_directory, URL_MAP_JSON, get_application_path, Vide
 def migrate():
     migrate_tracking()
     migrate_url_map()
-    migrate_fill_ai_features()
+    #migrate_fill_ai_features()
 
 def already_migrated(migration_name):
     with get_migration_db() as db:
