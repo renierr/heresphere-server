@@ -1,11 +1,8 @@
 import sqlite3
 import os
-from datetime import datetime
 from typing import Optional
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from globals import get_data_directory, ID_NAME_SEPERATOR
 
 
@@ -156,25 +153,5 @@ def get_similarity_db() -> SimilarityDatabase:
         init_similarity_database()
     return similarity_db
 
-download_db: Optional[DownloadsDatabase] = None
-def init_downloads_database():
-    global download_db
-    download_db = DownloadsDatabase()
-    download_db.execute_query('''
-        CREATE TABLE IF NOT EXISTS downloads (
-            id INTEGER PRIMARY KEY,
-            video_url TEXT NOT NULL UNIQUE ON CONFLICT IGNORE,
-            file_name TEXT NOT NULL,
-            original_url TEXT,
-            title TEXT,
-            download_date INTEGER,
-            favorite BOOLEAN NOT NULL DEFAULT 0,
-            failed BOOLEAN NOT NULL DEFAULT 0
-        )
-    ''')
 
-def get_downloads_db() -> DownloadsDatabase:
-    if download_db is None:
-        init_downloads_database()
-    return download_db
 
