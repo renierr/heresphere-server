@@ -9,7 +9,7 @@ from flask import Blueprint, request, jsonify
 from loguru import logger
 from yt_dlp import ImpersonateTarget
 
-from database import get_downloads_db
+from database.database import get_downloads_db
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, get_application_path, \

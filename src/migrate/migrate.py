@@ -3,8 +3,9 @@ import shutil
 import threading
 
 from bus import push_text_to_client
-from database import get_migration_db
+from database.database import get_migration_db
 from globals import get_data_directory, URL_MAP_JSON, get_application_path, VideoFolder
+
 
 
 def migrate():

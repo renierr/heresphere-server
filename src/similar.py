@@ -6,7 +6,7 @@ from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from tensorflow.keras.preprocessing import image
 from sklearn.metrics.pairwise import cosine_similarity
 
-from database import get_similarity_db
+from database.database import get_similarity_db
 from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME, get_data_directory
 from thumbnail import ThumbnailFormat
 

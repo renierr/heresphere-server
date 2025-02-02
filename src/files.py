@@ -4,7 +4,7 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from database import get_downloads_db
+from database.database import get_downloads_db
 from globals import get_static_directory, VideoInfo, get_real_path_from_url, get_url_map, \
     VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path
 from utils import check_folder, get_mime_type
