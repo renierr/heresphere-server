@@ -25,8 +25,6 @@ def migrate_download_db_to_videos():
         column_names = [description[0] for description in cursor.description]
         downloads = [dict(zip(column_names, row)) for row in all_download_data]
         conn.close()
-        print(downloads)
-
         with get_video_db() as video_db:
             for download in downloads:
                 video_data = {

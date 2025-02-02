@@ -8,8 +8,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 from loguru import logger
 from yt_dlp import ImpersonateTarget
-
-from database.database import get_downloads_db
+from database.video_database import get_video_db
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, get_application_path, \
@@ -134,7 +133,7 @@ def download_video(url, title):
     url_map = get_url_map()
 
     try:
-        with get_downloads_db() as db:
+        with get_video_db() as db:
             download_random_id = db.next_download(url)
 
         push_text_to_client(f"Downloading video {download_random_id}")
@@ -164,7 +163,7 @@ def download_video(url, title):
         url_map[download_random_id]['title'] = title
         url_map[download_random_id]['download_date'] = int(datetime.now().timestamp())
 
-        with get_downloads_db() as db:
+        with get_video_db() as db:
             db.store_download(url=url, video_url=video_url, filename=basename, title=title)
 
         # only generate thumbnails if download is a video check for file with extension ".unknown_video" this is not a video
@@ -176,8 +175,8 @@ def download_video(url, title):
     except Exception as e:
         logger.error( f"Failed to download video: {e}")
         url_map[download_random_id]['failed'] = True
-        with get_downloads_db() as db:
-            db.mark_failed(url)
+        with get_video_db() as db:
+            db.mark_download_failed(url)
         list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download failed [{download_random_id}] - {e}")
 

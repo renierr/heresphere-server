@@ -6,6 +6,8 @@ import subprocess
 import sys
 import time
 
+from database.video_database import get_video_db, Downloads
+
 # Add the src directory to the Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
@@ -22,7 +24,6 @@ from threading import Event
 from loguru import logger
 from flask import Flask, Response, render_template, jsonify, send_from_directory, request
 
-from database.database import get_downloads_db
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
@@ -228,14 +229,14 @@ def cl():
 
 def populate_url_map() -> None:
     url_map = get_url_map()
-    with get_downloads_db() as db:
-        all_downloads = db.fetch_all('SELECT * FROM downloads')
+    with get_video_db() as db:
+        all_downloads = db.get_session().query(Downloads).all()
         for downloads in all_downloads:
-            filename = downloads.get('file_name')
+            filename = downloads.file_name
             if filename:
                 download_id = filename.split(ID_NAME_SEPERATOR)[0]
                 if download_id:
-                    dat = {'url': downloads.get('original_url'), 'title': downloads.get('title'), 'failed': downloads.get('failed'), 'download_date': downloads.get('download_date')}
+                    dat = {'url': downloads.original_url, 'title': downloads.title, 'failed': downloads.failed, 'download_date': downloads.download_date}
                     url_map[download_id] = dat
 
 def start_server() -> Optional[str]:

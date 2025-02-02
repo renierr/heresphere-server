@@ -4,7 +4,7 @@ import shutil
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache
-from database.database import get_downloads_db
+from database.video_database import get_video_db
 from globals import get_static_directory, VideoInfo, get_real_path_from_url, get_url_map, \
     VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path
 from utils import check_folder, get_mime_type
@@ -334,17 +334,17 @@ def cleanup() -> ServerResponse:
     get_url_map().clear()
 
     to_remove = []
-    with get_downloads_db() as db:
-        all_downloads = db.fetch_all('select * from downloads')
-        for row in all_downloads:
-            pk = row.get('id')
-            video_url = row.get('video_url')
+    with get_video_db() as db:
+        all_downloads = db.list_downloads()
+        for download in all_downloads:
+            pk = download.id
+            video_url = download.video_url
             if video_url:
                 check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
                 logger.debug(f"Checking file: {check_file}")
                 if not os.access(check_file, os.F_OK):
                     to_remove.append(pk)
-                    db.delete_key(pk)
+                    db.get_session().delete(download)
     logger.debug(f"removed orphan db entries: {to_remove}")
     push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
 
@@ -392,7 +392,7 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     if not real_path:
         return ServerResponse(False, "File not found")
 
-    with get_downloads_db() as db:
+    with get_video_db() as db:
         db.change_title(video_path, new_title)
 
     # title update dict
@@ -438,7 +438,7 @@ def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
         'favorite': favorite,
     }
     update_file_info(real_path, favorite_update)
-    with get_downloads_db() as db:
+    with get_video_db() as db:
         db.set_favorite(video_path, favorite)
 
     # clear the cache and push/return info
