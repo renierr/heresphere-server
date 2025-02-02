@@ -1,11 +1,14 @@
 import os
 from sqlalchemy import Column, Integer, String, DateTime, func
 from typing import Optional
-from database.database import Database, TableBase
+from sqlalchemy.orm import declarative_base
+from database.database import Database, ReprMixin
 from globals import get_data_directory
 
+MigrationBase = declarative_base()
+
 # migrations table
-class Migrations(TableBase):
+class Migrations(MigrationBase, ReprMixin):
     __tablename__ = 'migrations'
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False, unique=True)
@@ -18,6 +21,7 @@ class MigrationDatabase(Database):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'migrate.db')
         super().__init__(db_path)
+        MigrationBase.metadata.create_all(self.engine)
 
     def upsert_migration(self, migration_name):
         session = self.get_session()

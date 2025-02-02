@@ -1,12 +1,14 @@
 import os
-from sqlalchemy import Column, Integer, String
-
+from sqlalchemy import Column, Integer, String, UniqueConstraint
 from typing import Optional
-from database.database import Database, TableBase
+from sqlalchemy.orm import declarative_base
+from database.database import Database, ReprMixin
 from globals import get_data_directory
 
+VideoBase = declarative_base()
+
 # videos table
-class Videos(TableBase):
+class Videos(VideoBase, ReprMixin):
     __tablename__ = 'videos'
     id = Column(Integer, primary_key=True, autoincrement=True)
     path = Column(String, nullable=False, unique=True)
@@ -19,6 +21,20 @@ class Videos(TableBase):
     download_date = Column(Integer)
     favorite = Column(Integer, nullable=False, default=0)
 
+class Downloads(VideoBase, ReprMixin):
+    __tablename__ = 'downloads'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    video_url = Column(String, nullable=False)
+    file_name = Column(String, nullable=False)
+    original_url = Column(String)
+    title = Column(String)
+    download_date = Column(Integer)
+    favorite = Column(Integer, nullable=False, default=0)
+    failed = Column(Integer, nullable=False, default=0)
+    __table_args__ = (
+        UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
+    )
+
 class VideoDatabase(Database):
     """
     Database class for storing video data
@@ -26,6 +42,7 @@ class VideoDatabase(Database):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'videos.db')
         super().__init__(db_path)
+        VideoBase.metadata.create_all(self.engine)
 
     def upsert_video(self, video_data):
         session = self.get_session()

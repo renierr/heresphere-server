@@ -4,14 +4,10 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from globals import get_data_directory, ID_NAME_SEPERATOR
 
-
-# Create a base class for declarative class definitions
-SqlalchemyBase = declarative_base()
 
 # Define a mixin class that provides a __repr__ method and a to_dict method
 class ReprMixin:
@@ -28,13 +24,6 @@ class ReprMixin:
         attrs = ', '.join(f"{key}={value!r}" for key, value in self.to_dict().items())
         return f"<{self.__class__.__name__}({attrs})>"
 
-# Create a new base class that extends both TableBase and ReprMixin
-class TableBase(ReprMixin, SqlalchemyBase):
-    """
-    Base class for declarative class definitions that extends both TableBase and ReprMixin
-    """
-    __abstract__ = True
-
 # Base class for databases with common methods
 class Database:
     """
@@ -47,7 +36,6 @@ class Database:
     def __init__(self, db_path):
         self.db_path = db_path
         self.engine = create_engine(f'sqlite:///{db_path}')
-        TableBase.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
         self.session = None
 
