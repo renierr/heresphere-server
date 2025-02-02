@@ -48,10 +48,15 @@ def extract_frames_from_webp(webp_path):
             frames.append(frame_path)
     return frames
 
+def clean_up_frames(frames):
+    for frame in frames:
+        os.remove(frame)
+
 def build_similarity_features(thumbnail_file: str) -> np.ndarray:
     base_model = init_video_compare_model()
     frames = extract_frames_from_webp(thumbnail_file)
     features_list = [extract_features(frame, base_model) for frame in frames]
+    clean_up_frames(frames)
     return np.mean(features_list, axis=0)
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
