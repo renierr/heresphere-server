@@ -56,11 +56,7 @@ def get_application_path() -> str:
     if getattr(sys, 'frozen', False):
         application_path = os.path.dirname(sys.executable)
     else:
-        try:
-            app_full_path = os.path.realpath(__file__)
-            application_path = os.path.dirname(app_full_path)
-        except NameError:
-            application_path = os.getcwd()
+        application_path = os.getcwd()
     return application_path
 
 
