@@ -8,3 +8,4 @@ tensorflow
 scikit-learn
 numpy
 Pillow
+sqlalchemy

@@ -2,7 +2,54 @@ import sqlite3
 import os
 from datetime import datetime
 from typing import Optional
+
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 from globals import get_data_directory, ID_NAME_SEPERATOR
+
+
+# Create a base class for declarative class definitions
+TableBase = declarative_base()
+
+# Define a mixin class that provides a __repr__ method and a to_dict method
+class ReprMixin:
+    def to_dict(self):
+        return {col.name: getattr(self, col.name) for col in self.__table__.columns}
+
+    def __repr__(self):
+        attrs = ', '.join(f"{key}={value!r}" for key, value in self.to_dict().items())
+        return f"<{self.__class__.__name__}({attrs})>"
+
+# Base class for databases with common methods
+class Database:
+    def __init__(self, db_path):
+        self.db_path = db_path
+        self.engine = create_engine(f'sqlite:///{db_path}')
+        TableBase.metadata.create_all(self.engine)
+        self.Session = sessionmaker(bind=self.engine)
+        self.session = None
+
+    def __enter__(self):
+        self.session = self.Session()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self.session.commit()
+        else:
+            self.session.rollback()
+        self.session.close()
+        self.session = None
+
+    def new_session(self):
+        return self.Session()
+
+    def get_session(self):
+        if self.session:
+            return self.session
+        return self.Session()
 
 
 def result_as_dict(cursor) -> dict:
@@ -12,8 +59,8 @@ def result_as_dict(cursor) -> dict:
     columns = [column[0] for column in cursor.description]
     return dict(zip(columns, row))
 
-
-class Database:
+# deprecated class changed to Database
+class DatabaseOld:
     def __init__(self, db_path):
         self.db_path = db_path
         self.connection = None
@@ -58,7 +105,7 @@ class Database:
         self.close()
 
 
-class MigrateDatabase(Database):
+class MigrateDatabase(DatabaseOld):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'migrate.db')
         super().__init__(db_path)
@@ -82,7 +129,7 @@ class MigrateDatabase(Database):
         params = [migration_name]
         return self.fetch_one(query, params)
 
-class DownloadsDatabase(Database):
+class DownloadsDatabase(DatabaseOld):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'downloads.db')
         super().__init__(db_path)
@@ -174,7 +221,7 @@ class DownloadsDatabase(Database):
         params = [url]
         self.execute_query(query, params)
 
-class SimilarityDatabase(Database):
+class SimilarityDatabase(DatabaseOld):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'similarity.db')
         super().__init__(db_path)
