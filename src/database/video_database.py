@@ -2,9 +2,9 @@ import os
 from sqlalchemy import create_engine, Column, Integer, String
 
 from typing import Optional
-from database import Database
+from database.database import Database
 from globals import get_data_directory
-from database import TableBase
+from database.database import TableBase
 
 # videos table
 class Videos(TableBase):
