@@ -3,9 +3,8 @@ import shutil
 import threading
 
 from bus import push_text_to_client
-from database.database import get_migration_db
+from database.migrate_database import get_migration_db
 from globals import get_data_directory, URL_MAP_JSON, get_application_path, VideoFolder
-
 
 
 def migrate():
@@ -22,8 +21,6 @@ def track_migration(migration_name):
         db.upsert_migration(migration_name)
 
 def migrate_tracking():
-    # make sure data fodler exists
-    os.makedirs(get_data_directory(), exist_ok=True)
     if not already_migrated('tracking'):
         track_migration('tracking')
         print("Migrated tracking")

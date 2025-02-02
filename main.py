@@ -281,10 +281,6 @@ def start_server() -> Optional[str]:
     if not os.path.exists(youtube_dir) and not os.path.islink(youtube_dir):
         os.makedirs(youtube_dir, exist_ok=True)
 
-    data_dir = get_data_directory()
-    if not os.path.exists(data_dir) and not os.path.islink(data_dir):
-        os.makedirs(data_dir, exist_ok=True)
-
     clean_client_task()
 
     # Get the server's IP address
@@ -296,6 +292,9 @@ def start_server() -> Optional[str]:
 
 
 if __name__ == '__main__':
+    data_dir = get_data_directory()
+    if not os.path.exists(data_dir) and not os.path.islink(data_dir):
+        os.makedirs(data_dir, exist_ok=True)
     migrate()
 
     populate_url_map()

@@ -125,30 +125,6 @@ class DatabaseOld:
         self.close()
 
 
-class MigrateDatabase(DatabaseOld):
-    def __init__(self):
-        db_path = os.path.join(get_data_directory(), 'migrate.db')
-        super().__init__(db_path)
-
-    def upsert_migration(self, migration_name):
-        query = '''
-        INSERT OR REPLACE INTO migrations (id, migration_name)
-        VALUES (
-            (SELECT id FROM migrations WHERE migration_name = ?),
-            ?
-        )
-        '''
-        params = [migration_name, migration_name]
-        self.execute_query(query, params)
-
-    def get_migration(self, migration_name):
-        query = '''
-            SELECT * FROM migrations
-            WHERE migration_name = ?
-        '''
-        params = [migration_name]
-        return self.fetch_one(query, params)
-
 class DownloadsDatabase(DatabaseOld):
     def __init__(self):
         db_path = os.path.join(get_data_directory(), 'downloads.db')
@@ -300,18 +276,3 @@ def get_downloads_db() -> DownloadsDatabase:
         init_downloads_database()
     return download_db
 
-migrate_db: Optional[MigrateDatabase] = None
-def init_migration_database():
-    global migrate_db
-    migrate_db = MigrateDatabase()
-    migrate_db.execute_query('''
-        CREATE TABLE IF NOT EXISTS migrations (
-            id INTEGER PRIMARY KEY,
-            migration_name TEXT NOT NULL UNIQUE ON CONFLICT IGNORE
-        )
-    ''')
-
-def get_migration_db() -> MigrateDatabase:
-    if migrate_db is None:
-        init_migration_database()
-    return MigrateDatabase()
