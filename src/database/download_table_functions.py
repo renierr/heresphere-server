@@ -12,15 +12,17 @@ class ForDownload:
         session = self.db.get_session()
         return session.query(Downloads).all()
 
-    def upsert_download(self, video_url, fields) -> Downloads:
+    def upsert_download(self, video_url: str, download: Downloads) -> Downloads:
         session = self.db.get_session()
-        download = session.query(Downloads).filter_by(video_url=video_url).first()
-        if download:
-            for key, value in fields.items():
-                setattr(download, key, value)
+        result = session.query(Downloads).filter_by(video_url=video_url).first()
+        if result:
+            for key, value in vars(download).items():
+                if not key.startswith('_'):  # Skip keys starting with an underscore
+                    setattr(result, key, value)
         else:
-            download = session.add(Downloads(video_url=video_url, **fields))
-        return download
+            result = session.add(download)
+            session.commit()
+        return result
 
     def delete_download(self, video_path) -> None:
         session = self.db.get_session()

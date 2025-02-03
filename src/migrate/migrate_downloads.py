@@ -2,6 +2,7 @@ import os
 import sqlite3
 
 from database.video_database import get_video_db
+from database.video_models import Videos
 from globals import get_data_directory
 from migrate.migrate_utils import already_migrated, track_migration
 
@@ -27,13 +28,8 @@ def migrate_download_db_to_videos():
         conn.close()
         with get_video_db() as video_db:
             for download in downloads:
-                video_data = {
-                    'original_url': download.get('original_url'),
-                    'file_name': download.get('file_name'),
-                    'title': download.get('title'),
-                    'download_date': download.get('download_date'),
-                    'favorite': download.get('favorite'),
-                    'failed': download.get('failed')
-                }
-                video_db.for_download_table.upsert_download(download.get('video_url'), video_data)
+                video = Videos(original_url=download.get('original_url'), file_name=download.get('file_name'),
+                               title=download.get('title'), download_date=download.get('download_date'),
+                               favorite=download.get('favorite'), failed=download.get('failed'))
+                video_db.for_download_table.upsert_download(download.get('video_url'), video)
         #os.remove(os.path.join(get_data_directory(), 'downloads.db'))
