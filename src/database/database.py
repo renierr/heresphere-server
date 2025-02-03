@@ -41,12 +41,24 @@ class Database:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is None:
-            self.session.commit()
-        else:
-            self.session.rollback()
-        self.session.close()
-        self.session = None
+        try:
+            if exc_type is None:  # No exception in the 'with' block
+                try:
+                    self.session.commit()
+                except Exception as commit_exc:  # Catch exceptions during commit
+                    self.session.rollback()  # Still try to rollback
+                    raise commit_exc # re-raise the exception
+            else:  # Exception occurred in the 'with' block
+                try:
+                    self.session.rollback()
+                except Exception:  # Catch exceptions during rollback
+                    pass # do not raise this exception, as the original one is more important
+        finally:  # Ensure session is ALWAYS closed
+            try:
+                self.session.close()
+                self.session = None
+            except Exception:  # Catch exceptions during close
+                self.session = None # set to None even if close fails to avoid future problems
 
     def new_session(self):
         return self.Session()
