@@ -183,9 +183,9 @@ def download_video(url, title):
                 if video_info:
                     video_uid = video_info.get('infos', {}).get('unique_info', None)
             with get_video_db() as db:
-                video = Videos(video_url=url, source_url=url, file_name=basename, title=title,
+                video = Videos(source_url=url, file_name=basename, title=title,
                                download_id=download_random_id, video_uid=video_uid, download_date=download_date)
-                db.session.merge(video)
+                db.for_video_table.upsert_video(url, video)
 
         list_files.cache__evict(VideoFolder.videos)
         logger.debug(f"Download finished: {video_url}")
