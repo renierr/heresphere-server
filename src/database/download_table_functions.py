@@ -12,15 +12,15 @@ class ForDownload:
         session = self.db.get_session()
         return session.query(Downloads).all()
 
-    def upsert_download(self, data) -> None:
+    def upsert_download(self, video_url, fields) -> Downloads:
         session = self.db.get_session()
-        video = session.query(Downloads).filter_by(video_url=data['video_url']).first()
-        if video:
-            for key, value in data.items():
-                setattr(video, key, value)
+        download = session.query(Downloads).filter_by(video_url=video_url).first()
+        if download:
+            for key, value in fields.items():
+                setattr(download, key, value)
         else:
-            video = Downloads(**data)
-            session.add(video)
+            download = session.add(Downloads(video_url=video_url, **fields))
+        return download
 
     def delete_download(self, video_path) -> None:
         session = self.db.get_session()

@@ -29,12 +29,11 @@ def migrate_download_db_to_videos():
             for download in downloads:
                 video_data = {
                     'original_url': download.get('original_url'),
-                    'video_url': download.get('video_url'),
                     'file_name': download.get('file_name'),
                     'title': download.get('title'),
                     'download_date': download.get('download_date'),
                     'favorite': download.get('favorite'),
                     'failed': download.get('failed')
                 }
-                video_db.for_download_table.upsert_download(video_data)
+                video_db.for_download_table.upsert_download(download.get('video_url'), video_data)
         #os.remove(os.path.join(get_data_directory(), 'downloads.db'))
