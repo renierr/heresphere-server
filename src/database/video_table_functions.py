@@ -7,7 +7,7 @@ class ForVideo:
 
     def upsert_video(self, video_data: dict) -> None:
         session = self.db.get_session()
-        video = session.query(Videos).filter_by(path=video_data['path']).first()
+        video = session.query(Videos).filter_by(video_url=video_data['video_url']).first()
         if video:
             for key, value in video_data.items():
                 setattr(video, key, value)
@@ -17,11 +17,11 @@ class ForVideo:
 
     def get_video(self, video_path: str) -> Optional[Videos]:
         session = self.db.get_session()
-        return session.query(Videos).filter_by(path=video_path).first()
+        return session.query(Videos).filter_by(video_url=video_path).first()
 
     def delete_video(self, video_path: str) -> None:
         session = self.db.get_session()
-        video = session.query(Videos).filter_by(path=video_path).first()
+        video = session.query(Videos).filter_by(video_url=video_path).first()
         if video:
             session.delete(video)
 
