@@ -128,7 +128,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                 relative_path = os.path.relpath(root, get_static_directory()).replace('\\', '/')
                 video_path = f"/static/{relative_path}/{filename}"
                 thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
-                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.JPG.extension}")
+                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBP.extension}")
                 if os.access(thumbnail_file, os.F_OK):
                     yield 'start', video_path, None
                     with get_similarity_db() as db:
@@ -143,7 +143,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
 
 if __name__ == '__main__':
     # Example usage
-    similarity_threshold = 0.1
+    similarity_threshold = 0.4
     provided_image_path = '/static/library/test/hlp_software.mp4'
     similar_images = find_similar(provided_image_path, similarity_threshold)
     print(f"Similar to [{provided_image_path}] :")
