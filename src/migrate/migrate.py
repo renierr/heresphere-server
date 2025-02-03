@@ -4,14 +4,16 @@ import threading
 
 from bus import push_text_to_client
 from globals import get_data_directory, URL_MAP_JSON, get_application_path, VideoFolder
-from migrate.migrate_downloads import migrate_download_db_to_videos
-from migrate.migrate_utils import already_migrated, track_migration
+from .migrate_downloads import migrate_download_db_to_videos
+from .migrate_drop_video_table import migrate_drop_video_table
+from .migrate_utils import already_migrated, track_migration
 
 
 def migrate():
     migrate_tracking()
     migrate_url_map()
     migrate_download_db_to_videos()
+    migrate_drop_video_table()
     #migrate_fill_ai_features()
 
 
