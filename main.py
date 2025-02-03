@@ -289,8 +289,7 @@ def start_server() -> Optional[str]:
     #app.run(debug=is_debug(), port=UI_PORT, use_reloader=False, host='0.0.0.0', threaded=True)
     serve(app, host='0.0.0.0', port=UI_PORT, threads=20)
 
-
-if __name__ == '__main__':
+def main():
     data_dir = get_data_directory()
     if not os.path.exists(data_dir) and not os.path.islink(data_dir):
         os.makedirs(data_dir, exist_ok=True)
@@ -301,3 +300,6 @@ if __name__ == '__main__':
     if result:
         logger.error(f"Server could not start: {result}")
         sys.exit(1)
+
+if __name__ == '__main__':
+    main()
