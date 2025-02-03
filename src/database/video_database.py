@@ -1,41 +1,10 @@
 import os
 from datetime import datetime
-
-from sqlalchemy import Column, Integer, String, UniqueConstraint
 from typing import Optional
-from sqlalchemy.orm import declarative_base
 from database.database import Database, ReprMixin
 from globals import get_data_directory, ID_NAME_SEPERATOR
-
-VideoBase = declarative_base()
-
-# videos table
-class Videos(VideoBase, ReprMixin):
-    __tablename__ = 'videos'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    path = Column(String, nullable=False, unique=True)
-    source_url = Column(String)
-    video_url = Column(String)
-    file_name = Column(String)
-    title = Column(String)
-    download_id = Column(String)
-    video_uid = Column(String)
-    download_date = Column(Integer)
-    favorite = Column(Integer, nullable=False, default=0)
-
-class Downloads(VideoBase, ReprMixin):
-    __tablename__ = 'downloads'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    video_url = Column(String, nullable=False)
-    file_name = Column(String, nullable=False)
-    original_url = Column(String)
-    title = Column(String)
-    download_date = Column(Integer)
-    favorite = Column(Integer, nullable=False, default=0)
-    failed = Column(Integer, nullable=False, default=0)
-    __table_args__ = (
-        UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
-    )
+from .video_table_functions import ForVideo
+from .video_models import Videos, Downloads, VideoBase
 
 class VideoDatabase(Database):
     """
@@ -45,29 +14,7 @@ class VideoDatabase(Database):
         db_path = os.path.join(get_data_directory(), 'videos.db')
         super().__init__(db_path)
         VideoBase.metadata.create_all(self.engine)
-
-    def upsert_video(self, video_data) -> None:
-        session = self.get_session()
-        video = session.query(Videos).filter_by(path=video_data['path']).first()
-        if video:
-            for key, value in video_data.items():
-                setattr(video, key, value)
-        else:
-            video = Videos(**video_data)
-            session.add(video)
-
-    def get_video(self, video_path) -> Videos:
-        return self.get_session().query(Videos).filter_by(path=video_path).first()
-
-    def delete_video(self, video_path) -> None:
-        session = self.get_session()
-        video = session.query(Videos).filter_by(path=video_path).first()
-        if video:
-            session.delete(video)
-
-    def list_videos(self) -> list:
-        session = self.get_session()
-        return session.query(Videos).all()
+        self.for_video_table = ForVideo(self)
 
     def list_downloads(self) -> list:
         session = self.get_session()
