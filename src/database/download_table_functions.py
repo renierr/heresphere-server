@@ -20,6 +20,7 @@ class ForDownload:
                 if not key.startswith('_'):  # Skip keys starting with an underscore
                     setattr(result, key, value)
         else:
+            download.video_url = video_url
             result = session.add(download)
             session.commit()
         return result

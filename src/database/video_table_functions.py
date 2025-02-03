@@ -13,6 +13,7 @@ class ForVideo:
                 if not key.startswith('_'):  # Skip keys starting with an underscore
                     setattr(result, key, value)
         else:
+            video.video_url = video_url
             result = session.add(video)
             session.commit()
         return result
