@@ -134,7 +134,7 @@ def download_video(url, title):
 
     try:
         with get_video_db() as db:
-            download_random_id = db.next_download(url)
+            download_random_id, current_download = db.next_download(url)
 
         push_text_to_client(f"Downloading video {download_random_id}")
         youtube_video = is_youtube_url(url)
@@ -161,10 +161,16 @@ def download_video(url, title):
         video_url = '/' + filename.replace('\\', '/')
         title = download_result.get('title', None) or title
         url_map[download_random_id]['title'] = title
-        url_map[download_random_id]['download_date'] = int(datetime.now().timestamp())
+        download_date = int(datetime.now().timestamp())
+        url_map[download_random_id]['download_date'] = download_date
 
         with get_video_db() as db:
-            db.store_download(url=url, video_url=video_url, filename=basename, title=title)
+            current_download.download_date = download_date
+            current_download.file_name = basename
+            current_download.title = title
+            current_download.video_url = video_url
+            current_download.original_url = url
+            db.session.merge(current_download)
 
         # only generate thumbnails if download is a video check for file with extension ".unknown_video" this is not a video
         if not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):

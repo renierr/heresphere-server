@@ -113,38 +113,28 @@ class VideoDatabase(Database):
         if download:
             download.failed = 1
 
-    def next_download(self, url) -> str:
+    def next_download(self, url) -> tuple[str,Downloads]:
+        """
+        prepare the next download
+        create a new download object if the url is not already in the database
+        pre-fill the download object with some initial data
+
+        :param url: the url to download
+        :return: the download id and the download object
+        """
         session = self.get_session()
         download_random_id = datetime.now().strftime('%Y%m%d%H%M%S')
         existing_download = session.query(Downloads).filter_by(original_url=url).first()
         if existing_download:
             download_random_id = existing_download.file_name.split(ID_NAME_SEPERATOR)[0]
+            return download_random_id, existing_download
         else:
             name = f"{download_random_id}{ID_NAME_SEPERATOR}downloading"
             download = Downloads(video_url=name, original_url=url, file_name=name, download_date=int(datetime.now().timestamp()))
             session.add(download)
             session.commit()
-        return download_random_id
+            return download_random_id, download
 
-    def store_download(self, *, url, video_url, filename, title) -> None:
-        download_date = int(datetime.now().timestamp())
-        session = self.Session()
-        download = session.query(Downloads).filter_by(original_url=url).first()
-        if download is None:
-            download = Downloads(
-                video_url=video_url,
-                file_name=filename,
-                original_url=url,
-                title=title,
-                download_date=download_date
-            )
-            session.add(download)
-        else:
-            download.video_url = video_url
-            download.file_name = filename
-            download.title = title
-            download.download_date = download_date
-        session.commit()
 
 video_db: Optional[VideoDatabase] = None
 def init_video_database():
