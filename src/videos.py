@@ -134,7 +134,7 @@ def download_video(url, title):
 
     try:
         with get_video_db() as db:
-            download_random_id, current_download = db.next_download(url)
+            download_random_id, current_download = db.for_download_table.next_download(url)
 
         push_text_to_client(f"Downloading video {download_random_id}")
         youtube_video = is_youtube_url(url)
@@ -182,7 +182,7 @@ def download_video(url, title):
         logger.error( f"Failed to download video: {e}")
         url_map[download_random_id]['failed'] = True
         with get_video_db() as db:
-            db.mark_download_failed(url)
+            db.for_download_table.mark_download_failed(url)
         list_files.cache__evict(VideoFolder.videos)
         push_text_to_client(f"Download failed [{download_random_id}] - {e}")
 

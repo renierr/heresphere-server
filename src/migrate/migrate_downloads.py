@@ -36,5 +36,5 @@ def migrate_download_db_to_videos():
                     'favorite': download.get('favorite'),
                     'failed': download.get('failed')
                 }
-                video_db.upsert_download(video_data)
+                video_db.for_download_table.upsert_download(video_data)
         #os.remove(os.path.join(get_data_directory(), 'downloads.db'))

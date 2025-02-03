@@ -335,7 +335,7 @@ def cleanup() -> ServerResponse:
 
     to_remove = []
     with get_video_db() as db:
-        all_downloads = db.list_downloads()
+        all_downloads = db.for_download_table.list_downloads()
         for download in all_downloads:
             pk = download.id
             video_url = download.video_url
