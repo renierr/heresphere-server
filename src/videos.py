@@ -9,11 +9,12 @@ from flask import Blueprint, request, jsonify
 from loguru import logger
 from yt_dlp import ImpersonateTarget
 from database.video_database import get_video_db
+from database.video_models import Videos
 from files import list_files
 from bus import push_text_to_client
 from globals import get_url_map, get_application_path, \
-    remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR
-from thumbnail import generate_thumbnail_for_path
+    remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR, get_real_path_from_url
+from thumbnail import generate_thumbnail_for_path, get_video_info
 
 root_path = get_application_path()
 video_bp = Blueprint('video', __name__)
@@ -175,6 +176,17 @@ def download_video(url, title):
         # only generate thumbnails if download is a video check for file with extension ".unknown_video" this is not a video
         if not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):
             generate_thumbnail_for_path(video_url)
+            real_path, _ = get_real_path_from_url(video_url)
+            video_uid = None
+            if real_path:
+                video_info = get_video_info(real_path)
+                if video_info:
+                    video_uid = video_info.get('infos', {}).get('unique_info', None)
+            with get_video_db() as db:
+                video = Videos(video_url=url, source_url=url, file_name=basename, title=title,
+                               download_id=download_random_id, video_uid=video_uid, download_date=download_date)
+                db.session.merge(video)
+
         list_files.cache__evict(VideoFolder.videos)
         logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
