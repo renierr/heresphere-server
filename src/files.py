@@ -319,6 +319,11 @@ def delete_file(url: str) -> ServerResponse:
             if os.path.exists(thumbnail_path):
                 os.remove(thumbnail_path)
     os.remove(real_path)
+
+    # delete from db
+    with get_video_db() as db:
+        db.for_video_table.delete_video(url)
+
     list_files.cache__evict(vid_folder)
     push_text_to_client(f"File deleted: {base_name}")
     return ServerResponse(True, f"File {base_name} deleted")

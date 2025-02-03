@@ -185,7 +185,7 @@ def download_video(url, title):
             with get_video_db() as db:
                 video = Videos(source_url=url, file_name=basename, title=title,
                                download_id=download_random_id, video_uid=video_uid, download_date=download_date)
-                db.for_video_table.upsert_video(url, video)
+                db.for_video_table.upsert_video(video_url, video)
 
         list_files.cache__evict(VideoFolder.videos)
         logger.debug(f"Download finished: {video_url}")
