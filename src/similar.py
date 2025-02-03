@@ -2,8 +2,8 @@ import os
 import numpy as np
 from PIL import Image
 from keras.src.saving import load_model
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
-from tensorflow.keras.preprocessing import image
+#from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
+from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
 from sklearn.metrics.pairwise import cosine_similarity
 
 from database.database import get_similarity_db
@@ -11,52 +11,64 @@ from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME, get_d
 from thumbnail import ThumbnailFormat
 
 # Load pre-trained VGG16 model + higher level layers
-vgg16_base_model = None
-def init_video_compare_model() -> VGG16:
-    global vgg16_base_model
-    if vgg16_base_model is not None:
-        return vgg16_base_model
+image_base_model = None
+def init_video_compare_model():
+    global image_base_model
+    if image_base_model is not None:
+        return image_base_model
 
     data_dir = get_data_directory()
-    model_file = os.path.join(data_dir, 'vgg16_model.keras')
+    model_file = os.path.join(data_dir, 'resnet50_model.keras')
     if not os.access(model_file, os.F_OK):
-        base_model = VGG16(weights='imagenet', include_top=False)
+        #base_model = VGG16(weights='imagenet', include_top=False)
+        base_model = ResNet50(weights='imagenet', include_top=False)
         base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         base_model.save(model_file, include_optimizer=False)
     else:
         base_model = load_model(model_file)
         base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    vgg16_base_model = base_model
-    return base_model
+    image_base_model = base_model
+    return image_base_model
 
+def build_image_data_from_file(img_path: str) -> np.ndarray:
+    with Image.open(img_path) as pil_img:
+        img_data = build_image_data(pil_img)
+    return img_data
 
-def extract_features(img_path, model):
-    img = image.load_img(img_path, target_size=(224, 224))
-    img_data = image.img_to_array(img)
-    img_data = np.expand_dims(img_data, axis=0)
+def build_image_data(pil_img: Image) -> np.ndarray:
+    crop_border = 50
+    width, height = pil_img.size
+    if width > (crop_border * 2) and height > (crop_border * 2):
+        left = crop_border
+        top = crop_border
+        right = width - crop_border
+        bottom = height - crop_border
+        pil_img = pil_img.crop((left, top, right, bottom))
+    return np.array(pil_img.resize((224, 224)).convert('RGB'))
+
+def extract_features(img_data_input, model):
+    img_data = np.expand_dims(img_data_input, axis=0)
     img_data = preprocess_input(img_data)
     features = model.predict(img_data)
     return features.flatten()
 
-def extract_frames_from_webp(webp_path):
+def _extract_frames_from_webp(webp_path):
     frames = []
     with Image.open(webp_path) as img:
         for frame in range(0, img.n_frames):
             img.seek(frame)
-            frame_path = f"{webp_path}_frame_{frame}.png"
-            img.save(frame_path)
-            frames.append(frame_path)
+            frames.append(build_image_data(img))
     return frames
 
-def clean_up_frames(frames):
-    for frame in frames:
-        os.remove(frame)
 
-def build_similarity_features(thumbnail_file: str) -> np.ndarray:
+def build_similarity_features(image_file: str) -> np.ndarray:
+    if image_file.endswith('.webp'):
+        image_data = _extract_frames_from_webp(image_file)
+    else:
+        image_data = [build_image_data_from_file(image_file)]
+
     base_model = init_video_compare_model()
-    frames = extract_frames_from_webp(thumbnail_file)
-    features_list = [extract_features(frame, base_model) for frame in frames]
-    clean_up_frames(frames)
+    features_list = [extract_features(frame_data, base_model) for frame_data in image_data]
     return np.mean(features_list, axis=0)
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
@@ -95,7 +107,7 @@ def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     return similars
 
 
-def fill_db_with_features(folder: VideoFolder) -> tuple:
+def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
     """
     Fill the database with features for all videos in the given folder (generator function)
     Yields a tuple with the state of the processing, the video path and the features
@@ -116,7 +128,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple:
                 relative_path = os.path.relpath(root, get_static_directory()).replace('\\', '/')
                 video_path = f"/static/{relative_path}/{filename}"
                 thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
-                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBP.extension}")
+                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.JPG.extension}")
                 if os.access(thumbnail_file, os.F_OK):
                     yield 'start', video_path, None
                     with get_similarity_db() as db:
@@ -131,8 +143,8 @@ def fill_db_with_features(folder: VideoFolder) -> tuple:
 
 if __name__ == '__main__':
     # Example usage
-    similarity_threshold = 0.8
-    provided_image_path = '/static/videos/direct/20250131231949____L0tt1e_M@gne.mp4'
+    similarity_threshold = 0.1
+    provided_image_path = '/static/library/test/hlp_software.mp4'
     similar_images = find_similar(provided_image_path, similarity_threshold)
     print(f"Similar to [{provided_image_path}] :")
     for img_path, similarity in similar_images:
@@ -142,7 +154,7 @@ if __name__ == '__main__':
     # Example usage with all grouping
     video_paths = []
     features = []
-    for state, local_video_path, local_features in fill_db_with_features(VideoFolder.library):
+    for state, local_video_path, local_features in fill_db_with_features(VideoFolder.videos):
         if state != 'start':
             video_paths.append(local_video_path)
             features.append(local_features)
@@ -155,6 +167,7 @@ if __name__ == '__main__':
     visited = set()
 
     for i, video_path in enumerate(video_paths):
+        print(f"Processing {video_path}")
         if i in visited:
             continue
 
@@ -169,6 +182,7 @@ if __name__ == '__main__':
         if len(group) > 1:
             grouped_videos.append(group)
 
+    print(f"Found {len(grouped_videos)} groups of similar videos")
     for group_id, videos in enumerate(grouped_videos):
         print(f"Group {group_id}:")
         for video, score in videos:
