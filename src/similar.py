@@ -10,7 +10,7 @@ from database.database import get_similarity_db
 from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME, get_data_directory
 from thumbnail import ThumbnailFormat
 
-pca = PCA(n_components=1)
+pca = PCA(n_components=0.95)
 image_base_model = None
 def init_video_compare_model():
     global image_base_model
@@ -70,7 +70,9 @@ def build_similarity_features(image_file: str) -> np.ndarray:
     features_list = [extract_features(frame_data, base_model) for frame_data in image_data]
     features_array = np.array(features_list)
     reduced_features = pca.fit_transform(features_array)
-    return np.mean(reduced_features, axis=0)
+    padded_features = np.pad(reduced_features, ((0, 0), (0, 50 - reduced_features.shape[1])), 'constant')
+
+    return np.mean(padded_features, axis=0)
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     """
