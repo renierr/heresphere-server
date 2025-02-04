@@ -2,15 +2,15 @@ import os
 import numpy as np
 from PIL import Image
 from keras.src.saving import load_model
-#from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
-from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
+from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import PCA
 
 from database.database import get_similarity_db
 from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME, get_data_directory
 from thumbnail import ThumbnailFormat
 
-# Load pre-trained VGG16 model + higher level layers
+pca = PCA(n_components=1)
 image_base_model = None
 def init_video_compare_model():
     global image_base_model
@@ -20,8 +20,7 @@ def init_video_compare_model():
     data_dir = get_data_directory()
     model_file = os.path.join(data_dir, 'resnet50_model.keras')
     if not os.access(model_file, os.F_OK):
-        #base_model = VGG16(weights='imagenet', include_top=False)
-        base_model = ResNet50(weights='imagenet', include_top=False)
+        base_model = VGG16(weights='imagenet', include_top=False)
         base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
         base_model.save(model_file, include_optimizer=False)
     else:
@@ -69,7 +68,9 @@ def build_similarity_features(image_file: str) -> np.ndarray:
 
     base_model = init_video_compare_model()
     features_list = [extract_features(frame_data, base_model) for frame_data in image_data]
-    return np.mean(features_list, axis=0)
+    features_array = np.array(features_list)
+    reduced_features = pca.fit_transform(features_array)
+    return np.mean(reduced_features, axis=0)
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     """
