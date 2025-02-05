@@ -153,7 +153,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                             yield 'new', video_path, combined_features
 
 if __name__ == '__main__':
-    similarity_threshold = 0.3
+    similarity_threshold = 0.5
 
     #fill db
     #for state, vid, features in fill_db_with_features(VideoFolder.videos):
