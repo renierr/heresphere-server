@@ -25,6 +25,10 @@ class ForDownload:
             session.commit()
         return result
 
+    def get_download(self, video_url: str) -> Optional[Downloads]:
+        session = self.db.get_session()
+        return session.query(Downloads).filter_by(video_url=video_url).first()
+
     def delete_download(self, video_path) -> None:
         session = self.db.get_session()
         download = session.query(Downloads).filter_by(video_path=video_path).first()

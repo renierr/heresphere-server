@@ -20,22 +20,28 @@ class VideoDatabase(Database):
         self.for_download_table = ForDownload(self)
 
     def set_favorite(self, video_url, favorite) -> None:
-        session = self.get_session()
-        video = session.query(Videos).filter_by(video_url=video_url).first()
+        video = self.for_video_table.get_video(video_url)
         if video:
             video.favorite = favorite
-        download = session.query(Downloads).filter_by(video_url=video_url).first()
+        download = self.for_download_table.get_download(video_url)
         if download:
             download.favorite = favorite
 
     def change_title(self, video_url, title) -> None:
-        session = self.get_session()
-        video = session.query(Videos).filter_by(video_url=video_url).first()
+        video = self.for_video_table.get_video(video_url)
         if video:
             video.title = title
-        download = session.query(Downloads).filter_by(video_url=video_url).first()
+        download = self.for_download_table.get_download(video_url)
         if download:
             download.title = title
+
+    def move_video(self, video_url: str, new_url: str) -> None:
+        video = self.for_video_table.get_video(video_url)
+        if video:
+            video.video_url = new_url
+        download = self.for_download_table.get_download(video_url)
+        if download:
+            download.video_url = new_url
 
 
 video_db: Optional[VideoDatabase] = None

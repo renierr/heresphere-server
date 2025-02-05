@@ -73,6 +73,14 @@ def remove_ansi_codes(text) -> str:
     ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
     return ansi_escape.sub('', text)
 
+def get_url_from_path(file_path, add_subfolder=None) -> Optional[str]:
+    if not file_path or not os.access(file_path, os.F_OK):
+        return None
+    base_name = os.path.basename(file_path)
+    base_directory = os.path.dirname(file_path) if add_subfolder is None else os.path.join(os.path.dirname(file_path), add_subfolder)
+    relative_path = os.path.relpath(base_directory, get_static_directory()).replace('\\', '/')
+    return f"/static/{relative_path}/{base_name}"
+
 def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
     if not url:
         return None, None

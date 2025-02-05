@@ -6,7 +6,7 @@ from bus import push_text_to_client
 from cache import cache
 from database.video_database import get_video_db
 from globals import get_static_directory, VideoInfo, get_real_path_from_url, get_url_map, \
-    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path, get_url_from_path
 from utils import check_folder, get_mime_type
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails, update_file_info
 
@@ -271,7 +271,14 @@ def move_file_with_thumbnails(file_path: str, target_path: str) -> None:
     """
 
     # Move the video file
+    from_url = get_url_from_path(file_path)
     shutil.move(file_path, target_path)
+    to_url = get_url_from_path(target_path)
+
+    # update db
+    if from_url and to_url:
+        with get_video_db() as db:
+            db.move_video(from_url, to_url)
 
     # Move the thumbnails
     base_name = os.path.basename(file_path)
@@ -283,7 +290,6 @@ def move_file_with_thumbnails(file_path: str, target_path: str) -> None:
                 library_thumbnail_dir = os.path.join(os.path.dirname(target_path), THUMBNAIL_DIR_NAME)
                 os.makedirs(library_thumbnail_dir, exist_ok=True)
                 shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
-
 
     list_files.cache__clear()
     push_text_to_client(f"File and all thumbnails moved: {base_name}")
@@ -323,6 +329,7 @@ def delete_file(url: str) -> ServerResponse:
     # delete from db
     with get_video_db() as db:
         db.for_video_table.delete_video(url)
+        db.for_download_table.delete_download(url)
 
     list_files.cache__evict(vid_folder)
     push_text_to_client(f"File deleted: {base_name}")

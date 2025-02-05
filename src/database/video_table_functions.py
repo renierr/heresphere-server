@@ -28,6 +28,12 @@ class ForVideo:
         if video:
             session.delete(video)
 
+    def move_video(self, video_url: str, new_url: str) -> None:
+        session = self.db.get_session()
+        video = session.query(Videos).filter_by(video_url=video_url).first()
+        if video:
+            video.video_url = new_url
+
     def list_videos(self) -> List[Videos]:
         session = self.db.get_session()
         return session.query(Videos).all()
