@@ -10,7 +10,6 @@ from database.database import get_similarity_db
 from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME, get_data_directory
 from thumbnail import ThumbnailFormat
 
-pca = PCA(n_components=0.95)
 image_base_model = None
 def init_video_compare_model():
     global image_base_model
@@ -49,13 +48,17 @@ def extract_features(img_data_input, model):
     img_data = np.expand_dims(img_data_input, axis=0)
     img_data = preprocess_input(img_data)
     features = model.predict(img_data)
-    return features.flatten()
+    reshaped_features = features.reshape(-1, features.shape[-1])
+    return reshaped_features
 
 def _extract_frames_from_webp(webp_path):
     frames = []
     with Image.open(webp_path) as img:
-        for frame in range(0, img.n_frames):
-            img.seek(frame)
+        if img.n_frames > 0:
+            img.seek(0)
+            frames.append(build_image_data(img))
+        if img.n_frames > 1:
+            img.seek(img.n_frames - 1)
             frames.append(build_image_data(img))
     return frames
 
@@ -68,10 +71,16 @@ def build_similarity_features(image_file: str) -> np.ndarray:
 
     base_model = init_video_compare_model()
     features_list = [extract_features(frame_data, base_model) for frame_data in image_data]
-    features_array = np.array(features_list)
+    features_array = np.vstack(features_list)
+    print(f"Extracted {len(features_array)} features, with shape {features_array.shape}")
+    pca = PCA(n_components=0.99)
     reduced_features = pca.fit_transform(features_array)
-    padded_features = np.pad(reduced_features, ((0, 0), (0, 50 - reduced_features.shape[1])), 'constant')
-
+    target_size = 50
+    max_feature_size = max(target_size, reduced_features.shape[1])
+    if reduced_features.shape[1] < max_feature_size:
+        padded_features = np.pad(reduced_features, ((0, 0), (0, max_feature_size - reduced_features.shape[1])), 'constant')
+    else:
+        padded_features = reduced_features[:, :max_feature_size]
     return np.mean(padded_features, axis=0)
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
@@ -141,7 +150,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                             yield 'exising', video_path, combined_features
                         else:
                             combined_features = build_similarity_features(thumbnail_file)
-                            db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
+                            #db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
                             yield 'new', video_path, combined_features
 
 if __name__ == '__main__':
