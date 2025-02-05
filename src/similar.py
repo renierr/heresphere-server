@@ -153,8 +153,15 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                             yield 'new', video_path, combined_features
 
 if __name__ == '__main__':
-    # Example usage
     similarity_threshold = 0.3
+
+    #fill db
+    #for state, vid, features in fill_db_with_features(VideoFolder.videos):
+    #    if state == 'start':
+    #        print(f"Processing AI features for {vid}")
+    #    else:
+    #        print(state, vid, len(features))
+
     print("\n\nGrouping similar videos")
     # Example usage with all grouping
     video_paths = []
