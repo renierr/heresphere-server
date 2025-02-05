@@ -154,23 +154,22 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
 
 if __name__ == '__main__':
     # Example usage
-    similarity_threshold = 0.4
-    provided_image_path = '/static/library/test/hlp_software.mp4'
-    similar_images = find_similar(provided_image_path, similarity_threshold)
-    print(f"Similar to [{provided_image_path}] :")
-    for img_path, similarity in similar_images:
-        print(f" - {img_path} (similarity: {similarity})")
-
+    similarity_threshold = 0.3
     print("\n\nGrouping similar videos")
     # Example usage with all grouping
     video_paths = []
     features = []
-    for state, local_video_path, local_features in fill_db_with_features(VideoFolder.videos):
-        if state != 'start':
-            video_paths.append(local_video_path)
-            features.append(local_features)
+    with get_similarity_db() as db:
+        all_features = db.fetch_all('SELECT * FROM features')
+        for row in all_features:
+            video_path = row.get('video_path')
+            features_blob = row.get('features')
+            stored_features = np.frombuffer(features_blob, dtype=np.float32)
+            video_paths.append(video_path)
+            features.append(stored_features)
 
-    print(f"Found {len(video_paths)} videos with length {len(features)}")
+
+    print(f"Found {len(video_paths)} videos")
     features_array = np.array(features)
     similarity_matrix = cosine_similarity(features_array)
 
