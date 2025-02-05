@@ -44,13 +44,6 @@ def build_image_data(pil_img: Image) -> np.ndarray:
         pil_img = pil_img.crop((left, top, right, bottom))
     return np.array(pil_img.resize((224, 224)).convert('RGB'))
 
-def extract_features(img_data_input, model):
-    img_data = np.expand_dims(img_data_input, axis=0)
-    img_data = preprocess_input(img_data)
-    features = model.predict(img_data)
-    reshaped_features = features.reshape(-1, features.shape[-1])
-    return reshaped_features
-
 def _extract_frames_from_webp(webp_path):
     frames = []
     with Image.open(webp_path) as img:
@@ -62,6 +55,12 @@ def _extract_frames_from_webp(webp_path):
             frames.append(build_image_data(img))
     return frames
 
+def extract_features(img_data_input, model):
+    img_data = preprocess_input(img_data_input)
+    features = model.predict(img_data)
+    reshaped_features = features.reshape(-1, features.shape[-1])
+    return reshaped_features
+
 
 def build_similarity_features(image_file: str) -> np.ndarray:
     if image_file.endswith('.webp'):
@@ -69,14 +68,14 @@ def build_similarity_features(image_file: str) -> np.ndarray:
     else:
         image_data = [build_image_data_from_file(image_file)]
 
+    img_data = np.concatenate([np.expand_dims(img, axis=0) for img in image_data], axis=0)
     base_model = init_video_compare_model()
-    features_list = [extract_features(frame_data, base_model) for frame_data in image_data]
+    features_list = extract_features(img_data, base_model)
     features_array = np.vstack(features_list)
-    print(f"Extracted {len(features_array)} features, with shape {features_array.shape}")
-    pca = PCA(n_components=0.99)
+    pca = PCA(n_components=0.95)
     reduced_features = pca.fit_transform(features_array)
     target_size = 50
-    max_feature_size = max(target_size, reduced_features.shape[1])
+    max_feature_size = max(target_size, min(target_size, reduced_features.shape[1]))
     if reduced_features.shape[1] < max_feature_size:
         padded_features = np.pad(reduced_features, ((0, 0), (0, max_feature_size - reduced_features.shape[1])), 'constant')
     else:
@@ -150,7 +149,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                             yield 'exising', video_path, combined_features
                         else:
                             combined_features = build_similarity_features(thumbnail_file)
-                            #db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
+                            db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
                             yield 'new', video_path, combined_features
 
 if __name__ == '__main__':
