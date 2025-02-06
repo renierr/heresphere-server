@@ -1,35 +1,36 @@
-from sqlalchemy import Column, Integer, String, UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import String, Integer, UniqueConstraint
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from .database import ReprMixin
 
-VideoBase = declarative_base()
+class VideoBase(DeclarativeBase):
+    pass
 
 # videos table
 class Videos(VideoBase, ReprMixin):
     __tablename__ = 'videos'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    video_url = Column(String, nullable=False)
-    source_url = Column(String)
-    file_name = Column(String)
-    title = Column(String)
-    download_id = Column(String)
-    video_uid = Column(String)
-    download_date = Column(Integer)
-    favorite = Column(Integer, nullable=False, default=0)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    video_url: Mapped[str] = mapped_column(String, nullable=False)
+    source_url: Mapped[str] = mapped_column(String)
+    file_name: Mapped[str] = mapped_column(String)
+    title: Mapped[str] = mapped_column(String)
+    download_id: Mapped[str] = mapped_column(String)
+    video_uid: Mapped[str] = mapped_column(String)
+    download_date: Mapped[int] = mapped_column(Integer)
+    favorite: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     __table_args__ = (
         UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
     )
 
 class Downloads(VideoBase, ReprMixin):
     __tablename__ = 'downloads'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    video_url = Column(String, nullable=False)
-    file_name = Column(String, nullable=False)
-    original_url = Column(String)
-    title = Column(String)
-    download_date = Column(Integer)
-    favorite = Column(Integer, nullable=False, default=0)
-    failed = Column(Integer, nullable=False, default=0)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    video_url: Mapped[str] = mapped_column(String, nullable=False)
+    file_name: Mapped[str] = mapped_column(String, nullable=False)
+    original_url: Mapped[str] = mapped_column(String)
+    title: Mapped[str] = mapped_column(String)
+    download_date: Mapped[int] = mapped_column(Integer)
+    favorite: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    failed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     __table_args__ = (
         UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
     )
