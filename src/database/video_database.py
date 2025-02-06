@@ -4,6 +4,7 @@ from typing import Optional
 from database.database import Database, ReprMixin
 from globals import get_data_directory, ID_NAME_SEPERATOR
 from .download_table_functions import ForDownload
+from .similarity_table_functions import ForSimilarity
 from .video_table_functions import ForVideo
 from .video_models import Downloads, VideoBase, Videos
 
@@ -18,6 +19,7 @@ class VideoDatabase(Database):
         VideoBase.metadata.create_all(self.engine)
         self.for_video_table = ForVideo(self)
         self.for_download_table = ForDownload(self)
+        self.for_similarity_table = ForSimilarity(self)
 
     def set_favorite(self, video_url, favorite) -> None:
         video = self.for_video_table.get_video(video_url)

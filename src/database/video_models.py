@@ -1,4 +1,4 @@
-from sqlalchemy import String, Integer, UniqueConstraint
+from sqlalchemy import String, Integer, UniqueConstraint, LargeBinary
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from .database import ReprMixin
 
@@ -31,6 +31,15 @@ class Downloads(VideoBase, ReprMixin):
     download_date: Mapped[int] = mapped_column(Integer)
     favorite: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     failed: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    __table_args__ = (
+        UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
+    )
+
+class Similarity(VideoBase, ReprMixin):
+    __tablename__ = 'similarity'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    video_url: Mapped[str] = mapped_column(String, nullable=False)
+    features: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     __table_args__ = (
         UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
     )

@@ -1,9 +1,13 @@
 import os
-import numpy as np
+
 import cv2
-from database.database import get_similarity_db
+import numpy as np
+
+from database.video_database import get_video_db
+from database.video_models import Similarity
 from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME
 from thumbnail import ThumbnailFormat
+
 
 def similar_compare(features_a, features_b):
     return cv2.compareHist(features_a, features_b, cv2.HISTCMP_CORREL)
@@ -20,28 +24,27 @@ def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     :return: list of similar videos with similarity score (tuple)
     """
     similars = []
-    with (get_similarity_db() as db):
-        features_row = db.get_features(provided_video_path)
-        if features_row:
-            combined_features = np.frombuffer(features_row['features'], dtype=np.float32)
+    with (get_video_db() as db):
+        similarity = db.for_similarity_table.get_similarity(provided_video_path)
+        if similarity:
+            combined_features = np.frombuffer(similarity.features, dtype=np.float32)
         else:
             return []
 
-        all_features = db.fetch_all('SELECT * FROM features')
-
+        # load all features for compare - TODO maybe cache this
+        all_features = db.for_similarity_table.list_similarity()
         for row in all_features:
-            video_path = row.get('video_path')
-            if video_path == provided_video_path:
+            video_path = row.video_url
+            if video_path == provided_video_path:  # ignore myself in the comparison
                 continue
-            features_blob = row.get('features')
+            features_blob = row.features
             stored_features = np.frombuffer(features_blob, dtype=np.float32)
-            similarity = similar_compare(combined_features, stored_features)
-            if similarity > similarity_threshold:
-                similars.append((video_path, int(similarity * 100)))
+            similar = similar_compare(combined_features, stored_features)
+            if similar > similarity_threshold:
+                similars.append((video_path, int(similar * 100)))
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
-
     return similars
 
 
@@ -71,14 +74,16 @@ def fill_db_with_features(folder: VideoFolder):
                 thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBM.extension}")
                 if os.access(thumbnail_file, os.F_OK):
                     yield 'start', video_path, None
-                    with get_similarity_db() as db:
-                        features_row = db.get_features(video_path)
-                        if features_row:
-                            combined_features = np.frombuffer(features_row['features'], dtype=np.float32)
+                    with get_video_db() as db:
+                        similarity = db.for_similarity_table.get_similarity(video_path)
+                        if similarity:
+                            combined_features = np.frombuffer(similarity.features, dtype=np.float32)
                             yield 'exising', video_path, combined_features
                         else:
                             combined_features = create_histogram(thumbnail_file)
-                            db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
+                            db.for_similarity_table.upsert_similarity(video_path,
+                                Similarity(video_url=video_path, features=combined_features.tobytes())
+                            )
                             yield 'new', video_path, combined_features
 
 
@@ -96,6 +101,7 @@ class VideoCaptureContext:
     def __exit__(self, exc_type, exc_value, traceback):
         if self.cap is not None:
             self.cap.release()
+
 
 def create_histogram(video_path: str) -> np.ndarray:
     with VideoCaptureContext(video_path) as cap:
@@ -116,21 +122,21 @@ def create_histogram(video_path: str) -> np.ndarray:
 if __name__ == '__main__':
     similarity_threshold = 0.5
 
-    #fill db
-    #for state, vid, features in fill_db_with_features(VideoFolder.videos):
+    # fill db
+    # for state, vid, features in fill_db_with_features(VideoFolder.videos):
     #    if state == 'start':
     #        print(f"Processing AI features for {vid}")
     #    else:
     #        print(state, vid, len(features))
 
     print("\n\nGrouping similar videos")
-    with get_similarity_db() as db:
-        all_features = db.fetch_all('SELECT * FROM features')
-        video_data = [(row.get('video_path'), np.frombuffer(row.get('features'), dtype=np.float32)) for row in all_features]
-
+    with get_video_db() as db:
+        all_features = db.for_similarity_table.list_similarity()
+        video_data = [(row.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
 
     similarity_matrix = np.array([[similar_compare(f1[1], f2[1]) for f2 in video_data] for f1 in video_data])
     from collections import defaultdict
+
     similar_groups = defaultdict(list)
 
     for i in range(len(video_data)):
@@ -143,6 +149,6 @@ if __name__ == '__main__':
     for video, sim_video in similar_groups.items():
         print(f"Video: {video}")
         for similar_video, score in sim_video:
-            print(f"  Score: {int(score*100)} - Similar: {similar_video}")
+            print(f"  Score: {int(score * 100)} - Similar: {similar_video}")
 
     print(f"Found {len(video_data)} videos")
