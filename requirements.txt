@@ -4,8 +4,6 @@ yt_dlp
 yt-dlp[default,curl-cffi]
 waitress
 python-magic
-tensorflow
-scikit-learn
 numpy
-Pillow
 sqlalchemy
+opencv-python

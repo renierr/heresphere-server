@@ -1,86 +1,13 @@
 import os
 import numpy as np
-from PIL import Image
-from keras.src.saving import load_model
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.decomposition import PCA
-
+import cv2
 from database.database import get_similarity_db
-from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME, get_data_directory
+from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME
 from thumbnail import ThumbnailFormat
 
-image_base_model = None
-def init_video_compare_model():
-    global image_base_model
-    if image_base_model is not None:
-        return image_base_model
+def similar_compare(features_a, features_b):
+    return cv2.compareHist(features_a, features_b, cv2.HISTCMP_CORREL)
 
-    data_dir = get_data_directory()
-    model_file = os.path.join(data_dir, 'resnet50_model.keras')
-    if not os.access(model_file, os.F_OK):
-        base_model = VGG16(weights='imagenet', include_top=False)
-        base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        base_model.save(model_file, include_optimizer=False)
-    else:
-        base_model = load_model(model_file)
-        base_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    image_base_model = base_model
-    return image_base_model
-
-def build_image_data_from_file(img_path: str) -> np.ndarray:
-    with Image.open(img_path) as pil_img:
-        img_data = build_image_data(pil_img)
-    return img_data
-
-def build_image_data(pil_img: Image) -> np.ndarray:
-    crop_border = 50
-    width, height = pil_img.size
-    if width > (crop_border * 2) and height > (crop_border * 2):
-        left = crop_border
-        top = crop_border
-        right = width - crop_border
-        bottom = height - crop_border
-        pil_img = pil_img.crop((left, top, right, bottom))
-    return np.array(pil_img.resize((224, 224)).convert('RGB'))
-
-def _extract_frames_from_webp(webp_path):
-    frames = []
-    with Image.open(webp_path) as img:
-        if img.n_frames > 0:
-            img.seek(0)
-            frames.append(build_image_data(img))
-        if img.n_frames > 1:
-            img.seek(img.n_frames - 1)
-            frames.append(build_image_data(img))
-    return frames
-
-def extract_features(img_data_input, model):
-    img_data = preprocess_input(img_data_input)
-    features = model.predict(img_data)
-    reshaped_features = features.reshape(-1, features.shape[-1])
-    return reshaped_features
-
-
-def build_similarity_features(image_file: str) -> np.ndarray:
-    if image_file.endswith('.webp'):
-        image_data = _extract_frames_from_webp(image_file)
-    else:
-        image_data = [build_image_data_from_file(image_file)]
-
-    img_data = np.concatenate([np.expand_dims(img, axis=0) for img in image_data], axis=0)
-    base_model = init_video_compare_model()
-    features_list = extract_features(img_data, base_model)
-    features_array = np.vstack(features_list)
-    pca = PCA(n_components=0.95)
-    reduced_features = pca.fit_transform(features_array)
-    target_size = 50
-    max_feature_size = max(target_size, min(target_size, reduced_features.shape[1]))
-    if reduced_features.shape[1] < max_feature_size:
-        padded_features = np.pad(reduced_features, ((0, 0), (0, max_feature_size - reduced_features.shape[1])), 'constant')
-    else:
-        padded_features = reduced_features[:, :max_feature_size]
-    return np.mean(padded_features, axis=0)
 
 def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     """
@@ -108,7 +35,7 @@ def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
                 continue
             features_blob = row.get('features')
             stored_features = np.frombuffer(features_blob, dtype=np.float32)
-            similarity = cosine_similarity([combined_features], [stored_features])[0][0]
+            similarity = similar_compare(combined_features, stored_features)
             if similarity > similarity_threshold:
                 similars.append((video_path, int(similarity * 100)))
 
@@ -118,13 +45,15 @@ def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
     return similars
 
 
-def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
+def fill_db_with_features(folder: VideoFolder):
     """
     Fill the database with features for all videos in the given folder (generator function)
     Yields a tuple with the state of the processing, the video path and the features
     state: 'start' - starting processing a video
            'existing' - video already has features in the database
            'new' - video has been processed and features added to the database
+
+    uses the thumbnail webm file to get a histogram of the video
 
     :param folder: VideoFolder to process
     :return: tuple with state, video path and features
@@ -139,7 +68,7 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                 relative_path = os.path.relpath(root, get_static_directory()).replace('\\', '/')
                 video_path = f"/static/{relative_path}/{filename}"
                 thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
-                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBP.extension}")
+                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBM.extension}")
                 if os.access(thumbnail_file, os.F_OK):
                     yield 'start', video_path, None
                     with get_similarity_db() as db:
@@ -148,9 +77,36 @@ def fill_db_with_features(folder: VideoFolder) -> tuple[str, str, np.ndarray]:
                             combined_features = np.frombuffer(features_row['features'], dtype=np.float32)
                             yield 'exising', video_path, combined_features
                         else:
-                            combined_features = build_similarity_features(thumbnail_file)
+                            combined_features = create_histogram(thumbnail_file)
                             db.upsert_similarity(video_path=video_path, image_path=thumbnail_file, features=combined_features)
                             yield 'new', video_path, combined_features
+
+
+def create_histogram(video_path: str) -> np.ndarray:
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError(f"Video at path {video_path} could not be loaded.")
+
+    hist_list = []
+    frame_count = 0
+
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        hist = cv2.calcHist([frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+        hist = cv2.normalize(hist, hist).flatten()
+        hist_list.append(hist)
+        frame_count += 1
+
+    cap.release()
+
+    if frame_count == 0:
+        raise ValueError(f"No frames extracted from video at path {video_path}.")
+
+    avg_hist = np.mean(hist_list, axis=0)
+    return avg_hist
 
 if __name__ == '__main__':
     similarity_threshold = 0.5
@@ -175,32 +131,19 @@ if __name__ == '__main__':
             video_paths.append(video_path)
             features.append(stored_features)
 
+    from collections import defaultdict
+    similar_groups = defaultdict(list)
+
+    for i in range(len(features)):
+        for j in range(i + 1, len(features)):
+            similarity = similar_compare(features[i], features[j])
+            if similarity > similarity_threshold:
+                similar_groups[video_paths[i]].append((video_paths[j], similarity))
+                similar_groups[video_paths[j]].append((video_paths[i], similarity))
+
+    for video, similars in similar_groups.items():
+        print(f"Video: {video}")
+        for similar_video, score in similars:
+            print(f"  Similar: {similar_video} with score {score}")
 
     print(f"Found {len(video_paths)} videos")
-    features_array = np.array(features)
-    similarity_matrix = cosine_similarity(features_array)
-
-    grouped_videos = []
-    visited = set()
-
-    for i, video_path in enumerate(video_paths):
-        print(f"Processing {video_path}")
-        if i in visited:
-            continue
-
-        group = [(video_path, 0)]
-        visited.add(i)
-
-        for j in range(i + 1, len(video_paths)):
-            if similarity_matrix[i][j] > similarity_threshold:
-                group.append((video_paths[j], int(similarity_matrix[i][j] * 100)))
-                visited.add(j)
-        group.sort(key=lambda x: x[1], reverse=True)
-        if len(group) > 1:
-            grouped_videos.append(group)
-
-    print(f"Found {len(grouped_videos)} groups of similar videos")
-    for group_id, videos in enumerate(grouped_videos):
-        print(f"Group {group_id}:")
-        for video, score in videos:
-            print(f" - ({score}) {video}")
