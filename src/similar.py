@@ -82,31 +82,36 @@ def fill_db_with_features(folder: VideoFolder):
                             yield 'new', video_path, combined_features
 
 
+class VideoCaptureContext:
+    def __init__(self, video_path):
+        self.video_path = video_path
+        self.cap = None
+
+    def __enter__(self):
+        self.cap = cv2.VideoCapture(self.video_path)
+        if not self.cap.isOpened():
+            raise ValueError(f"Video at path {self.video_path} could not be loaded.")
+        return self.cap
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.cap is not None:
+            self.cap.release()
+
 def create_histogram(video_path: str) -> np.ndarray:
-    cap = cv2.VideoCapture(video_path)
-    if not cap.isOpened():
-        raise ValueError(f"Video at path {video_path} could not be loaded.")
-
-    hist_list = []
-    frame_count = 0
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        hist = cv2.calcHist([frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
-        hist = cv2.normalize(hist, hist).flatten()
-        hist_list.append(hist)
-        frame_count += 1
-
-    cap.release()
-
-    if frame_count == 0:
-        raise ValueError(f"No frames extracted from video at path {video_path}.")
+    with VideoCaptureContext(video_path) as cap:
+        hist_list = []
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            hist = cv2.calcHist([frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+            hist = cv2.normalize(hist, hist).flatten()
+            hist_list.append(hist)
 
     avg_hist = np.mean(hist_list, axis=0)
     return avg_hist
+
 
 if __name__ == '__main__':
     similarity_threshold = 0.5
@@ -119,31 +124,25 @@ if __name__ == '__main__':
     #        print(state, vid, len(features))
 
     print("\n\nGrouping similar videos")
-    # Example usage with all grouping
-    video_paths = []
-    features = []
     with get_similarity_db() as db:
         all_features = db.fetch_all('SELECT * FROM features')
-        for row in all_features:
-            video_path = row.get('video_path')
-            features_blob = row.get('features')
-            stored_features = np.frombuffer(features_blob, dtype=np.float32)
-            video_paths.append(video_path)
-            features.append(stored_features)
+        video_data = [(row.get('video_path'), np.frombuffer(row.get('features'), dtype=np.float32)) for row in all_features]
 
+
+    similarity_matrix = np.array([[similar_compare(f1[1], f2[1]) for f2 in video_data] for f1 in video_data])
     from collections import defaultdict
     similar_groups = defaultdict(list)
 
-    for i in range(len(features)):
-        for j in range(i + 1, len(features)):
-            similarity = similar_compare(features[i], features[j])
+    for i in range(len(video_data)):
+        for j in range(i + 1, len(video_data)):
+            similarity = similar_compare(video_data[i][1], video_data[j][1])
             if similarity > similarity_threshold:
-                similar_groups[video_paths[i]].append((video_paths[j], similarity))
-                similar_groups[video_paths[j]].append((video_paths[i], similarity))
+                similar_groups[video_data[i][0]].append((video_data[j][0], similarity))
+                similar_groups[video_data[j][0]].append((video_data[i][0], similarity))
 
-    for video, similars in similar_groups.items():
+    for video, sim_video in similar_groups.items():
         print(f"Video: {video}")
-        for similar_video, score in similars:
+        for similar_video, score in sim_video:
             print(f"  Score: {int(score*100)} - Similar: {similar_video}")
 
-    print(f"Found {len(video_paths)} videos")
+    print(f"Found {len(video_data)} videos")
