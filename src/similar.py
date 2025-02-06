@@ -80,11 +80,14 @@ def fill_db_with_features(folder: VideoFolder):
                             combined_features = np.frombuffer(similarity.features, dtype=np.float32)
                             yield 'exising', video_path, combined_features
                         else:
-                            combined_features = create_histogram(thumbnail_file)
-                            db.for_similarity_table.upsert_similarity(video_path,
-                                Similarity(video_url=video_path, features=combined_features.tobytes())
-                            )
-                            yield 'new', video_path, combined_features
+                            try:
+                                combined_features = create_histogram(thumbnail_file)
+                                db.for_similarity_table.upsert_similarity(video_path,
+                                    Similarity(video_url=video_path, features=combined_features.tobytes())
+                                )
+                                yield 'new', video_path, combined_features
+                            except ValueError as e:
+                                yield 'error', video_path, None
 
 
 class VideoCaptureContext:
