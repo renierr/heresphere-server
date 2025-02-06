@@ -144,6 +144,6 @@ if __name__ == '__main__':
     for video, similars in similar_groups.items():
         print(f"Video: {video}")
         for similar_video, score in similars:
-            print(f"  Similar: {similar_video} with score {score}")
+            print(f"  Score: {int(score*100)} - Similar: {similar_video}")
 
     print(f"Found {len(video_paths)} videos")
