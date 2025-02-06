@@ -13,7 +13,7 @@ def similar_compare(features_a, features_b):
     return cv2.compareHist(features_a, features_b, cv2.HISTCMP_CORREL)
 
 
-def find_similar(provided_video_path, similarity_threshold=0.4) -> list:
+def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
     """
     Find similar videos to the provided video path.
     Currently only compares the similarity of the thumbnail images.
