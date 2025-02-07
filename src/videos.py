@@ -278,8 +278,8 @@ def scan_for_videos():
     files = list_files(VideoFolder.videos) + list_files(VideoFolder.library)
     try:
         for i, file in enumerate(files):
-            if i % 10 == 0:
-                push_text_to_client(f"...scanned {i} videos - still running")
+            if i != 0 and i % 10 == 0:
+                push_text_to_client(f"...scanned {i} videos - running")
             _add_video_to_db(file)
 
         push_text_to_client(f"Scanned {len(files)} videos finished")
