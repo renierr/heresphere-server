@@ -88,6 +88,12 @@ def get_thumbnail_directory(file_path) -> str:
     return os.path.join(base_directory, THUMBNAIL_DIR_NAME)
 
 def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
+    """
+    Get the real path from the given url
+
+    :param url: url to get the real path for
+    :return: real path and VideoFolder tuple
+    """
     if not url:
         return None, None
 

@@ -111,7 +111,8 @@ export const methods = {
         })
             .then(response => response.json())
             .then(data => {
-                const message = `Similar files (${data.length})<ul>${data.map(d => `<li>${d.video_path} (${d.score})</li>`).join('')}</ul>`;
+                
+                const message = `Similar files (${data.length})<ul>${data.map(d => `<li>(${d.score}) - ${d.video_path} <img src="${d.file.thumbnail}" style="max-height: 100px; max-width: 100px" /></li>`).join('')}</ul>`;
                 this.showMessage(message, {title: 'Similar files', stayOpen: true, asHtml: true});
             })
             .catch(error => {

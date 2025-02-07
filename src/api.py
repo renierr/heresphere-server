@@ -93,5 +93,5 @@ def similar():
         return jsonify(ServerResponse(False, "No video path")), 400
 
     similar = find_similar(video_path, 0.7)
-    similar = [{'video_path': x[0], 'score': x[1]} for x in similar]
+    similar = [{'video_path': x[0], 'score': x[1], 'file': x[2]} for x in similar]
     return jsonify(similar)

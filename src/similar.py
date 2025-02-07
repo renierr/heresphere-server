@@ -5,7 +5,7 @@ import numpy as np
 
 from cache import cache
 from database.video_database import get_video_db
-from files import list_files
+from files import list_files, find_file_info
 from globals import VideoFolder, get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
@@ -45,7 +45,8 @@ def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
             continue
         similar = similar_compare(provided_features, features)
         if similar > similarity_threshold:
-            similars.append((video_path, int(similar * 100)))
+            file_info = find_file_info(video_path)
+            similars.append((video_path, int(similar * 100), file_info))
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
