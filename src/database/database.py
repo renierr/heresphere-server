@@ -30,10 +30,10 @@ class Database:
         self.db_path = db_path
         self.engine = create_engine(f'sqlite:///{db_path}')
         self.SessionMaker = sessionmaker(bind=self.engine)
-        self.session: Session
+        self.session: Session | None = None
 
     def __enter__(self):
-        self.session = self.SessionMaker()
+        self.session = self.SessionMaker() if self.session is None else self.session
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
