@@ -22,6 +22,7 @@ export const data = {
     serverOutput: '',
     serverResult: null,
     currentFile: null,
+    similarVideos: null,
     currentPage: 1,
     totalItems: 0,
     totalSize: 0,
@@ -74,6 +75,9 @@ export const methods = {
         this.currentFile = file;
         const modal = new bootstrap.Modal(document.getElementById('thumbnailModal'));
         modal.show();
+        modal._element.addEventListener('hidden.bs.modal', () => {
+            this.currentFile = null;
+        });
     },
     changePage(page) {
         if (page < 1) {
@@ -111,9 +115,14 @@ export const methods = {
         })
             .then(response => response.json())
             .then(data => {
-                
-                const message = `Similar files (${data.length})<br><ul style="overflow: auto; min-width: 50dvw ;max-height: 100dvh">${data.map(d => `<li>(${d.score}) - ${d.video_path}<br><img src="${d.file.thumbnail}" style="max-height: 100px; max-width: 100px" /></li>`).join('')}</ul>`;
-                this.showMessage(message, {title: 'Similar files', stayOpen: true, asHtml: true});
+                this.currentFile = file;
+                this.similarVideos = data;
+                const modal = new bootstrap.Modal(document.getElementById('similarityModal'));
+                modal.show();
+                modal._element.addEventListener('hidden.bs.modal', () => {
+                    this.currentFile = null;
+                    this.similarVideos = null;
+                });
             })
             .catch(error => {
                 console.error('Error:', error);

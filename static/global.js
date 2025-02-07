@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // scroll back to top button
     const scrollButton = document.getElementById('scroll-to-top');
-    scrollButton.addEventListener('click', () => {
+    scrollButton?.addEventListener('click', () => {
         window.scrollTo({top: 0, behavior: 'smooth'});
     });
     window.addEventListener('scroll', () => {
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollButton.classList.add('d-none');
         }
     });
-    document.getElementById('videoModal').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('videoModal')?.addEventListener('hidden.bs.modal', function () {
         try {
             const player = videojs('videoPlayer');
             if (player && typeof player.dispose === 'function') {

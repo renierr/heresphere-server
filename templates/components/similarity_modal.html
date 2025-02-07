@@ -1,0 +1,27 @@
+<div class="modal fade" id="similarityModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-truncate" id="similarityModalLabel">{{ currentFile ? currentFile.title : 'Similar Videos' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div v-if="currentFile" class="modal-body">
+        <img v-if="currentFile.thumbnail" :src="currentFile.thumbnail" alt="Thumbnail" class="thumbnail p-2 border border-secondary-subtle border-2 text-center">
+        <hr>
+        <ul v-if="similarVideos.length" class="list-unstyled">
+          <li v-for="similar in similarVideos">
+            <p class="text-muted text-wrap" style="word-break: break-word;"><span class="score">({{ similar.score }})</span> - {{ similar.file.title }}</p>
+            <img :src="similar.file.thumbnail" alt="Thumbnail" class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
+          </li>
+        </ul>
+        <div v-else>
+          <p>No similar videos found</p>
+        </div>
+
+      </div>
+      <div v-else class="modal-body">
+        <p>No file selected</p>  
+      </div>      
+    </div>
+  </div>
+</div>
