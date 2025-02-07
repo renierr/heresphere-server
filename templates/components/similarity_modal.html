@@ -6,12 +6,36 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div v-if="currentFile" class="modal-body">
-        <img v-if="currentFile.thumbnail" :src="currentFile.thumbnail" alt="Thumbnail" class="thumbnail p-2 border border-secondary-subtle border-2 text-center">
+        <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
+          <img v-if="currentFile.thumbnail" :src="currentFile.thumbnail" alt="Thumbnail" class="thumbnail p-2 border border-secondary-subtle border-2 text-center">
+          <div class="text-muted">
+            <p>
+              <span v-if="currentFile.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(currentFile.filesize) }}</span> <span v-if="currentFile.width && currentFile.height"><i class="bi bi-aspect-ratio"></i> {{ currentFile.width }}x{{ currentFile.height}}</span>
+              <span v-if="currentFile.width && (currentFile.width > 1900 || currentFile.height > 1900)"><i class="bi bi-badge-hd-fill"></i></span>
+              <span v-if="currentFile.width && (currentFile.width >= 8000 || currentFile.height >= 8000)"><i class="bi bi-badge-8k-fill"></i></span>
+              <span v-else-if="currentFile.width && (currentFile.width > 3800 || currentFile.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
+              <span v-if="currentFile.stereo"><i class="bi bi-badge-3d-fill"></i></span>
+            </p>
+            <p><i class="bi bi-calendar"></i> {{ formatDate(currentFile.created) }} (Created)</p>
+            <p v-if="currentFile.download_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile.download_date) }} (Downloaded)</p>
+            <p v-if="currentFile.duration"><i class="bi bi-clock"></i> {{ formatDuration(currentFile.duration) }}</p>
+            <p v-if="currentFile.folder"><i class="bi bi-folder"></i> {{ currentFile.folder }}</p>
+          </div>
+        </div>
         <hr>
         <ul v-if="similarVideos.length" class="list-unstyled">
-          <li v-for="similar in similarVideos">
-            <p class="text-muted text-wrap" style="word-break: break-word;"><span class="score">({{ similar.score }})</span> - {{ similar.file.title }}</p>
-            <img :src="similar.file.thumbnail" alt="Thumbnail" class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
+          <li v-for="similar in similarVideos" class="mb-2">
+            <p class="text-muted text-wrap m-0" style="word-break: break-word;"><span class="score">({{ similar.score }})</span> - {{ similar.file.title }}</p>
+            <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
+              <img :src="similar.file.thumbnail" alt="Thumbnail" class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
+                <div class="text-muted">
+                  <p v-if="similar.file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(similar.file.filesize) }}</span> <span v-if="similar.file.width && similar.file.height"><i class="bi bi-aspect-ratio"></i> {{ similar.file.width }}x{{ similar.file.height}}</span></p>
+                  <p><i class="bi bi-calendar"></i> {{ formatDate(similar.file.created) }} (Created)</p>
+                  <p v-if="similar.file.download_date"><i class="bi bi-calendar-check"></i> {{ formatDate(similar.file.download_date) }} (Downloaded)</p>
+                  <p v-if="similar.file.duration"><i class="bi bi-clock"></i> {{ formatDuration(similar.file.duration) }}</p>
+                  <p v-if="similar.file.folder"><i class="bi bi-folder"></i> {{ similar.file.folder }}</p>
+                </div>
+            </div>
           </li>
         </ul>
         <div v-else>
