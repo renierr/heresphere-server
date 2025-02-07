@@ -62,7 +62,12 @@ def request_stream():
 
 @video_bp.route('/scan')
 def sfv():
-    return jsonify(scan_for_videos())
+    thumbnail_thread = threading.Thread(target=scan_for_videos)
+    thumbnail_thread.daemon = True
+    thumbnail_thread.start()
+
+    push_text_to_client("Scanning Videos started in the background")
+    return jsonify(ServerResponse(True, "Scanning Videos started in the background"))
 
 
 def filename_with_ext(filename, youtube=True):
@@ -253,11 +258,17 @@ def _add_video_to_db(file):
 
 
 def scan_for_videos():
-    push_text_to_client("Scanning for videos...")
     files = list_files(VideoFolder.videos) + list_files(VideoFolder.library)
-    for file in files:
-        _add_video_to_db(file)
+    try:
+        for i, file in enumerate(files):
+            if i % 10 == 0:
+                push_text_to_client(f"...scanned {i} videos - still running")
+            _add_video_to_db(file)
 
-    push_text_to_client(f"Scanned {len(files)} videos")
+        push_text_to_client(f"Scanned {len(files)} videos finished")
+    except Exception as e:
+        logger.error(f"Error scanning for videos: {e}")
+        push_text_to_client(f"Error scanning for videos: {e}")
+        return ServerResponse(False, f"Error scanning for videos: {e}")
     return ServerResponse(True, f"Scanned {len(files)} videos")
 
