@@ -31,6 +31,35 @@ def library_subfolders() -> list:
 
 @cache(maxsize=128, ttl=18000)
 def list_files(directory: VideoFolder) -> list:
+    """
+    List all files in the given directory
+    The returned list contains dictionaries with the following keys:
+
+    - title: the title of the file
+    - filename: the full url path to the file
+    - folder: the subfolder of the file
+    - created: the creation date of the file
+    - filesize: the size of the file
+    - mimetype: the mimetype of the file
+    - duration: the duration of the video file
+    - width: the width of the video file
+    - height: the height of the video file
+    - resolution: the resolution of the video file
+    - stereo: the stereo mode of the video file
+    - uid: the unique id of the video file
+    - favorite: the favorite status of the video file
+    - preview: the preview thumbnail of the video file
+    - thumbnail: the thumbnail of the video file
+    - partial: the partial status of the video file
+    - download_id: the download id of the video file
+    - url: the download url of the video file
+    - download_date: the download date of the video file
+    - may_exist: the possible duplicate file info
+
+
+    :param directory: the directory to list files from
+    :return: list of dictionaries with file details
+    """
     extracted_details = []
     base_path = directory.web_path
 
@@ -71,7 +100,6 @@ def list_files(directory: VideoFolder) -> list:
                 download_id = filename.split('____')[0][:14]
                 url_info = get_url_map().get(download_id, {})
                 common_details.update({
-                    'url_id': download_id,
                     **({k: url_info.get(k) for k in ['url', 'failed', 'download_date']} if url_info else {})
                 })
             extracted_details.append(common_details)
@@ -104,6 +132,15 @@ def list_files(directory: VideoFolder) -> list:
 def generic_file_details(root: str, filename: str, base_weburl: str, subfolder: str) -> dict:
     """
     Extract details from a file in given directory
+    The returned dictionary contains the following keys:
+
+    - mimetype: the mimetype of the file
+    - unknown: True
+    - title: the title of the file
+    - filename: the full url path to the file
+    - folder: the subfolder of the file
+    - created: the creation date of the file
+    - filesize: the size of the file
 
     :param root: root of the directory
     :param filename: the file to get details from
@@ -129,6 +166,29 @@ def generic_file_details(root: str, filename: str, base_weburl: str, subfolder: 
 def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: str) -> dict:
     """
     Extract details from a file in the videos directory
+    The returned dictionary contains the following keys:
+
+    - title: the title of the file
+    - filename: the full url path to the file
+    - basename: the base name of the file
+    - folder: the subfolder of the file
+    - created: the creation date of the file
+    - filesize: the size of the file
+    - mimetype: the mimetype of the file
+    - duration: the duration of the video file
+    - width: the width of the video file
+    - height: the height of the video file
+    - resolution: the resolution of the video file
+    - stereo: the stereo mode of the video file
+    - uid: the unique id of the video file
+    - favorite: the favorite status of the video file
+    - preview: the preview thumbnail of the video file
+    - thumbnail: the thumbnail of the video file
+    - partial: the partial status of the video file
+    - download_id: the download id of the video file
+    - url: the download url of the video file
+    - download_date: the download date of the video file
+
 
     :param root: the root directory
     :param filename: the filename
@@ -142,10 +202,13 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
         return {}
 
     partial = filename.endswith('.part')
+    download_id = filename.split('____')[0][:14]
     result = {
         'partial': partial,
         'title': os.path.splitext(filename)[0],
         'filename': f"{base_weburl}{subfolder + '/' if subfolder else ''}{filename}",
+        'basename': filename,
+        'download_id': download_id,
         'folder' : subfolder,
         'favorite': False,
     }
@@ -154,6 +217,7 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
             'created': os.path.getctime(realfile),
         })
     else:
+        mimetype, _ = get_mime_type(realfile)
         thumbnails = get_thumbnails(realfile)
         thumbnail = thumbnails.get(ThumbnailFormat.WEBP, thumbnails.get(ThumbnailFormat.JPG))
         preview = thumbnails.get(ThumbnailFormat.WEBM)
@@ -164,6 +228,7 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
         url = url_info.get('url', None)
 
         result.update({
+            'mimetype': mimetype,
             'preview': preview,
             'thumbnail': thumbnail,
             'created': info.created,

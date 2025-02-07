@@ -40,7 +40,7 @@
             <div v-if="file.unknown" class="partial d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded">Not a Video File</div>
             <a v-if="file.url" class="btn btn-sm m-1" :href="file.url" target="_blank">Original Link</a>
             {% if option_download %}
-            <button v-if="file.url" class="btn btn-outline-secondary btn-sm m-1" @click="redownload(file)">Download again (id={{ file.url_id }})</button>
+            <button v-if="file.url" class="btn btn-outline-secondary btn-sm m-1" @click="redownload(file)">Download again (id={{ file.download_id }})</button>
             {% endif %}
             <button v-if="!file.partial && !file.unknown" class="btn btn-outline-secondary btn-sm m-1" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
             <button v-if="!file.partial && !file.unknown" class="btn btn-outline-warning btn-sm m-1" @click="confirmRenameFile(file)">Rename</button>
