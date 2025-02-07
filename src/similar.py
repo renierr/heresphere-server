@@ -3,6 +3,7 @@ import os
 import cv2
 import numpy as np
 
+from cache import cache
 from database.video_database import get_video_db
 from files import list_files
 from globals import VideoFolder, get_real_path_from_url, get_thumbnail_directory
@@ -12,6 +13,11 @@ from thumbnail import ThumbnailFormat
 def similar_compare(features_a, features_b):
     return cv2.compareHist(features_a, features_b, cv2.HISTCMP_CORREL)
 
+@cache(ttl=3600)
+def _all_features():
+    with get_video_db() as db:
+        all_features = db.for_similarity_table.list_similarity()
+        return [(row.video.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
 
 def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
     """
@@ -23,25 +29,23 @@ def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
     :param similarity_threshold: threshold for similarity default 0.4
     :return: list of similar videos with similarity score (tuple)
     """
-    similars = []
-    with (get_video_db() as db):
-        video = db.for_video_table.get_video(provided_video_path)
-        if video:
-            combined_features = np.frombuffer(video.similarity.features, dtype=np.float32)
-        else:
-            return []
 
-        # load all features for compare - TODO maybe cache this
-        all_features = db.for_similarity_table.list_similarity()
-        for row in all_features:
-            video_path = row.video_url
-            if video_path == provided_video_path:  # ignore myself in the comparison
-                continue
-            features_blob = row.features
-            stored_features = np.frombuffer(features_blob, dtype=np.float32)
-            similar = similar_compare(combined_features, stored_features)
-            if similar > similarity_threshold:
-                similars.append((video_path, int(similar * 100)))
+    all_features = _all_features()
+    provided_features = None
+    for video_path, features in all_features:
+        if video_path == provided_video_path:
+            provided_features = features
+            break
+    if provided_features is None:
+        return []
+
+    similars = []
+    for video_path, features in all_features:
+        if video_path == provided_video_path:    # ignore myself in the comparison
+            continue
+        similar = similar_compare(provided_features, features)
+        if similar > similarity_threshold:
+            similars.append((video_path, int(similar * 100)))
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
