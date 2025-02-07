@@ -5,12 +5,15 @@ class ForVideo:
     def __init__(self, db):
         self.db = db
 
-    def upsert_video(self, video_url: str, video: Videos) -> Videos:
+    def upsert_video(self, video_url: str, video: Videos, exclude_fields=None) -> Videos:
+        if exclude_fields is None:
+            exclude_fields = []
+
         session = self.db.get_session()
         result = session.query(Videos).filter_by(video_url=video_url).first()
         if result:
             for key, value in vars(video).items():
-                if not key.startswith('_'):  # Skip keys starting with an underscore
+                if not key.startswith('_') and key not in exclude_fields:  # Skip keys starting with an underscore or excluded
                     setattr(result, key, value)
         else:
             video.video_url = video_url
