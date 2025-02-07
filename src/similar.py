@@ -19,7 +19,7 @@ def _all_features():
         all_features = db.for_similarity_table.list_similarity()
         return [(row.video.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
 
-def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
+def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> list:
     """
     Find similar videos to the provided video path.
     Currently only compares the similarity of the thumbnail images.
@@ -47,6 +47,8 @@ def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
         if similar > similarity_threshold:
             file_info = find_file_info(video_path)
             similars.append((video_path, int(similar * 100), file_info))
+            if len(similars) >= limit:
+                break
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
