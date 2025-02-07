@@ -249,10 +249,26 @@ def _add_video_to_db(file):
 
     with get_video_db() as db:
         video = db.for_video_table.get_video(video_url)
-        if video is None:
-            video = Videos(video_url=video_url, source_url=file.get('url'), file_name=file.get('basename'),
-                           title=file.get('title'), download_id=file.get('download_id'), video_uid=file.get('uid'),
-                           download_date=file.get('download_date'))
+        # declare file variables for later use
+        file_vars = {
+            'file_name': file.get('basename'),
+            'title': file.get('title'),
+            'download_id': file.get('download_id'),
+            'download_date': file.get('download_date'),
+            'video_uid': file.get('uid'),
+            'source_url': file.get('url')
+        }
+
+        if video:
+            # update fields if they have changed
+            for attr, value in file_vars.items():
+                if getattr(video, attr) != value:
+                    setattr(video, attr, value)
+            if not video.similarity:
+                features = build_features_for_video(video_url)
+                video.similarity = Similarity(features=features)
+        else:
+            video = Videos(video_url=video_url, **file_vars)
             features = build_features_for_video(video_url)
             video.similarity = Similarity(features=features)
             db.session.add(video)
