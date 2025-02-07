@@ -211,11 +211,6 @@ def sse():
     # send server time on first request
     client_queue.put(f"SSE Connection to Server established at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}\n\n")
 
-    # Send ffmpeg and ffprobe version information on first request
-    if ffmpeg_version_info and ffprobe_version_info:
-        client_queue.put(f"Server uses ffmpeg: {ffmpeg_version_info}\n\n")
-        client_queue.put(f"Server uses ffprobe: {ffprobe_version_info}\n\n")
-
     response = Response(event_stream(client_queue, stop_event), mimetype="text/event-stream")
     response.call_on_close(cleanup_client)
     return response
@@ -244,8 +239,9 @@ def start_server() -> Optional[str]:
         sys.stdout = open(os.devnull, 'w')
         sys.stderr = open(os.devnull, 'w')
 
+    logger.info(f"Server uses Python version: {sys.version}")
+
     # we need ffmpeg and ffprobe check if it is available in path
-    logger.info("Checking for ffmpeg and ffprobe")
     try:
         ffmpeg_version_info = subprocess.check_output(["ffmpeg", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
         ffprobe_version_info = subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import String, Integer, UniqueConstraint, LargeBinary
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from .database import ReprMixin
