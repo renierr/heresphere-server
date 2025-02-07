@@ -26,6 +26,7 @@
           </div>
         </div>
         <hr>
+        <p>Found {{ similarVideos.length }} similar videos</p>
         <ul v-if="similarVideos.length" class="list-unstyled">
           <li v-for="similar in similarVideos" class="mb-2">
             <p class="text-muted text-wrap m-0" style="word-break: break-word;"><span class="score">({{ similar.score }})</span> - {{ similar.file.title }}</p>
@@ -44,9 +45,6 @@
             </div>
           </li>
         </ul>
-        <div v-else>
-          <p>No similar videos found</p>
-        </div>
 
       </div>
       <div v-else class="modal-body">
