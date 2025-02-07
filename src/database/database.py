@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 
 # Define a mixin class that provides a __repr__ method and a to_dict method
@@ -29,11 +29,11 @@ class Database:
     def __init__(self, db_path):
         self.db_path = db_path
         self.engine = create_engine(f'sqlite:///{db_path}')
-        self.Session = sessionmaker(bind=self.engine)
-        self.session = None
+        self.SessionMaker = sessionmaker(bind=self.engine)
+        self.session: Session
 
     def __enter__(self):
-        self.session = self.Session()
+        self.session = self.SessionMaker()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -56,11 +56,11 @@ class Database:
             except Exception:  # Catch exceptions during close
                 self.session = None # set to None even if close fails to avoid future problems
 
-    def new_session(self):
-        return self.Session()
+    def new_session(self) -> Session:
+        return self.SessionMaker()
 
-    def get_session(self):
+    def get_session(self) -> Session:
         if self.session:
             return self.session
-        return self.Session()
+        return self.SessionMaker()
 
