@@ -20,6 +20,9 @@
             <p v-if="currentFile.download_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile.download_date) }} (Downloaded)</p>
             <p v-if="currentFile.duration"><i class="bi bi-clock"></i> {{ formatDuration(currentFile.duration) }}</p>
             <p v-if="currentFile.folder"><i class="bi bi-folder"></i> {{ currentFile.folder }}</p>
+            <button class="btn btn-outline-success btn-sm" @click="playVideo(currentFile)">
+              <i class="bi bi-play-fill"></i>&nbsp;Play
+            </button>
           </div>
         </div>
         <hr>
@@ -34,6 +37,9 @@
                   <p v-if="similar.file.download_date"><i class="bi bi-calendar-check"></i> {{ formatDate(similar.file.download_date) }} (Downloaded)</p>
                   <p v-if="similar.file.duration"><i class="bi bi-clock"></i> {{ formatDuration(similar.file.duration) }}</p>
                   <p v-if="similar.file.folder"><i class="bi bi-folder"></i> {{ similar.file.folder }}</p>
+                  <button class="btn btn-outline-success btn-sm" @click="playVideo(similar.file)">
+                    <i class="bi bi-play-fill"></i>&nbsp;Play
+                  </button>
                 </div>
             </div>
           </li>

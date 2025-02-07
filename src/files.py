@@ -33,7 +33,13 @@ def find_file_info(video_url: str) -> dict | None:
     file_path, folder = get_real_path_from_url(video_url)
     if not file_path:
         return None
-    return extract_file_details(os.path.dirname(file_path), os.path.basename(file_path), folder.web_path, folder.dir)
+
+    root = os.path.dirname(file_path)
+    subfolder = os.path.relpath(root, os.path.join(get_static_directory(),  folder.dir)).replace('\\', '/')
+    if subfolder == '.':
+        subfolder = ''
+
+    return extract_file_details(root, os.path.basename(file_path), folder.web_path, subfolder)
 
 
 @cache(maxsize=128, ttl=18000)
