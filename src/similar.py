@@ -74,7 +74,7 @@ def build_features_for_video(video_url: str) -> np.ndarray | None:
     thumbnail_dir = get_thumbnail_directory(file_path)
     thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
     if os.access(thumbnail_file, os.F_OK):
-        return create_histogram(thumbnail_file)
+        return _create_video_features_for_similarity_compare(thumbnail_file)
     return None
 
 
@@ -117,7 +117,7 @@ def fill_db_with_features(folder: VideoFolder):
                     yield 'exising', video_path, combined_features
                 else:
                     try:
-                        combined_features = create_histogram(thumbnail_file)
+                        combined_features = _create_video_features_for_similarity_compare(thumbnail_file)
                         db.for_similarity_table.update_features(video, combined_features.tobytes())
                         yield 'new', video_path, combined_features
                     except ValueError:
@@ -140,19 +140,38 @@ class VideoCaptureContext:
             self.cap.release()
 
 
-def create_histogram(video_path: str) -> np.ndarray:
+def _create_video_features_for_similarity_compare(video_path: str) -> np.ndarray:
     with VideoCaptureContext(video_path) as cap:
         hist_list = []
+        #flow_features = []
+
+        #first = True
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            #motion_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            #if first:
+            #    prev_frame = motion_frame
+            #    first = False
+
             hist = cv2.calcHist([frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
             hist = cv2.normalize(hist, hist).flatten()
             hist_list.append(hist)
 
+            #flow = cv2.calcOpticalFlowFarneback(prev_frame, motion_frame, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+            #prev_frame = motion_frame
+            #mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
+            #flow_feature = np.hstack((mag.flatten(), ang.flatten()))
+            #flow_features.append(flow_feature)
+
+
+
     avg_hist = np.mean(hist_list, axis=0)
+    #avg_flow = np.mean(flow_features, axis=0)
+    #combined_features = np.hstack((avg_hist, avg_flow))
+    #return combined_features
     return avg_hist
 
 
