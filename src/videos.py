@@ -2,18 +2,20 @@ import os
 import re
 import threading
 import time
+from datetime import datetime
 
 import yt_dlp
-from datetime import datetime
 from flask import Blueprint, request, jsonify
 from loguru import logger
 from yt_dlp import ImpersonateTarget
-from database.video_database import get_video_db
-from database.video_models import Videos
-from files import list_files
+
 from bus import push_text_to_client
+from database.video_database import get_video_db
+from database.video_models import Videos, Similarity
+from files import list_files
 from globals import get_url_map, get_application_path, \
     remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR, get_real_path_from_url
+from similar import build_features_for_video
 from thumbnail import generate_thumbnail_for_path, get_video_info
 
 root_path = get_application_path()
@@ -56,6 +58,11 @@ def request_stream():
     if video_url is None and audio_url is None:
         return jsonify(ServerResponse(False, "Failed to retrieve video and audio streams")), 500
     return jsonify({"success": True, "videoUrl": video_url, "audioUrl": audio_url, "title": title, "cookies": cookies })
+
+
+@video_bp.route('/scan')
+def sfv():
+    return jsonify(scan_for_videos())
 
 
 def filename_with_ext(filename, youtube=True):
@@ -229,4 +236,26 @@ def download_progress(d):
         output = f"Downloading...[{video_id}] - 100.0% complete: {fname}"
     push_text_to_client(output)
 
+def _add_video_to_db(file):
+    video_url = file.get('filename')
+    if not video_url:
+        return
+
+    with get_video_db() as db:
+        video = db.for_video_table.get_video(video_url)
+        if video is None:
+            video = Videos(video_url=video_url, source_url=file.get('url'), file_name=file.get('basename'),
+                           title=file.get('title'), download_id=file.get('download_id'), video_uid=file.get('uid'),
+                           download_date=file.get('download_date'))
+            features = build_features_for_video(video_url)
+            video.similarity = Similarity(features=features)
+            db.session.add(video)
+
+
+def scan_for_videos():
+    files = list_files(VideoFolder.videos) + list_files(VideoFolder.library)
+    for file in files:
+        _add_video_to_db(file)
+        
+    return ServerResponse(True, f"Scanned {len(files)} videos")
 

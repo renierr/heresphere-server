@@ -52,6 +52,29 @@ def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
     return similars
 
 
+def build_features_for_video(video_url: str) -> np.ndarray | None:
+    """
+    Build the features for the given video_url and return the features
+
+    :param video_url: url of the video to build features for
+    :return: features for the video
+    """
+
+    if not video_url:
+        return None
+
+    file_path, _ = get_real_path_from_url(video_url)
+    if not file_path:
+        return None
+
+    base_name = os.path.basename(file_path)
+    thumbnail_dir = get_thumbnail_directory(file_path)
+    thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
+    if os.access(thumbnail_file, os.F_OK):
+        return create_histogram(thumbnail_file)
+    return None
+
+
 def fill_db_with_features(folder: VideoFolder):
     """
     Fill the database with features for all videos in the given folder (generator function)
