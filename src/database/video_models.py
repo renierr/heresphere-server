@@ -1,6 +1,9 @@
 from __future__ import annotations
-from sqlalchemy import String, Integer, UniqueConstraint, LargeBinary
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+import datetime
+
+from sqlalchemy import String, Integer, UniqueConstraint, LargeBinary, ForeignKey, func, DateTime
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from .database import ReprMixin
 
 class VideoBase(DeclarativeBase):
@@ -18,6 +21,7 @@ class Videos(VideoBase, ReprMixin):
     video_uid: Mapped[str] = mapped_column(String)
     download_date: Mapped[int] = mapped_column(Integer)
     favorite: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    similarity: Mapped[Similarity] = relationship(back_populates='video')
     __table_args__ = (
         UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
     )
@@ -39,8 +43,9 @@ class Downloads(VideoBase, ReprMixin):
 class Similarity(VideoBase, ReprMixin):
     __tablename__ = 'similarity'
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    video_url: Mapped[str] = mapped_column(String, nullable=False)
+    video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
+    video: Mapped[Videos] = relationship(back_populates="similarity")
     features: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
-    __table_args__ = (
-        UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
-    )
+    changed: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())
+
+

@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 
 from database.video_database import get_video_db
-from database.video_models import Similarity
 from files import list_files
 from globals import VideoFolder, get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
@@ -26,9 +25,9 @@ def find_similar(provided_video_path, similarity_threshold=0.6) -> list:
     """
     similars = []
     with (get_video_db() as db):
-        similarity = db.for_similarity_table.get_similarity(provided_video_path)
-        if similarity:
-            combined_features = np.frombuffer(similarity.features, dtype=np.float32)
+        video = db.for_video_table.get_video(provided_video_path)
+        if video:
+            combined_features = np.frombuffer(video.similarity.features, dtype=np.float32)
         else:
             return []
 
@@ -78,18 +77,20 @@ def fill_db_with_features(folder: VideoFolder):
         if os.access(thumbnail_file, os.F_OK):
             yield 'start', video_path, None
             with get_video_db() as db:
-                similarity = db.for_similarity_table.get_similarity(video_path)
-                if similarity:
-                    combined_features = np.frombuffer(similarity.features, dtype=np.float32)
+                video = db.for_video_table.get_video(video_path)
+                if video is None:
+                    yield 'missing', video_path, None
+                    continue
+
+                if video.similarity:
+                    combined_features = np.frombuffer(video.similarity.features, dtype=np.float32)
                     yield 'exising', video_path, combined_features
                 else:
                     try:
                         combined_features = create_histogram(thumbnail_file)
-                        db.for_similarity_table.upsert_similarity(video_path,
-                            Similarity(video_url=video_path, features=combined_features.tobytes())
-                        )
+                        db.for_similarity_table.update_features(video, combined_features.tobytes())
                         yield 'new', video_path, combined_features
-                    except ValueError as e:
+                    except ValueError:
                         yield 'error', video_path, None
 
 
@@ -125,7 +126,7 @@ def create_histogram(video_path: str) -> np.ndarray:
     return avg_hist
 
 
-if __name__ == '__main__':
+def main():
     similarity_threshold = 0.5
 
     # fill db
@@ -158,3 +159,6 @@ if __name__ == '__main__':
             print(f"  Score: {int(score * 100)} - Similar: {similar_video}")
 
     print(f"Found {len(video_data)} videos")
+
+if __name__ == '__main__':
+    main()

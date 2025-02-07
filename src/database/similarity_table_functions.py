@@ -1,4 +1,9 @@
+from datetime import datetime
 from typing import Optional, List
+
+from sqlalchemy import inspect
+from sqlalchemy.orm import Session
+
 from .video_models import Videos, Similarity
 
 
@@ -6,18 +11,23 @@ class ForSimilarity:
     def __init__(self, db):
         self.db = db
 
-    def upsert_similarity(self, video_url: str, similarity: Similarity) -> Similarity:
-        session = self.db.get_session()
-        result = session.query(Similarity).filter_by(video_url=video_url).first()
-        if result:
-            for key, value in vars(similarity).items():
-                if not key.startswith('_'):  # Skip keys starting with an underscore
-                    setattr(result, key, value)
+    def update_features(self, video: Videos, features: bytes) -> None:
+        session: Session = self.db.get_session()
+
+        if not video or not video.video_url:
+            return
+
+        if inspect(video).transient:
+            video = self.db.for_video_table.get_video(video.video_url)
+
+        similarity = video.similarity
+        if similarity:
+            similarity.features = features
+            similarity.changed = datetime.now()
         else:
-            similarity.video_url = video_url
-            result = session.add(similarity)
-            session.commit()
-        return result
+            similarity = Similarity(video=video, features=features)
+            session.add(similarity)
+            video.similarity = similarity
 
     def get_similarity(self, video_url: str) -> Optional[Similarity]:
         session = self.db.get_session()
