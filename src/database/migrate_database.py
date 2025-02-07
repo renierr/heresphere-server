@@ -1,4 +1,8 @@
+from __future__ import annotations
 import os
+from datetime import datetime
+
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Column, Integer, String, DateTime, func
 from typing import Optional
 from sqlalchemy.orm import declarative_base
@@ -10,9 +14,9 @@ MigrationBase = declarative_base()
 # migrations table
 class Migrations(MigrationBase, ReprMixin):
     __tablename__ = 'migrations'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False, unique=True)
-    date = Column(DateTime, nullable=False, default=func.now())
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    date: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())
 
 class MigrationDatabase(Database):
     """

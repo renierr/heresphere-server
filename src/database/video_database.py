@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from typing import Optional
 from database.database import Database, ReprMixin
 from globals import get_data_directory, ID_NAME_SEPERATOR
