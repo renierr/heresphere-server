@@ -503,14 +503,14 @@ export const computed = {
             return 0;
         });
 
+        this.totalItems = filtered.length;
+        this.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
+
         if (this.pageSize === 0) {
             return filtered; // Return all items if pageSize is 0
         }
-
         const start = (this.currentPage - 1) * this.pageSize;
         const end = start + this.pageSize;
-        this.totalItems = filtered.length;
-        this.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
         return filtered.slice(start, end);
     },
     uniqueFolders() {
