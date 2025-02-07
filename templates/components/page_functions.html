@@ -4,7 +4,7 @@
             {% if server_update_possible %}<a href="#" @click.prevent="confirmUpdate" class="btn btn-danger btn-sm">Server Update</a>{% endif %}
             <a href="#" @click.prevent="confirmCleanup" class="btn btn-danger btn-sm">Cleanup Files</a>
             <a href="#" @click.prevent="cacheClear" class="btn btn-warning btn-sm">Clear all Caches</a>
-            <a href="#" @click.prevent="findDuplicates" class="btn btn-info btn-sm">Find Duplicates</a>
+            <a href="#" @click.prevent="scanFiles" class="btn btn-warning btn-sm">Scan Videos</a>
             <a href="#" @click.prevent="generateThumbnails" class="btn btn-secondary btn-sm">Generate Thumbnails</a>
             <a href="#" @click.prevent="fetchFiles" class="btn btn-secondary btn-sm">Reload files</a>
         </div>

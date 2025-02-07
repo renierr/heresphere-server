@@ -253,9 +253,11 @@ def _add_video_to_db(file):
 
 
 def scan_for_videos():
+    push_text_to_client("Scanning for videos...")
     files = list_files(VideoFolder.videos) + list_files(VideoFolder.library)
     for file in files:
         _add_video_to_db(file)
-        
+
+    push_text_to_client(f"Scanned {len(files)} videos")
     return ServerResponse(True, f"Scanned {len(files)} videos")
 

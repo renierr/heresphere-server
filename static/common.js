@@ -240,6 +240,17 @@ export const methods = {
                 this.serverResult = 'Error clearing cache';
             });
     },
+    scanFiles: function () {
+        fetch('/scan')
+          .then(response => response.json())
+          .then(data => {
+              this.serverResult = data;
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              this.serverResult = 'Error clearing cache';
+          });
+    },
     showMessage: function (input, options = {}) {
         const { title = 'Message', stayOpen = false, asHtml = false } = options;
         const toastElement = document.getElementById('serverResultToast');
@@ -338,30 +349,6 @@ export const methods = {
     checkDuration(file) {
         const durationInMinutes = file.duration / 60;
         return durationInMinutes >= this.selectedDuration;
-    },
-    findDuplicates() {
-        this.serverOutput = 'Try to Find duplicates...\n' + this.serverOutput;
-        const fileMap = new Map();
-        const duplicates = [];
-
-        this.files.forEach(file => {
-            if (!file.uid) return;
-            if (fileMap.has(file.uid)) {
-                duplicates.push(file);
-            } else {
-                fileMap.set(file.uid, true);
-            }
-        });
-
-        if (duplicates.length > 0) {
-            console.log("Duplicate files found:", duplicates);
-            this.serverOutput = 'Duplicate files found:\n' + duplicates.map(file => file.filename).join('\n') + '\n' + this.serverOutput;
-            this.showMessage(`Duplicate files found (${duplicates.length})\n` + duplicates.map(file => file.filename).join('\n'));
-        } else {
-            console.log("No duplicate files found.");
-            this.serverOutput = 'No duplicate files found.\n' + this.serverOutput;
-            this.showMessage('No duplicate files found');
-        }
     },
     showDuplicateInfo(file) {
         if (file.may_exist) {
