@@ -6,7 +6,7 @@ from bus import push_text_to_client
 from cache import cache
 from database.video_database import get_video_db
 from globals import get_static_directory, VideoInfo, get_real_path_from_url, get_url_map, \
-    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path, get_url_from_path
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path, get_url_from_path, get_thumbnail_directory
 from utils import check_folder, get_mime_type
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails, update_file_info
 
@@ -282,12 +282,12 @@ def move_file_with_thumbnails(file_path: str, target_path: str) -> None:
 
     # Move the thumbnails
     base_name = os.path.basename(file_path)
-    thumbnail_dir = os.path.join(os.path.dirname(file_path), THUMBNAIL_DIR_NAME)
+    thumbnail_dir = get_thumbnail_directory(file_path)
     if os.path.exists(thumbnail_dir):
         for fmt in ThumbnailFormat:
             thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")
             if os.path.exists(thumbnail_path):
-                library_thumbnail_dir = os.path.join(os.path.dirname(target_path), THUMBNAIL_DIR_NAME)
+                library_thumbnail_dir = get_thumbnail_directory(target_path)
                 os.makedirs(library_thumbnail_dir, exist_ok=True)
                 shutil.move(thumbnail_path, os.path.join(library_thumbnail_dir, f"{base_name}{fmt.extension}"))
 
@@ -318,7 +318,7 @@ def delete_file(url: str) -> ServerResponse:
 
     # delete the file and thumbnails
     base_name = os.path.basename(real_path)
-    thumbnail_dir = os.path.join(os.path.dirname(real_path), THUMBNAIL_DIR_NAME)
+    thumbnail_dir = get_thumbnail_directory(real_path)
     if os.path.exists(thumbnail_dir):
         for fmt in ThumbnailFormat:
             thumbnail_path = os.path.join(thumbnail_dir, f"{base_name}{fmt.extension}")

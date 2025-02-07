@@ -9,7 +9,7 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
 from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, \
-    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map, ID_NAME_SEPERATOR
+    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map, ID_NAME_SEPERATOR, get_thumbnail_directory
 from utils import check_folder
 
 
@@ -76,7 +76,7 @@ def get_video_info(video_path, force=False):
 
         # find the video json in .thumb folder first
         infos = {}
-        json_path = os.path.join(os.path.dirname(video_path), THUMBNAIL_DIR_NAME, os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
+        json_path = os.path.join(get_thumbnail_directory(video_path), os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
         if os.access(json_path, os.F_OK):
             with open(json_path, 'r', encoding='utf-8') as f:
@@ -201,7 +201,7 @@ def generate_thumbnail(video_path) -> Optional[bool]:
         logger.debug(f"Evict cache for {video_path}")
         get_thumbnails.cache__evict(video_path)   # evict cache for thumbnails
 
-        thumbnail_dir = os.path.join(os.path.dirname(video_path), THUMBNAIL_DIR_NAME)
+        thumbnail_dir = get_thumbnail_directory(video_path)
         os.makedirs(thumbnail_dir, exist_ok=True)
 
         video_info = get_video_info(video_path, force=True)
@@ -283,7 +283,7 @@ def get_thumbnails(filename):
     """
 
     base_name = os.path.basename(filename)
-    thumbnail_directory = os.path.join(os.path.dirname(filename), THUMBNAIL_DIR_NAME)
+    thumbnail_directory = get_thumbnail_directory(filename)
     relative_path = os.path.relpath(thumbnail_directory, get_static_directory()).replace('\\', '/')
 
     return {
@@ -331,7 +331,7 @@ def update_file_info(file_path: str, updated_dict: dict) -> None:
     :return: none
     """
     base_name = os.path.basename(file_path)
-    json_path = os.path.join(os.path.dirname(file_path), THUMBNAIL_DIR_NAME, base_name) + ThumbnailFormat.JSON.extension
+    json_path = os.path.join(get_thumbnail_directory(file_path), base_name) + ThumbnailFormat.JSON.extension
     if os.access(json_path, os.F_OK):
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)

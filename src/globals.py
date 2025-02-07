@@ -81,6 +81,12 @@ def get_url_from_path(file_path, add_subfolder=None) -> Optional[str]:
     relative_path = os.path.relpath(base_directory, get_static_directory()).replace('\\', '/')
     return f"/static/{relative_path}/{base_name}"
 
+def get_thumbnail_directory(file_path) -> str:
+    if not file_path:
+        raise ValueError("File path to get thumbnails dir for is None")
+    base_directory = os.path.dirname(file_path)
+    return os.path.join(base_directory, THUMBNAIL_DIR_NAME)
+
 def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
     if not url:
         return None, None

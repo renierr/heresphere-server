@@ -5,7 +5,8 @@ import numpy as np
 
 from database.video_database import get_video_db
 from database.video_models import Similarity
-from globals import get_static_directory, VideoFolder, THUMBNAIL_DIR_NAME
+from files import list_files
+from globals import VideoFolder, get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
 
@@ -61,33 +62,35 @@ def fill_db_with_features(folder: VideoFolder):
     :param folder: VideoFolder to process
     :return: tuple with state, video path and features
     """
-    video_dir = os.path.join(get_static_directory(), folder.dir)
-    for root, dirs, files in os.walk(video_dir, followlinks=True):
-        # Exclude directories that start with a dot
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
 
-        for filename in files:
-            if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
-                relative_path = os.path.relpath(root, get_static_directory()).replace('\\', '/')
-                video_path = f"/static/{relative_path}/{filename}"
-                thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
-                thumbnail_file = os.path.join(thumbnail_dir, f"{filename}{ThumbnailFormat.WEBM.extension}")
-                if os.access(thumbnail_file, os.F_OK):
-                    yield 'start', video_path, None
-                    with get_video_db() as db:
-                        similarity = db.for_similarity_table.get_similarity(video_path)
-                        if similarity:
-                            combined_features = np.frombuffer(similarity.features, dtype=np.float32)
-                            yield 'exising', video_path, combined_features
-                        else:
-                            try:
-                                combined_features = create_histogram(thumbnail_file)
-                                db.for_similarity_table.upsert_similarity(video_path,
-                                    Similarity(video_url=video_path, features=combined_features.tobytes())
-                                )
-                                yield 'new', video_path, combined_features
-                            except ValueError as e:
-                                yield 'error', video_path, None
+    for file in list_files(folder):
+        video_path = file.get('filename')
+        if not video_path:
+            continue
+
+        file_path, _ = get_real_path_from_url(video_path)
+        if not file_path:
+            continue
+
+        base_name = os.path.basename(file_path)
+        thumbnail_dir = get_thumbnail_directory(file_path)
+        thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
+        if os.access(thumbnail_file, os.F_OK):
+            yield 'start', video_path, None
+            with get_video_db() as db:
+                similarity = db.for_similarity_table.get_similarity(video_path)
+                if similarity:
+                    combined_features = np.frombuffer(similarity.features, dtype=np.float32)
+                    yield 'exising', video_path, combined_features
+                else:
+                    try:
+                        combined_features = create_histogram(thumbnail_file)
+                        db.for_similarity_table.upsert_similarity(video_path,
+                            Similarity(video_url=video_path, features=combined_features.tobytes())
+                        )
+                        yield 'new', video_path, combined_features
+                    except ValueError as e:
+                        yield 'error', video_path, None
 
 
 class VideoCaptureContext:
