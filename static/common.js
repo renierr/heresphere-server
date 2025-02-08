@@ -71,14 +71,6 @@ export const methods = {
             return `${secs}s`;
         }
     },
-    openThumbnail(file) {
-        this.currentFile = file;
-        const modal = new bootstrap.Modal(document.getElementById('thumbnailModal'));
-        modal.show();
-        modal._element.addEventListener('hidden.bs.modal', () => {
-            this.currentFile = null;
-        });
-    },
     changePage(page) {
         if (page < 1) {
             this.currentPage = 1;
