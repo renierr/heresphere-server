@@ -161,19 +161,12 @@ def _create_video_features_for_similarity_compare(video_path: str) -> np.ndarray
 
 
 def main():
-    similarity_threshold = 0.5
-
-    # fill db
-    # for state, vid, features in fill_db_with_features(VideoFolder.videos):
-    #    if state == 'start':
-    #        print(f"Processing AI features for {vid}")
-    #    else:
-    #        print(state, vid, len(features))
+    similarity_threshold = 0.99
 
     print("\n\nGrouping similar videos")
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
-        video_data = [(row.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
+        video_data = [(row.video.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
 
     similarity_matrix = np.array([[similar_compare(f1[1], f2[1]) for f2 in video_data] for f1 in video_data])
     from collections import defaultdict
@@ -182,15 +175,22 @@ def main():
 
     for i in range(len(video_data)):
         for j in range(i + 1, len(video_data)):
-            similarity = similar_compare(video_data[i][1], video_data[j][1])
+            similarity = similarity_matrix[i][j]
             if similarity > similarity_threshold:
                 similar_groups[video_data[i][0]].append((video_data[j][0], similarity))
                 similar_groups[video_data[j][0]].append((video_data[i][0], similarity))
 
+    #for i in range(len(video_data)):
+    #    for j in range(i + 1, len(video_data)):
+    #        similarity = similar_compare(video_data[i][1], video_data[j][1])
+    #        if similarity > similarity_threshold:
+    #            similar_groups[video_data[i][0]].append((video_data[j][0], similarity))
+    #            similar_groups[video_data[j][0]].append((video_data[i][0], similarity))
+
     for video, sim_video in similar_groups.items():
         print(f"Video: {video}")
         for similar_video, score in sim_video:
-            print(f"  Score: {int(score * 100)} - Similar: {similar_video}")
+            print(f"  Score: {int(score * 100)} - Similar to: {similar_video}")
 
     print(f"Found {len(video_data)} videos")
 
