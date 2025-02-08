@@ -47,12 +47,10 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
         if similar > similarity_threshold:
             file_info = find_file_info(video_path)
             similars.append((video_path, int(similar * 100), file_info))
-            if len(similars) >= limit:
-                break
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
-    return similars
+    return similars[:limit]
 
 
 def build_features_for_video(video_url: str) -> np.ndarray | None:
