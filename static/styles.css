@@ -98,3 +98,7 @@ img.similar-thumbnail:focus {
     top: -1.5rem;
     left: -1rem;
 }
+.modal-dialog {
+    user-select: text !important;
+    pointer-events: auto !important;
+}
