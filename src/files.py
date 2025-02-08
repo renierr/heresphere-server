@@ -288,7 +288,7 @@ def get_basic_save_video_info(file_path: str) -> VideoInfo:
         else:
             stereo = ''
         infos = video_info.get('infos', {})
-        uid = infos.get('video_uid', None)
+        uid = infos.get('video_uid', infos.get('unique_info', None))    # unique_info is the old name
         title = infos.get('title', None)
     else:
         duration = 0
