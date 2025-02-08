@@ -2,12 +2,12 @@
   <div class="modal-dialog modal-lg modal-fullscreen-lg-down modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title text-truncate" id="similarityModalLabel">{{ currentFile ? currentFile.title : 'Similar Videos' }}</h5>
+        <h5 class="modal-title text-truncate" id="similarityModalLabel">{{ currentFile ? currentFile.title : 'Video Info' }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div v-if="currentFile" class="modal-body">
         <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
-          <img v-if="currentFile.thumbnail" :src="currentFile.thumbnail" alt="Thumbnail" class="thumbnail p-2 border border-secondary-subtle border-2 text-center">
+          <img v-if="currentFile.thumbnail" tabindex="0" :src="currentFile.thumbnail" alt="Thumbnail" class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
           <div class="text-muted">
             <p>
               <span v-if="currentFile.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(currentFile.filesize) }}</span> <span v-if="currentFile.width && currentFile.height"><i class="bi bi-aspect-ratio"></i> {{ currentFile.width }}x{{ currentFile.height}}</span>
@@ -20,9 +20,12 @@
             <p v-if="currentFile.download_date"><i class="bi bi-calendar-check"></i> {{ formatDate(currentFile.download_date) }} (Downloaded)</p>
             <p v-if="currentFile.duration"><i class="bi bi-clock"></i> {{ formatDuration(currentFile.duration) }}</p>
             <p v-if="currentFile.folder"><i class="bi bi-folder"></i> {{ currentFile.folder }}</p>
-            <button class="btn btn-outline-success btn-sm" @click="playVideo(currentFile)">
-              <i class="bi bi-play-fill"></i>&nbsp;Play
-            </button>
+            <div v-if="currentFile.may_exist" @click.stop.prevent="showDuplicateInfo(currentFile)" class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded" style="word-break: break-word">Possible duplicate file</div>
+            <div class="border-top mt-2 pt-1 d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-success btn-sm m-1" @click="playVideo(currentFile)"><i class="bi bi-play-fill"></i>&nbsp;Play</button>
+              <a v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1" :href="currentFile.url" target="_blank">Original Link</a>
+              <button v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1" data-bs-dismiss="modal"  @click="redownload(currentFile)">Download again (id={{ currentFile.download_id }})</button>
+            </div>
           </div>
         </div>
         <hr>
@@ -31,7 +34,7 @@
           <li v-for="similar in similarVideos" class="mb-2">
             <p class="text-muted text-wrap m-0" style="word-break: break-word;"><span class="score">({{ similar.score }})</span> - {{ similar.file.title }}</p>
             <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
-              <img :src="similar.file.thumbnail" alt="Thumbnail" class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
+              <img :src="similar.file.thumbnail" tabindex="0" alt="Thumbnail" class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
                 <div class="text-muted">
                   <p v-if="similar.file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(similar.file.filesize) }}</span> <span v-if="similar.file.width && similar.file.height"><i class="bi bi-aspect-ratio"></i> {{ similar.file.width }}x{{ similar.file.height}}</span></p>
                   <p><i class="bi bi-calendar"></i> {{ formatDate(similar.file.created) }} (Created)</p>

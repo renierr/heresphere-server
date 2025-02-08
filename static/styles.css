@@ -51,6 +51,15 @@ img.similar-thumbnail {
     max-width: 200px;
     max-height: 150px;
 }
+img.similar-thumbnail:focus {
+    position: fixed;
+    max-width: 95dvh;
+    max-height: 95dvh;
+    inset: 0;
+    margin: auto;
+    height: auto;
+    width: auto;
+}
 #scroll-to-top {
     width: 50px;
     height: 50px;
