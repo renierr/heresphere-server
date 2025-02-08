@@ -160,64 +160,6 @@ def _create_video_features_for_similarity_compare(video_path: str) -> np.ndarray
     return avg_hist
 
 
-# TODO: test? is it useful?
-def _create_video_features_for_similarity_compare_alt_motion(video_path: str, motion_fix_size=512, motion_frame_skip=25) -> np.ndarray:
-    with VideoCaptureContext(video_path) as cap:
-        flow_features = []
-
-        first = True
-        frame_count = 0
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frame_count += 1
-
-            # Skip frames for motion flow calculation
-            if frame_count % motion_frame_skip != 0:
-                continue
-
-            motion_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            if first:
-                prev_frame = motion_frame
-                first = False
-
-            flow = cv2.calcOpticalFlowFarneback(prev_frame, motion_frame, None, 0.5, 3, 15, 2, 5, 1.1, 0)
-            prev_frame = motion_frame
-            mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])
-            flow_feature = np.hstack((mag.flatten(), ang.flatten()))
-            # Resize the flow feature to a fixed size
-            if flow_feature.size > motion_fix_size:
-                flow_feature = np.interp(np.linspace(0, flow_feature.size, motion_fix_size), np.arange(flow_feature.size), flow_feature)
-            elif flow_feature.size < motion_fix_size:
-                flow_feature = np.pad(flow_feature, (0, motion_fix_size - flow_feature.size), mode='constant')
-            flow_features.append(flow_feature)
-
-    avg_flow = np.mean(flow_features, axis=0)
-    return avg_flow
-
-
-# TODO: test? is it useful?
-def _create_video_features_for_similarity_compare_alt_frames(video_path: str, frame_skip=25) -> np.ndarray:
-    with VideoCaptureContext(video_path) as cap:
-        features = []
-
-        frame_count = 0
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frame_count += 1
-
-            # Skip frames for motion flow calculation
-            if frame_count % frame_skip != 0:
-                continue
-
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            features.append(frame.flatten())
-
-
-
 def main():
     similarity_threshold = 0.5
 

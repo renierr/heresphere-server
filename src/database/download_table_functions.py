@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional
 
 from globals import ID_NAME_SEPERATOR
 from .video_models import Downloads

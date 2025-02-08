@@ -123,8 +123,6 @@ def get_video_info(video_path, force=False):
         video_uid = f"{format_info.get('format_name', '')}_{format_info.get('duration', '')}_{format_info.get('size', '')}"
         for stream in streams_info:
             video_uid += f"_{stream.get('codec_name', '')}_{stream.get('width', '')}_{stream.get('height', '')}_{stream.get('bit_rate', '')}_{stream.get('sample_rate', '')}_{stream.get('channels', '')}"
-
-        # TODO: rename to video_uid
         infos['video_uid'] = video_uid
 
         # store json to .thumb folder

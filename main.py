@@ -24,8 +24,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
-from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory, ID_NAME_SEPERATOR
-from database.video_database import get_video_db, Downloads
+from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
 from migrate.migrate import migrate
 from thumbnail import thumbnail_bp
 from videos import video_bp
@@ -83,21 +82,6 @@ app.register_blueprint(heresphere_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(video_bp)
 app.register_blueprint(thumbnail_bp)
-
-
-# debug purpose only
-# @app.before_request
-# def log_request_info():
-#     logger.info(f"Request: {request.method} {request.url}")
-#     logger.info(f"Headers: {request.headers}")
-#     logger.info(f"Body: {request.get_data()}")
-#
-# @app.after_request
-# def log_response_info(response):
-#     logger.info(f"Response: {response.status}")
-#     logger.info(f"Headers: {response.headers}")
-#     logger.info(f"Body: {response.get_data()}")
-#     return response
 
 @app.errorhandler(Exception)
 def handle_exception(e):
