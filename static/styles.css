@@ -53,7 +53,7 @@ img.similar-thumbnail {
 }
 img.similar-thumbnail:focus {
     position: fixed;
-    max-width: 95dvh;
+    max-width: 95dvw;
     max-height: 95dvh;
     inset: 0;
     margin: auto;
