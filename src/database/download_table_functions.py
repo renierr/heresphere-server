@@ -41,13 +41,14 @@ class ForDownload:
         if download:
             download.failed = 1
 
-    def next_download(self, url) -> tuple[str,Downloads]:
+    def next_download(self, url: str, title: str) -> tuple[str, Downloads]:
         """
         prepare the next download
         create a new download object if the url is not already in the database
         pre-fill the download object with some initial data
 
         :param url: the url to download
+        :param title: the intermediate title of the video
         :return: the download id and the download object
         """
         session = self.db.get_session()
@@ -58,7 +59,7 @@ class ForDownload:
             return download_random_id, existing_download
         else:
             name = f"{download_random_id}{ID_NAME_SEPERATOR}downloading"
-            download = Downloads(video_url=name, original_url=url, file_name=name, download_date=int(datetime.now().timestamp()))
+            download = Downloads(video_url=name, original_url=url, file_name=name, title=title, download_date=int(datetime.now().timestamp()))
             session.add(download)
             session.commit()
             return download_random_id, download

@@ -8,8 +8,10 @@ from flask import Blueprint, jsonify, request
 from loguru import logger
 from bus import push_text_to_client
 from cache import cache, clear_cache_by_name
+from database.video_database import get_video_db
 from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, \
-    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, get_url_map, ID_NAME_SEPERATOR, get_thumbnail_directory
+    THUMBNAIL_DIR_NAME, ServerResponse, FolderState, ID_NAME_SEPERATOR, get_thumbnail_directory, \
+    get_url_from_path
 from utils import check_folder
 
 
@@ -98,30 +100,32 @@ def get_video_info(video_path, force=False):
         # additional infos
         info['infos'] = infos
 
-        # find title from url map
-        download_id = os.path.basename(video_path).split(ID_NAME_SEPERATOR)[0]
-        url_info = get_url_map().get(download_id, {})
-        if url_info:
-            infos['download_id'] = download_id
-            infos['url_info'] = url_info
-            title = url_info.get('title')
-            if title:
-                infos['title'] = title
-            url = url_info.get('url')
-            if url:
-                infos['original_url'] = url
-            download_date = url_info.get('download_date')
-            if download_date:
-                infos['download_date'] = download_date
+        # find title and stuff from db
+        video_url = get_url_from_path(video_path)
+        with get_video_db() as db:
+            download = db.for_download_table.get_download(video_url)
+            download_id = os.path.basename(video_path).split(ID_NAME_SEPERATOR)[0]
+            if download:
+                infos['download_id'] = download_id
+                title = download.title
+                if title:
+                    infos['title'] = title
+                url = download.original_url
+                if url:
+                    infos['original_url'] = url
+                download_date = download.download_date
+                if download_date:
+                    infos['download_date'] = download_date
 
         # generate unique info string from specific fields
         format_info = info.get('format', {})
         streams_info = info.get('streams', [])
-        unique_info = f"{format_info.get('format_name', '')}_{format_info.get('duration', '')}_{format_info.get('size', '')}"
+        video_uid = f"{format_info.get('format_name', '')}_{format_info.get('duration', '')}_{format_info.get('size', '')}"
         for stream in streams_info:
-            unique_info += f"_{stream.get('codec_name', '')}_{stream.get('width', '')}_{stream.get('height', '')}_{stream.get('bit_rate', '')}_{stream.get('sample_rate', '')}_{stream.get('channels', '')}"
+            video_uid += f"_{stream.get('codec_name', '')}_{stream.get('width', '')}_{stream.get('height', '')}_{stream.get('bit_rate', '')}_{stream.get('sample_rate', '')}_{stream.get('channels', '')}"
 
-        infos['unique_info'] = unique_info
+        # TODO: rename to video_uid
+        infos['video_uid'] = video_uid
 
         # store json to .thumb folder
         with open(json_path, 'w', encoding='utf-8') as f:

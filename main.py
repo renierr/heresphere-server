@@ -24,7 +24,7 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
-from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory, get_url_map, ID_NAME_SEPERATOR
+from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory, ID_NAME_SEPERATOR
 from database.video_database import get_video_db, Downloads
 from migrate.migrate import migrate
 from thumbnail import thumbnail_bp
@@ -220,17 +220,6 @@ def sse():
 def cl():
     return jsonify(cleanup())
 
-def populate_url_map() -> None:
-    url_map = get_url_map()
-    with get_video_db() as db:
-        all_downloads = db.get_session().query(Downloads).all()
-        for downloads in all_downloads:
-            filename = downloads.file_name
-            if filename:
-                download_id = filename.split(ID_NAME_SEPERATOR)[0]
-                if download_id:
-                    dat = {'url': downloads.original_url, 'title': downloads.title, 'failed': downloads.failed, 'download_date': downloads.download_date}
-                    url_map[download_id] = dat
 
 def start_server() -> Optional[str]:
     global ffmpeg_version_info, ffprobe_version_info
@@ -291,7 +280,6 @@ def main():
         os.makedirs(data_dir, exist_ok=True)
     migrate()
 
-    populate_url_map()
     result = start_server()
     if result:
         logger.error(f"Server could not start: {result}")

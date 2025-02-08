@@ -5,7 +5,8 @@ from loguru import logger
 from bus import push_text_to_client
 from cache import cache
 from database.video_database import get_video_db
-from globals import get_static_directory, VideoInfo, get_real_path_from_url, get_url_map, \
+from database.video_models import Downloads
+from globals import get_static_directory, VideoInfo, get_real_path_from_url,  \
     VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path, get_url_from_path, get_thumbnail_directory
 from utils import check_folder, get_mime_type
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails, update_file_info
@@ -82,6 +83,9 @@ def list_files(directory: VideoFolder) -> list:
         logger.warning(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
         return extracted_details
 
+    with get_video_db() as db:
+        failed_downloads = [download.file_name for download in db.session.query(Downloads).filter_by(failed=True).all()]
+
     for root, dirs, files in os.walk(folder, followlinks=True):
         # Exclude directories that start with a dot
         dirs[:] = [d for d in dirs if not d.startswith('.')]
@@ -110,11 +114,8 @@ def list_files(directory: VideoFolder) -> list:
 
             # only for videos directory
             if directory == VideoFolder.videos:
-                download_id = filename.split('____')[0][:14]
-                url_info = get_url_map().get(download_id, {})
-                common_details.update({
-                    **({k: url_info.get(k) for k in ['url', 'failed', 'download_date']} if url_info else {})
-                })
+                if filename in failed_downloads:
+                    common_details['failed'] = True
             extracted_details.append(common_details)
 
     # check for duplicates
@@ -236,9 +237,8 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
         preview = thumbnails.get(ThumbnailFormat.WEBM)
         info = get_basic_save_video_info(realfile)
         favorite = info.infos.get('favorite', False)
-        url_info = info.infos.get('url_info', {})
-        download_date = info.infos.get('download_date', url_info.get('downloaded_date', url_info.get('download_date', None)))
-        url = url_info.get('url', None)
+        download_date = info.infos.get('download_date')
+        url = info.infos.get('original_url')
 
         result.update({
             'mimetype': mimetype,
@@ -288,7 +288,7 @@ def get_basic_save_video_info(file_path: str) -> VideoInfo:
         else:
             stereo = ''
         infos = video_info.get('infos', {})
-        uid = infos.get('unique_info', None)
+        uid = infos.get('video_uid', None)
         title = infos.get('title', None)
     else:
         duration = 0
@@ -421,8 +421,6 @@ def cleanup() -> ServerResponse:
     :return: object with success and message
     """
 
-    get_url_map().clear()
-
     to_remove = []
     with get_video_db() as db:
         all_downloads = db.for_download_table.list_downloads()
@@ -436,7 +434,7 @@ def cleanup() -> ServerResponse:
                     to_remove.append(pk)
                     db.get_session().delete(download)
     logger.debug(f"removed orphan db entries: {to_remove}")
-    push_text_to_client(f"Cleanup tracking map finished (removed: {len(to_remove)} entries).")
+    push_text_to_client(f"Cleanup db entries finished (removed: {len(to_remove)} entries).")
 
     # cleanup thumbnails from .thumb directory that no longer have a corresponding video file for both videos and library directory
     known_extensions = [fmt.extension for fmt in ThumbnailFormat]
@@ -488,9 +486,6 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     # title update dict
     title_update = {
         'title': new_title,
-        'url_info': {
-            'title': new_title
-        }
     }
     update_file_info(real_path, title_update)
 

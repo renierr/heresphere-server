@@ -8,11 +8,9 @@ from enum import Enum
 from typing import Tuple, Optional
 
 DEBUG: bool = False
-url_map = {}
 url_counter: int = 1
 
 ID_NAME_SEPERATOR = '____'
-URL_MAP_JSON = 'url_map.json'
 THUMBNAIL_DIR_NAME: str = '.thumb'
 UNKNOWN_VIDEO_EXTENSION: str = '.unknown_video'
 VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title', 'infos'])
@@ -44,11 +42,14 @@ def set_debug(value) -> None:
 def is_debug() -> bool:
     return DEBUG
 
-def get_url_map() -> dict:
-    return url_map
-
 application_path = None
 def get_application_path() -> str:
+    """
+    Get the application path
+    The application path is the directory where the application started from
+
+    :return: application path
+    """
     global application_path
     if application_path:
         return application_path
@@ -61,10 +62,22 @@ def get_application_path() -> str:
 
 
 def get_static_directory() -> str:
+    """
+    Get the static directory path
+    The static directory is used to store the static files for the web interface - access via /static/
+    Also where the videos are stored and served from.
+    Thumbnails are stored in subfolders of the video directories
+
+    :return: static directory path
+    """
     application_path = get_application_path()
     return os.path.join(application_path, 'static')
 
 def get_data_directory() -> str:
+    """
+    Get the data directory path
+    The data directory is used to store the database and other data files
+    """
     application_path = get_application_path()
     return os.path.join(application_path, 'data')
 
@@ -74,6 +87,14 @@ def remove_ansi_codes(text) -> str:
     return ansi_escape.sub('', text)
 
 def get_url_from_path(file_path, add_subfolder=None) -> Optional[str]:
+    """
+    Get the url from the given file path
+    The URL is the relative path from the static directory, used to access the file from the web
+
+    :param file_path: file path to get the url for
+    :param add_subfolder: add a subfolder to the url
+    :return: url for the given file path
+    """
     if not file_path or not os.access(file_path, os.F_OK):
         return None
     base_name = os.path.basename(file_path)
@@ -82,6 +103,12 @@ def get_url_from_path(file_path, add_subfolder=None) -> Optional[str]:
     return f"/static/{relative_path}/{base_name}"
 
 def get_thumbnail_directory(file_path) -> str:
+    """
+    Get the thumbnail directory for the given file path
+
+    :param file_path: file path to get the thumbnail directory for
+    :return: thumbnail directory
+    """
     if not file_path:
         raise ValueError("File path to get thumbnails dir for is None")
     base_directory = os.path.dirname(file_path)

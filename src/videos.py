@@ -13,7 +13,7 @@ from bus import push_text_to_client
 from database.video_database import get_video_db
 from database.video_models import Videos, Similarity
 from files import list_files
-from globals import get_url_map, get_application_path, \
+from globals import get_application_path, \
     remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR, get_real_path_from_url
 from similar import build_features_for_video
 from thumbnail import generate_thumbnail_for_path, get_video_info
@@ -143,16 +143,14 @@ def get_stream(url) -> tuple:
 
 def download_video(url, title):
     download_random_id = None
-    url_map = get_url_map()
 
     try:
         with get_video_db() as db:
-            download_random_id, current_download = db.for_download_table.next_download(url)
+            download_random_id, current_download = db.for_download_table.next_download(url, title)
 
         push_text_to_client(f"Downloading video {download_random_id}")
         youtube_video = is_youtube_url(url)
         subfolder = 'youtube' if youtube_video else 'direct'
-        url_map[download_random_id] = {'url': url, 'title': title, 'failed': False}
         ydl_opts = {
             'format': '(bv+ba/b)[protocol^=http][protocol!=dash] / (bv*+ba/b)',
             'restrictfilenames': True,
@@ -173,9 +171,7 @@ def download_video(url, title):
         basename = os.path.basename(filename)
         video_url = '/' + filename.replace('\\', '/')
         title = download_result.get('title', None) or title
-        url_map[download_random_id]['title'] = title
         download_date = int(datetime.now().timestamp())
-        url_map[download_random_id]['download_date'] = download_date
 
         with get_video_db() as db:
             current_download.download_date = download_date
@@ -193,7 +189,7 @@ def download_video(url, title):
             if real_path:
                 video_info = get_video_info(real_path)
                 if video_info:
-                    video_uid = video_info.get('infos', {}).get('unique_info', None)
+                    video_uid = video_info.get('infos', {}).get('video_uid', None)
             with get_video_db() as db:
                 similarity = Similarity(features=build_features_for_video(video_url))
                 video = Videos(source_url=url, file_name=basename, title=title, download_id=download_random_id,
@@ -205,7 +201,6 @@ def download_video(url, title):
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         logger.error( f"Failed to download video: {e}")
-        url_map[download_random_id]['failed'] = True
         with get_video_db() as db:
             db.for_download_table.mark_download_failed(url)
         list_files.cache__evict(VideoFolder.videos)
