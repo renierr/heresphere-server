@@ -26,8 +26,8 @@
           </div>
         </div>
         <hr>
-        <p>Found {{ similarVideos.length }} similar videos</p>
-        <ul v-if="similarVideos.length" class="list-unstyled">
+        <p>Found {{ similarVideos?.length }} similar videos</p>
+        <ul v-if="similarVideos?.length" class="list-unstyled">
           <li v-for="similar in similarVideos" class="mb-2">
             <p class="text-muted text-wrap m-0" style="word-break: break-word;"><span class="score">({{ similar.score }})</span> - {{ similar.file.title }}</p>
             <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
@@ -48,7 +48,7 @@
 
       </div>
       <div v-else class="modal-body">
-        <p>No file selected</p>  
+        <p>No file selected2</p>
       </div>      
     </div>
   </div>
