@@ -104,7 +104,7 @@ def get_video_info(video_path, force=False):
         video_url = get_url_from_path(video_path)
         with get_video_db() as db:
             download = db.for_download_table.get_download(video_url)
-            download_id = os.path.basename(video_path).split(ID_NAME_SEPERATOR)[0]
+            download_id = os.path.basename(video_path).split(ID_NAME_SEPERATOR)[0][:14]
             if download:
                 infos['download_id'] = download_id
                 title = download.title
