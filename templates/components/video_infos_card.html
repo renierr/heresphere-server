@@ -47,6 +47,5 @@
         {% if option_move_library %}
         <button @click="confirmMoveInsideLibrary(file)" class="btn btn-outline-danger btn-sm">Move To Folder</button>
         {% endif %}
-        <button v-if="!file.partial && !file.unknown" class="btn btn-outline-secondary btn-sm" @click="showSimilar(file)">Show Similar</button>
     </div>
 </div>

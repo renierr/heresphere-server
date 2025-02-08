@@ -109,7 +109,7 @@ export const methods = {
             .then(data => {
                 this.currentFile = file;
                 this.similarVideos = data;
-                const modal = new bootstrap.Modal(document.getElementById('similarityModal'));
+                const modal = new bootstrap.Modal(document.getElementById('similarityModal'), { backdrop: 'static' });
                 modal.show();
                 modal._element.addEventListener('hidden.bs.modal', () => {
                     this.currentFile = null;
