@@ -31,7 +31,7 @@ class ForDownload:
 
     def delete_download(self, video_path) -> None:
         session = self.db.get_session()
-        download = session.query(Downloads).filter_by(video_path=video_path).first()
+        download = session.query(Downloads).filter_by(video_url=video_path).first()
         if download:
             session.delete(download)
 
