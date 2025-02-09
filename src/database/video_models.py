@@ -21,7 +21,7 @@ class Videos(VideoBase, ReprMixin):
     video_uid: Mapped[str | None] = mapped_column(String)
     download_date: Mapped[int | None] = mapped_column(Integer)
     favorite: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    similarity: Mapped[Similarity | None] = relationship(back_populates='video')
+    similarity: Mapped[Similarity | None] = relationship(back_populates='video', cascade='all, delete-orphan')
     __table_args__ = (
         UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
     )
