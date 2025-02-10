@@ -56,73 +56,28 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
     return similars[:limit]
 
 
-def build_features_for_video(video_url: str) -> np.ndarray | None:
+def build_features_for_video(video_url: str) -> tuple[np.ndarray | None, np.ndarray | None]:
     """
     Build the features for the given video_url and return the features
+    uses the thumbnail webm file to get a histogram and phash of the video
 
     :param video_url: url of the video to build features for
-    :return: features for the video
+    :return: features for the video tuple (histogram, phash) or None if not possible
     """
 
     if not video_url:
-        return None
+        return None, None
 
     file_path, _ = get_real_path_from_url(video_url)
     if not file_path:
-        return None
+        return None, None
 
     base_name = os.path.basename(file_path)
     thumbnail_dir = get_thumbnail_directory(file_path)
     thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
     if os.access(thumbnail_file, os.F_OK):
         return _create_video_features_for_similarity_compare(thumbnail_file)
-    return None
-
-
-def fill_db_with_features(folder: VideoFolder):
-    """
-    Fill the database with features for all videos in the given folder (generator function)
-    Yields a tuple with the state of the processing, the video path and the features
-    state: 'start' - starting processing a video
-           'existing' - video already has features in the database
-           'new' - video has been processed and features added to the database
-
-    uses the thumbnail webm file to get a histogram of the video
-
-    :param folder: VideoFolder to process
-    :return: tuple with state, video path and features
-    """
-
-    for file in list_files(folder):
-        video_path = file.get('filename')
-        if not video_path:
-            continue
-
-        file_path, _ = get_real_path_from_url(video_path)
-        if not file_path:
-            continue
-
-        base_name = os.path.basename(file_path)
-        thumbnail_dir = get_thumbnail_directory(file_path)
-        thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
-        if os.access(thumbnail_file, os.F_OK):
-            yield 'start', video_path, None
-            with get_video_db() as db:
-                video = db.for_video_table.get_video(video_path)
-                if video is None:
-                    yield 'missing', video_path, None
-                    continue
-
-                if video.similarity:
-                    combined_features = np.frombuffer(video.similarity.histogramm, dtype=np.float32)
-                    yield 'exising', video_path, combined_features
-                else:
-                    try:
-                        combined_features = _create_video_features_for_similarity_compare(thumbnail_file)
-                        db.for_similarity_table.update_features(video, combined_features.tobytes())
-                        yield 'new', video_path, combined_features
-                    except ValueError:
-                        yield 'error', video_path, None
+    return None, None
 
 
 class VideoCaptureContext:
@@ -141,24 +96,39 @@ class VideoCaptureContext:
             self.cap.release()
 
 
-def _create_video_features_for_similarity_compare(video_path: str) -> np.ndarray:
+def _create_video_features_for_similarity_compare(video_path: str, skip_frames=10) -> tuple[np.ndarray, np.ndarray]:
     with VideoCaptureContext(video_path) as cap:
         hist_list = []
+        phash_list = []
 
         frame_count = 0
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
+
+            if frame_count > 0 and frame_count % skip_frames != 0:
+                continue
             frame_count += 1
 
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            hist = cv2.calcHist([frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+            # Calculate histogram
+            hist_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            hist = cv2.calcHist([hist_frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
             hist = cv2.normalize(hist, hist).flatten()
             hist_list.append(hist)
 
+            # Calculate phash
+            phash_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            dct = cv2.dct(np.float32(phash_frame))
+            dct_low_freq = dct[:8, :8]
+            median = np.median(dct_low_freq)
+            phash = (dct_low_freq > median).astype(int)
+            phash_list.append(phash.flatten())
+
     avg_hist = np.mean(hist_list, axis=0)
-    return avg_hist
+    avg_phash = np.mean(phash_list, axis=0)
+    binary_avg_phash = (avg_phash > 0.5).astype(int)
+    return avg_hist, binary_avg_phash
 
 
 def main():
