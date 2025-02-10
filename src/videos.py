@@ -15,7 +15,7 @@ from database.video_models import Videos, Similarity
 from files import list_files
 from globals import get_application_path, \
     remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR, get_real_path_from_url
-from similar import build_features_for_video
+from similar import build_features_for_video, clear_similarity_cache
 from thumbnail import generate_thumbnail_for_path, get_video_info
 
 root_path = get_application_path()
@@ -191,7 +191,7 @@ def download_video(url, title):
                 if video_info:
                     video_uid = video_info.get('infos', {}).get('video_uid', None)
             with get_video_db() as db:
-                similarity = Similarity(features=build_features_for_video(video_url))
+                similarity = Similarity(histogramm=build_features_for_video(video_url))
                 video = Videos(source_url=url, file_name=basename, title=title, download_id=download_random_id,
                                video_uid=video_uid, download_date=download_date, similarity=similarity)
                 db.for_video_table.upsert_video(video_url, video)
@@ -261,11 +261,11 @@ def _add_video_to_db(file):
                     setattr(video, attr, value)
             if not video.similarity:
                 features = build_features_for_video(video_url)
-                video.similarity = Similarity(features=features)
+                video.similarity = Similarity(histogramm=features)
         else:
             video = Videos(video_url=video_url, **file_vars)
             features = build_features_for_video(video_url)
-            video.similarity = Similarity(features=features)
+            video.similarity = Similarity(histogramm=features)
             db.session.add(video)
 
 
@@ -277,6 +277,7 @@ def scan_for_videos():
                 push_text_to_client(f"...scanned {i} videos - running")
             _add_video_to_db(file)
 
+        clear_similarity_cache()
         push_text_to_client(f"Scanned {len(files)} videos finished")
     except Exception as e:
         logger.error(f"Error scanning for videos: {e}")

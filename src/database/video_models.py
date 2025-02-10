@@ -45,7 +45,8 @@ class Similarity(VideoBase, ReprMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     video_id: Mapped[int] = mapped_column(ForeignKey("videos.id"))
     video: Mapped[Videos] = relationship(back_populates="similarity")
-    features: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
+    histogramm: Mapped[bytes | None] = mapped_column(LargeBinary)
+    phash: Mapped[bytes | None] = mapped_column(LargeBinary)
     changed: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())
 
 

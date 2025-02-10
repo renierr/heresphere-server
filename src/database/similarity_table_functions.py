@@ -22,10 +22,10 @@ class ForSimilarity:
 
         similarity = video.similarity
         if similarity:
-            similarity.features = features
+            similarity.histogramm = features
             similarity.changed = datetime.now()
         else:
-            similarity = Similarity(video=video, features=features)
+            similarity = Similarity(video=video, histogramm=features)
             session.add(similarity)
             video.similarity = similarity
 

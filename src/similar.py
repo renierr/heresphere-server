@@ -13,11 +13,14 @@ from thumbnail import ThumbnailFormat
 def similar_compare(features_a, features_b):
     return cv2.compareHist(features_a, features_b, cv2.HISTCMP_CORREL)
 
+def clear_similarity_cache():
+    _all_features.cache__clear()
+
 @cache(ttl=3600)
 def _all_features():
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
-        return [(row.video.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
+        return [(row.video.video_url, np.frombuffer(row.histogramm, dtype=np.float32)) for row in all_features]
 
 def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> list:
     """
@@ -111,7 +114,7 @@ def fill_db_with_features(folder: VideoFolder):
                     continue
 
                 if video.similarity:
-                    combined_features = np.frombuffer(video.similarity.features, dtype=np.float32)
+                    combined_features = np.frombuffer(video.similarity.histogramm, dtype=np.float32)
                     yield 'exising', video_path, combined_features
                 else:
                     try:
@@ -164,7 +167,7 @@ def main():
     print("\n\nGrouping similar videos")
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
-        video_data = [(row.video.video_url, np.frombuffer(row.features, dtype=np.float32)) for row in all_features]
+        video_data = [(row.video.video_url, np.frombuffer(row.histogramm, dtype=np.float32)) for row in all_features]
 
     similarity_matrix = np.array([[similar_compare(f1[1], f2[1]) for f2 in video_data] for f1 in video_data])
     from collections import defaultdict
