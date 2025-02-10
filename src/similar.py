@@ -2,25 +2,57 @@ import os
 
 import cv2
 import numpy as np
+from numpy import ndarray
 
 from cache import cache
 from database.video_database import get_video_db
-from files import list_files, find_file_info
-from globals import VideoFolder, get_real_path_from_url, get_thumbnail_directory
+from files import find_file_info
+from globals import get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
 
-def similar_compare(features_a, features_b):
-    return cv2.compareHist(features_a, features_b, cv2.HISTCMP_CORREL)
+def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarray, ndarray]) -> float:
+    """
+    Compare the similarity of two features
+    the features are a tuple of histogram and phash (ndarray)
+
+    :param features_a: tuple of histogram and phash (ndarray)
+    :param features_b: tuple of histogram and phash (ndarray)
+    :return: similarity score between 0 and 1
+    """
+
+    # compare histogram
+    hist_features_a = features_a[0]
+    hist_features_b = features_b[0]
+    if hist_features_a is None or hist_features_b is None:
+        score_hist = 0
+    else:
+        score_hist = cv2.compareHist(features_a[0], features_b[0], cv2.HISTCMP_CORREL)
+
+    # compare phash with hamming distance
+    phash_features_a = features_a[1]
+    phash_features_b = features_b[1]
+    if phash_features_a is None or phash_features_b is None:
+        score_phash = 0
+    else:
+        # hemming distance normalized by the length of the phash that a number between 0 and 1 is returned
+        score_phash = np.sum(phash_features_a != phash_features_b) / len(phash_features_a)
+        if score_phash == 0: # a hemming of 0 means identical
+            score_phash = 1
+
+    # combine the score equal weight for both
+    score = (score_hist + score_phash) / 2
+
+    return score_hist
 
 def clear_similarity_cache():
     _all_features.cache__clear()
 
 @cache(ttl=3600)
-def _all_features():
+def _all_features() -> dict[str, tuple[np.ndarray, np.ndarray]]:
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
-        return [(row.video.video_url, np.frombuffer(row.histogramm, dtype=np.float32)) for row in all_features]
+        return {row.video.video_url: (np.frombuffer(row.histogramm, dtype=np.float32), np.frombuffer(row.phash, dtype=np.float32)) for row in all_features}
 
 def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> list:
     """
@@ -34,16 +66,12 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
     """
 
     all_features = _all_features()
-    provided_features = None
-    for video_path, features in all_features:
-        if video_path == provided_video_path:
-            provided_features = features
-            break
+    provided_features = all_features.get(provided_video_path)
     if provided_features is None:
         return []
 
     similars = []
-    for video_path, features in all_features:
+    for video_path, features in all_features.items():
         if video_path == provided_video_path:    # ignore myself in the comparison
             continue
         similar = similar_compare(provided_features, features)
@@ -135,10 +163,7 @@ def main():
     similarity_threshold = 0.99
 
     print("\n\nGrouping similar videos")
-    with get_video_db() as db:
-        all_features = db.for_similarity_table.list_similarity()
-        video_data = [(row.video.video_url, np.frombuffer(row.histogramm, dtype=np.float32)) for row in all_features]
-
+    video_data = list(_all_features().items())
     similarity_matrix = np.array([[similar_compare(f1[1], f2[1]) for f2 in video_data] for f1 in video_data])
     from collections import defaultdict
 
@@ -150,13 +175,6 @@ def main():
             if similarity > similarity_threshold:
                 similar_groups[video_data[i][0]].append((video_data[j][0], similarity))
                 similar_groups[video_data[j][0]].append((video_data[i][0], similarity))
-
-    #for i in range(len(video_data)):
-    #    for j in range(i + 1, len(video_data)):
-    #        similarity = similar_compare(video_data[i][1], video_data[j][1])
-    #        if similarity > similarity_threshold:
-    #            similar_groups[video_data[i][0]].append((video_data[j][0], similarity))
-    #            similar_groups[video_data[j][0]].append((video_data[i][0], similarity))
 
     for video, sim_video in similar_groups.items():
         print(f"Video: {video}")
