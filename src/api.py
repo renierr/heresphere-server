@@ -92,6 +92,6 @@ def similar():
     if not video_path:
         return jsonify(ServerResponse(False, "No video path")), 400
 
-    similar_result = find_similar(video_path, 0.7)
+    similar_result = find_similar(video_path, 0.5)
     similar_result = [{'video_path': x[0], 'score': x[1], 'file': x[2]} for x in similar_result]
     return jsonify(similar_result)

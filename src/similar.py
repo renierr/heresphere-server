@@ -40,10 +40,10 @@ def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarr
         if score_phash == 0: # a hemming of 0 means identical
             score_phash = 1
 
-    # combine the score equal weight for both
-    score = (score_hist + score_phash) / 2
+    # combine the score 6:4
+    score = (0.6 * score_hist) + (0.4 * score_phash)
 
-    return score_hist
+    return score
 
 def clear_similarity_cache():
     _all_features.cache__clear()
