@@ -28,6 +28,7 @@ def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarr
         score_hist = 0
     else:
         score_hist = cv2.compareHist(features_a[0], features_b[0], cv2.HISTCMP_CORREL)
+        score_hist = score_hist if score_hist > 0 else 0    # make sure the score is not negative, the correl algorithm can return negative values
 
     # compare phash with hamming distance
     phash_features_a = features_a[1]
@@ -35,10 +36,8 @@ def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarr
     if phash_features_a is None or phash_features_b is None:
         score_phash = 0
     else:
-        # hemming distance normalized by the length of the phash that a number between 0 and 1 is returned
-        score_phash = np.sum(phash_features_a != phash_features_b) / len(phash_features_a)
-        if score_phash == 0: # a hemming of 0 means identical
-            score_phash = 1
+        # hamming distance normalized by the length of the phash that a number between 0 and 1 is returned
+        score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
 
     # combine the score 6:4
     score = (0.6 * score_hist) + (0.4 * score_phash)
