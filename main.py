@@ -151,6 +151,7 @@ def bookmarks():
 @app.route('/update')
 def update():
     # check if update.sh file is present in root folder
+    no_update_done = False
     if os.path.exists(UPDATE_SCRIPT_NAME):
         push_text_to_client("Update triggered, try to update server - possible connection lost, look for reconnect")
         try:
@@ -158,6 +159,8 @@ def update():
             # Read stdout line by line and push to client
             for line in process.stdout:
                 push_text_to_client(line.strip())
+                if "no restart required" in line:
+                    no_update_done = True
 
             stderr_output = process.stderr.read().strip()
             if stderr_output:
@@ -166,7 +169,7 @@ def update():
             push_text_to_client(f"Error during update call: {e}")
     else:
         push_text_to_client("Update triggered, no update.sh in root folder present!")
-    return jsonify(ServerResponse(True, "update finished"))
+    return jsonify(ServerResponse(True, f"update finished {'no update/restart required' if no_update_done else ''}"))
 
 
 @app.route('/cache')
