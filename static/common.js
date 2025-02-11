@@ -205,7 +205,7 @@ export const methods = {
             })
             .catch(error => {
                 console.error('Error:', error);
-                this.serverResult = 'Error occurred during server update';
+                this.serverResult = 'Server may lost connection after update see Info box or reload page';
             });
     },
     confirmCleanup() {
