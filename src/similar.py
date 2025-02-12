@@ -47,13 +47,9 @@ def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarr
     else:
         score_hog = cv2.compareHist(hog_features_a, hog_features_b, cv2.HISTCMP_CORREL)
         score_hog = score_hog if score_hog > 0 else 0
-        # example for Euclidean distance
-        #distance = np.linalg.norm(hog_features_a - hog_features_b)
-        #max_distance = np.sqrt(len(hog_features_a))
-        #score_hog = 1 - (distance / max_distance)
 
     # combine the score 6:4
-    score = (0.6 * score_hist) + (0.4 * score_phash)
+    score = (0.4 * score_hist) + (0.3 * score_phash) + (0.3 * score_hog)
 
     return score
 
