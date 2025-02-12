@@ -191,8 +191,8 @@ def download_video(url, title):
                 if video_info:
                     video_uid = video_info.get('infos', {}).get('video_uid', None)
             with get_video_db() as db:
-                hist_features, phash_features = build_features_for_video(video_url)
-                similarity = Similarity(histogramm=hist_features, phash=phash_features)
+                hist_features, phash_features, hog_features = build_features_for_video(video_url)
+                similarity = Similarity(histogramm=hist_features, phash=phash_features, hog=hog_features)
                 video = Videos(source_url=url, file_name=basename, title=title, download_id=download_random_id,
                                video_uid=video_uid, download_date=download_date, similarity=similarity)
                 db.for_video_table.upsert_video(video_url, video)
@@ -261,12 +261,12 @@ def _add_video_to_db(file):
                 if getattr(video, attr) != value:
                     setattr(video, attr, value)
             if not video.similarity or video.similarity.histogramm is None or video.similarity.phash is None:
-                hist_features, phash_features = build_features_for_video(video_url)
-                video.similarity = Similarity(histogramm=hist_features, phash=phash_features)
+                hist_features, phash_features, hog_features = build_features_for_video(video_url)
+                video.similarity = Similarity(histogramm=hist_features, phash=phash_features, hog=hog_features)
         else:
             video = Videos(video_url=video_url, **file_vars)
-            hist_features, phash_features = build_features_for_video(video_url)
-            video.similarity = Similarity(histogramm=hist_features, phash=phash_features)
+            hist_features, phash_features, hog_features = build_features_for_video(video_url)
+            video.similarity = Similarity(histogramm=hist_features, phash=phash_features, hog=hog_features)
             db.session.add(video)
 
 

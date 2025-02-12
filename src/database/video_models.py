@@ -47,6 +47,7 @@ class Similarity(VideoBase, ReprMixin):
     video: Mapped[Videos] = relationship(back_populates="similarity")
     histogramm: Mapped[bytes | None] = mapped_column(LargeBinary)
     phash: Mapped[bytes | None] = mapped_column(LargeBinary)
+    hog: Mapped[bytes | None] = mapped_column(LargeBinary)
     changed: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())
 
 

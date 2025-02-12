@@ -11,13 +11,13 @@ from globals import get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
 
-def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarray, ndarray]) -> float:
+def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarray, ndarray, ndarray]) -> float:
     """
     Compare the similarity of two features
-    the features are a tuple of histogram and phash (ndarray)
+    the features are a tuple of histogram and phash and hog (ndarray)
 
-    :param features_a: tuple of histogram and phash (ndarray)
-    :param features_b: tuple of histogram and phash (ndarray)
+    :param features_a: tuple of histogram and phash and hog (ndarray)
+    :param features_b: tuple of histogram and phash and hog (ndarray)
     :return: similarity score between 0 and 1
     """
 
@@ -39,6 +39,19 @@ def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarr
         # hamming distance normalized by the length of the phash that a number between 0 and 1 is returned
         score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
 
+    # compare hog
+    hog_features_a = features_a[2]
+    hog_features_b = features_b[2]
+    if hog_features_a is None or hog_features_b is None:
+        score_hog = 0
+    else:
+        score_hog = cv2.compareHist(hog_features_a, hog_features_b, cv2.HISTCMP_CORREL)
+        score_hog = score_hog if score_hog > 0 else 0
+        # example for Euclidean distance
+        #distance = np.linalg.norm(hog_features_a - hog_features_b)
+        #max_distance = np.sqrt(len(hog_features_a))
+        #score_hog = 1 - (distance / max_distance)
+
     # combine the score 6:4
     score = (0.6 * score_hist) + (0.4 * score_phash)
 
@@ -48,10 +61,12 @@ def clear_similarity_cache():
     _all_features.cache__clear()
 
 @cache(ttl=3600)
-def _all_features() -> dict[str, tuple[np.ndarray, np.ndarray]]:
+def _all_features() -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray]]:
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
-        return {row.video.video_url: (np.frombuffer(row.histogramm, dtype=np.float32), np.frombuffer(row.phash, dtype=np.float32)) for row in all_features}
+        return {row.video.video_url: (np.frombuffer(row.histogramm, dtype=np.float32),
+                                      np.frombuffer(row.phash, dtype=np.float32),
+                                      np.frombuffer(row.hog, dtype=np.float32)) for row in all_features}
 
 def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> list:
     """
@@ -83,7 +98,7 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
     return similars[:limit]
 
 
-def build_features_for_video(video_url: str) -> tuple[np.ndarray | None, np.ndarray | None]:
+def build_features_for_video(video_url: str) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
     """
     Build the features for the given video_url and return the features
     uses the thumbnail webm file to get a histogram and phash of the video
@@ -93,18 +108,18 @@ def build_features_for_video(video_url: str) -> tuple[np.ndarray | None, np.ndar
     """
 
     if not video_url:
-        return None, None
+        return None, None, None
 
     file_path, _ = get_real_path_from_url(video_url)
     if not file_path:
-        return None, None
+        return None, None, None
 
     base_name = os.path.basename(file_path)
     thumbnail_dir = get_thumbnail_directory(file_path)
     thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
     if os.access(thumbnail_file, os.F_OK):
         return _create_video_features_for_similarity_compare(thumbnail_file)
-    return None, None
+    return None, None, None
 
 
 class VideoCaptureContext:
@@ -123,39 +138,55 @@ class VideoCaptureContext:
             self.cap.release()
 
 
-def _create_video_features_for_similarity_compare(video_path: str, skip_frames=10) -> tuple[np.ndarray, np.ndarray]:
+_hog_descriptor = cv2.HOGDescriptor((64, 64), (16, 16), (8, 8), (8, 8), 4)
+def _create_video_features_for_similarity_compare(video_path: str, skip_frames=0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     with VideoCaptureContext(video_path) as cap:
         hist_list = []
         phash_list = []
+        hog_list = []
 
         frame_count = 0
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        skip_frames = int(fps) if skip_frames == 0 else skip_frames
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
 
             if frame_count > 0 and frame_count % skip_frames != 0:
+                frame_count += 1
                 continue
             frame_count += 1
 
             # Calculate histogram
-            hist_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            hist = cv2.calcHist([hist_frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            hist = cv2.calcHist([rgb_frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
             hist = cv2.normalize(hist, hist).flatten()
             hist_list.append(hist)
 
             # Calculate phash
-            phash_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            dct = cv2.dct(np.float32(phash_frame))
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            dct = cv2.dct(np.float32(gray_frame))
             dct_low_freq = dct[:8, :8]
             median = np.median(dct_low_freq)
             phash = (dct_low_freq > median).astype(int)
             phash_list.append(phash.flatten())
 
+            # HOG features from the frame
+            gray_frame_resized = cv2.resize(gray_frame, (64, 64))
+            h = np.array(_hog_descriptor.compute(gray_frame_resized)).flatten()
+            hog_list.append(h)
+
+            #cv2.imshow('Frame', gray_frame)
+            #if cv2.waitKey(0) & 0xFF == ord('q'):
+            #    break
+    #cv2.destroyAllWindows()
+
     avg_hist = np.mean(hist_list, axis=0)
     avg_phash = np.mean(phash_list, axis=0)
+    avg_hog = np.mean(hog_list, axis=0)
     binary_avg_phash = (avg_phash > 0.5).astype(int)
-    return avg_hist, binary_avg_phash
+    return avg_hist, binary_avg_phash, avg_hog
 
 
 def main():
