@@ -136,6 +136,26 @@ class VideoCaptureContext:
             self.cap.release()
 
 
+def _resize_and_pad(image, target_size):
+    h, w = image.shape[:2]
+    if h > w:
+        new_h = target_size
+        new_w = int(w * (target_size / h))
+    else:
+        new_w = target_size
+        new_h = int(h * (target_size / w))
+    resized_image = cv2.resize(image, (new_w, new_h))
+
+    delta_w = target_size - new_w
+    delta_h = target_size - new_h
+    top, bottom = delta_h // 2, delta_h - (delta_h // 2)
+    left, right = delta_w // 2, delta_w - (delta_w // 2)
+
+    color = [0, 0, 0]
+    new_image = cv2.copyMakeBorder(resized_image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)
+    return new_image
+
+
 _hog_descriptor = cv2.HOGDescriptor((128, 128), (32, 32), (16, 16), (16, 16), 9)
 def _create_video_features_for_similarity_compare(webp_path: str, skip_frames=0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     hist_list = []
@@ -155,7 +175,7 @@ def _create_video_features_for_similarity_compare(webp_path: str, skip_frames=0)
 
             # Calculate phash
             gray_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_BGR2GRAY)
-            gray_frame_resized = cv2.resize(gray_frame, (128, 128))
+            gray_frame_resized = _resize_and_pad(gray_frame, 128)
             dct = cv2.dct(np.float32(gray_frame_resized))
             dct_low_freq = dct[:8, :8]
             median = np.median(dct_low_freq)
