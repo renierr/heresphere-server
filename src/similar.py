@@ -2,6 +2,7 @@ import os
 
 import cv2
 import numpy as np
+from PIL import Image
 from numpy import ndarray
 
 from cache import cache
@@ -49,7 +50,7 @@ def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tu
         score_hog = score_hog if score_hog > 0 else 0
 
     # combine the score 6:4
-    score = (0.4 * score_hist) + (0.3 * score_phash) + (0.3 * score_hog)
+    score = (0.4 * score_hist) + (0.1 * score_phash) + (0.5 * score_hog)
 
     return score
 
@@ -113,7 +114,7 @@ def build_features_for_video(video_url: str) -> tuple[np.ndarray | None, np.ndar
 
     base_name = os.path.basename(file_path)
     thumbnail_dir = get_thumbnail_directory(file_path)
-    thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
+    thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBP.extension}")
     if os.access(thumbnail_file, os.F_OK):
         return _create_video_features_for_similarity_compare(thumbnail_file)
     return None, None, None
@@ -135,42 +136,33 @@ class VideoCaptureContext:
             self.cap.release()
 
 
-_hog_descriptor = cv2.HOGDescriptor((64, 64), (16, 16), (8, 8), (8, 8), 4)
-def _create_video_features_for_similarity_compare(video_path: str, skip_frames=0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    with VideoCaptureContext(video_path) as cap:
-        hist_list = []
-        phash_list = []
-        hog_list = []
+_hog_descriptor = cv2.HOGDescriptor((128, 128), (32, 32), (16, 16), (16, 16), 9)
+def _create_video_features_for_similarity_compare(webp_path: str, skip_frames=0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    hist_list = []
+    phash_list = []
+    hog_list = []
 
-        frame_count = 0
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        skip_frames = int(fps) if skip_frames == 0 else skip_frames
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-
-            if frame_count > 0 and frame_count % skip_frames != 0:
-                frame_count += 1
-                continue
-            frame_count += 1
+    with Image.open(webp_path) as img:
+        for frame in range(img.n_frames):
+            img.seek(frame)
+            frame_image = img.convert('RGB')
 
             # Calculate histogram
-            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            rgb_frame = np.array(frame_image)
             hist = cv2.calcHist([rgb_frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
             hist = cv2.normalize(hist, hist).flatten()
             hist_list.append(hist)
 
             # Calculate phash
-            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            dct = cv2.dct(np.float32(gray_frame))
+            gray_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_BGR2GRAY)
+            gray_frame_resized = cv2.resize(gray_frame, (128, 128))
+            dct = cv2.dct(np.float32(gray_frame_resized))
             dct_low_freq = dct[:8, :8]
             median = np.median(dct_low_freq)
             phash = (dct_low_freq > median).astype(int)
             phash_list.append(phash.flatten())
 
             # HOG features from the frame
-            gray_frame_resized = cv2.resize(gray_frame, (64, 64))
             h = np.array(_hog_descriptor.compute(gray_frame_resized)).flatten()
             hog_list.append(h)
 
