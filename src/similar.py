@@ -82,7 +82,7 @@ def _all_features() -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray]]:
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
         return {row.video.video_url: (np.frombuffer(row.histogramm, dtype=np.float32),
-                                      np.frombuffer(row.phash, dtype=np.float32),
+                                      np.frombuffer(row.phash, dtype=np.int64),
                                       np.frombuffer(row.hog, dtype=np.float32)) for row in all_features}
 
 def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> list:
