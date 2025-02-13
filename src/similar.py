@@ -11,7 +11,7 @@ from globals import get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
 
-def similar_compare(features_a: tuple[ndarray, ndarray], features_b: tuple[ndarray, ndarray, ndarray]) -> float:
+def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tuple[ndarray, ndarray, ndarray]) -> float:
     """
     Compare the similarity of two features
     the features are a tuple of histogram and phash and hog (ndarray)
