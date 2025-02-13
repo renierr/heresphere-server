@@ -111,10 +111,6 @@ export const methods = {
                 this.similarVideos = data;
                 const modal = new bootstrap.Modal(document.getElementById('similarityModal'), { backdrop: 'static' });
                 modal.show();
-                modal._element.addEventListener('hidden.bs.modal', () => {
-                    this.currentFile = null;
-                    this.similarVideos = null;
-                });
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -414,10 +410,6 @@ export const methods = {
         }
         const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
         modal.show();
-        // clear extras on modal close
-        modal._element.addEventListener('hidden.bs.modal', () => {
-            modalConfirmExtras.innerHTML = '';
-        });
         nameInput.addEventListener('keydown', (evt) => {
             if (evt.key === 'Enter') {
                 evt.preventDefault();
@@ -501,10 +493,6 @@ export const methods = {
         }
         const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
         modal.show();
-        // clear extras on modal close
-        modal._element.addEventListener('hidden.bs.modal', () => {
-            modalConfirmExtras.innerHTML = '';
-        });
     },
     moveFile(confData, subfolder) {
         if (!confData && !confData.file) {

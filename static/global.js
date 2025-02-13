@@ -87,6 +87,23 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error stopping the video player:', error);
         }
     });
+    document.getElementById('confirmModal')?.addEventListener('hidden.bs.modal', function () {
+        const vueInstance = window.vueInstance;
+        if (vueInstance) {
+            const modalConfirmExtras = document.getElementById('confirmModalExtras');
+            if (modalConfirmExtras) {
+                modalConfirmExtras.innerHTML = '';
+            }
+        }
+    });
+    document.getElementById('similarityModal')?.addEventListener('hidden.bs.modal', function () {
+        const vueInstance = window.vueInstance;
+        if (vueInstance) {
+            console.log('Modal closed');
+            vueInstance.currentFile = null;
+            vueInstance.similarVideos = null;
+        }
+    });
 
     // swipe listener for select (up/down) to select option
     const applySelectOptionSwipeHandler = (selectElement) => {
