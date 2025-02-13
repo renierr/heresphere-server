@@ -87,7 +87,8 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
         similar = similar_compare(provided_features, features)
         if similar > similarity_threshold:
             file_info = find_file_info(video_path)
-            similars.append((video_path, int(similar * 100), file_info))
+            if file_info:
+                similars.append((video_path, int(similar * 100), file_info))
 
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
