@@ -2,7 +2,7 @@ let previewVideoWarningAlreadyShown = false;
 
 function localStoreSettingsLoading() {
     const defaults = { cardLayout: true, pageSize: 12,
-        filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '', showVideoPreview: true };
+        filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '', showVideoPreview: true, similarThreshold: 50 };
     let storedSetting = JSON.parse(localStorage.getItem('settings')) || {};
     storedSetting = {...defaults, ...storedSetting};
     return storedSetting;
@@ -28,7 +28,6 @@ export const data = {
     totalSize: 0,
     confirmData: {},
     settings: localStoreSettingsLoading(),
-    similarThreshold: 50,
 };
 
 function debounce(func, wait) {
@@ -101,7 +100,7 @@ export const methods = {
     showSimilar(file) {
         fetch('/api/similar', {
             method: 'POST',
-            body: JSON.stringify({ video_path: file.filename, threshold: this.similarThreshold }),
+            body: JSON.stringify({ video_path: file.filename, threshold: this.settings.similarThreshold }),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -631,6 +630,9 @@ export const watch = {
         this.saveSettings();
     },
     'settings.showVideoPreview': function(newValue) {
+        this.saveSettings();
+    },
+    'settings.similarThreshold': function(newValue) {
         this.saveSettings();
     },
 };
