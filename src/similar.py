@@ -56,9 +56,9 @@ def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tu
         score_phash = 0
     else:
         # hamming distance normalized by the length of the phash that a number between 0 and 1 is returned
-        #score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
+        score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
         # Calculate cosine similarity
-        score_phash = _calc_cosine_similarity(phash_features_a, phash_features_b)
+        #score_phash = _calc_cosine_similarity(phash_features_a, phash_features_b)
 
     # compare hog
     hog_features_a = features_a[2]
@@ -69,8 +69,8 @@ def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tu
         score_hog = cv2.compareHist(hog_features_a, hog_features_b, cv2.HISTCMP_CORREL)
         score_hog = score_hog if score_hog > 0 else 0
 
-    # combine the score 6:4
-    score = (0.4 * score_hist) + (0.1 * score_phash) + (0.5 * score_hog)
+    # combine the score 4:2:4
+    score = (0.4 * score_hist) + (0.2 * score_phash) + (0.4 * score_hog)
 
     return score
 
