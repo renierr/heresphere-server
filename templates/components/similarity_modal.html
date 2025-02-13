@@ -50,12 +50,12 @@
                 <ul v-if="similarVideos?.length" class="list-unstyled">
                     <li v-for="similar in similarVideos" class="mb-2">
                         <p class="text-muted text-wrap m-0" style="word-break: break-word;"><span class="score fw-bold">({{ similar.score }} %)</span>
-                            - {{ similar.file.title }}</p>
-                        <div v-if="currentFile.uid === similar.file.uid" class="alert alert-warning m-1 p-2">
+                            - {{ similar.file?.title }}</p>
+                        <div v-if="currentFile.uid === similar.file?.uid" class="alert alert-warning m-1 p-2">
                             <strong>Warning!</strong> This file is the same as the current file.
                         </div>
 
-                        <div class="w-100 d-flex flex-column flex-sm-row gap-2 align-items-start pt-3 p-2">
+                        <div v-if="similar.file" class="w-100 d-flex flex-column flex-sm-row gap-2 align-items-start pt-3 p-2">
                             <img :src="similar.file.thumbnail" tabindex="0" alt="Thumbnail"
                                  class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center"/>
                             <div class="text-muted">
@@ -81,7 +81,7 @@
 
             </div>
             <div v-else class="modal-body">
-                <p>No file selected2</p>
+                <p>No file selected</p>
             </div>
         </div>
     </div>
