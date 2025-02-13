@@ -12,6 +12,24 @@ from globals import get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
 
+def _calc_cosine_similarity(phash_features_a: np.ndarray, phash_features_b: np.ndarray) -> float:
+    if phash_features_a is None or phash_features_b is None:
+        score = 0
+    else:
+        # Calculate norms
+        norm_a = np.linalg.norm(phash_features_a)
+        norm_b = np.linalg.norm(phash_features_b)
+
+        # Check for zero norms to avoid division by zero
+        if norm_a == 0 or norm_b == 0:
+            score = 0
+        else:
+            # Calculate cosine similarity
+            dot_product = np.dot(phash_features_a, phash_features_b)
+            score = dot_product / (norm_a * norm_b)
+    return score
+
+
 def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tuple[ndarray, ndarray, ndarray]) -> float:
     """
     Compare the similarity of two features
@@ -31,14 +49,16 @@ def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tu
         score_hist = cv2.compareHist(features_a[0], features_b[0], cv2.HISTCMP_CORREL)
         score_hist = score_hist if score_hist > 0 else 0    # make sure the score is not negative, the correl algorithm can return negative values
 
-    # compare phash with hamming distance
+    # compare phash
     phash_features_a = features_a[1]
     phash_features_b = features_b[1]
     if phash_features_a is None or phash_features_b is None:
         score_phash = 0
     else:
         # hamming distance normalized by the length of the phash that a number between 0 and 1 is returned
-        score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
+        #score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
+        # Calculate cosine similarity
+        score_phash = _calc_cosine_similarity(phash_features_a, phash_features_b)
 
     # compare hog
     hog_features_a = features_a[2]
@@ -157,7 +177,7 @@ def _resize_and_pad(image, target_size):
 
 
 _hog_descriptor = cv2.HOGDescriptor((128, 128), (32, 32), (16, 16), (16, 16), 9)
-def _create_video_features_for_similarity_compare(webp_path: str, skip_frames=0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _create_video_features_for_similarity_compare(webp_path: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     hist_list = []
     phash_list = []
     hog_list = []
@@ -166,16 +186,16 @@ def _create_video_features_for_similarity_compare(webp_path: str, skip_frames=0)
         for frame in range(img.n_frames):
             img.seek(frame)
             frame_image = img.convert('RGB')
+            rgb_frame = np.array(frame_image)
+            gray_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_BGR2GRAY)
+            gray_frame_resized = _resize_and_pad(gray_frame, 128)
 
             # Calculate histogram
-            rgb_frame = np.array(frame_image)
             hist = cv2.calcHist([rgb_frame], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
             hist = cv2.normalize(hist, hist).flatten()
             hist_list.append(hist)
 
             # Calculate phash
-            gray_frame = cv2.cvtColor(rgb_frame, cv2.COLOR_BGR2GRAY)
-            gray_frame_resized = _resize_and_pad(gray_frame, 128)
             dct = cv2.dct(np.float32(gray_frame_resized))
             dct_low_freq = dct[:8, :8]
             median = np.median(dct_low_freq)
