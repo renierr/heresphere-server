@@ -42,6 +42,10 @@
             <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedResolution === '4K' }" @click="selectedResolution = '4K'">4K+</button>
             <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedResolution === '8K' }" @click="selectedResolution = '8K'">8K+</button>
           </div>
+          <div class="position-relative">
+            <label for="similarThreshold" class="label small">Similarity Threshold ({{ similarThreshold }}%)</label>
+            <input type="range" class="form-range" id="similarThreshold" v-model="similarThreshold" min="0" max="100" step="1">
+          </div>
           <div class="btn-group" role="group" aria-label="Filter by Duration">
             <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 0 }" @click="selectedDuration = 0">All&nbsp;Durations</button>
             <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 5 }" @click="selectedDuration = 5">+5min</button>

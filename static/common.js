@@ -28,6 +28,7 @@ export const data = {
     totalSize: 0,
     confirmData: {},
     settings: localStoreSettingsLoading(),
+    similarThreshold: 50,
 };
 
 function debounce(func, wait) {
@@ -100,7 +101,7 @@ export const methods = {
     showSimilar(file) {
         fetch('/api/similar', {
             method: 'POST',
-            body: JSON.stringify({ video_path: file.filename }),
+            body: JSON.stringify({ video_path: file.filename, threshold: this.similarThreshold }),
             headers: {
                 'Content-Type': 'application/json'
             }

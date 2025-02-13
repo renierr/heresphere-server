@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <hr>
-                <p>Found {{ similarVideos?.length }} similar videos</p>
+                <p>Found {{ similarVideos?.length }} similar videos (limit to: 10)</p>
                 <ul v-if="similarVideos?.length" class="list-unstyled">
                     <li v-for="similar in similarVideos" class="mb-2">
                         <p class="text-muted text-wrap m-0" style="word-break: break-word;"><span class="score fw-bold">({{ similar.score }} %)</span>

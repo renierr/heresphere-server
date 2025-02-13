@@ -76,10 +76,20 @@ def df():
 def similar():
     data = request.get_json()
     video_path = data.get("video_path")
+    threshold = data.get("threshold")
+    # check if threshold is number between 0 and 100 and calc a number between 0 and 1
+    if threshold and threshold.isdigit():
+        threshold_int = int(threshold)
+        if 0 <= threshold_int <= 100:
+            threshold = threshold_int / 100
+        else:
+            threshold = 0.5
+    else:
+        threshold = 0.5
 
     if not video_path:
         return jsonify(ServerResponse(False, "No video path")), 400
 
-    similar_result = find_similar(video_path, 0.5)
+    similar_result = find_similar(video_path, threshold)
     similar_result = [{'video_path': x[0], 'score': x[1], 'file': x[2]} for x in similar_result]
     return jsonify(similar_result)
