@@ -7,7 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div v-if="currentFile" class="modal-body">
-                <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
+                <div class="w-100 d-flex flex-column flex-sm-row gap-2 align-items-start pt-3 p-2">
                     <img v-if="currentFile.thumbnail" tabindex="0" :src="currentFile.thumbnail" alt="Thumbnail"
                          class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
                     <div class="text-muted">
@@ -55,7 +55,7 @@
                             <strong>Warning!</strong> This file is the same as the current file.
                         </div>
 
-                        <div class="w-100 d-flex flex-row gap-2 align-items-start pt-3 p-2">
+                        <div class="w-100 d-flex flex-column flex-sm-row gap-2 align-items-start pt-3 p-2">
                             <img :src="similar.file.thumbnail" tabindex="0" alt="Thumbnail"
                                  class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center"/>
                             <div class="text-muted">
