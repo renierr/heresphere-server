@@ -78,10 +78,9 @@ def similar():
     video_path = data.get("video_path")
     threshold = data.get("threshold")
     # check if threshold is number between 0 and 100 and calc a number between 0 and 1
-    if threshold and threshold.isdigit():
-        threshold_int = int(threshold)
-        if 0 <= threshold_int <= 100:
-            threshold = threshold_int / 100
+    if threshold and isinstance(threshold, int):
+        if 0 <= threshold <= 100:
+            threshold = threshold / 100
         else:
             threshold = 0.5
     else:
