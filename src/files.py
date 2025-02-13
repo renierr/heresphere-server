@@ -302,7 +302,7 @@ def get_basic_save_video_info(file_path: str) -> VideoInfo:
 
     return VideoInfo(created, size, duration, width, height, resolution, stereo, uid, title, infos)
 
-def move_file_for(source_folder: VideoFolder, video_path: str, subfolder: str) -> ServerResponse:
+def move_file_for(video_path: str, subfolder: str) -> ServerResponse:
     """
     Move a file for a VideoFolder to or inside the library folder
     all thumbnails will be moved as well
@@ -313,29 +313,25 @@ def move_file_for(source_folder: VideoFolder, video_path: str, subfolder: str) -
     :return: json object with success and library_path
     """
 
-    push_text_to_client(f"Move file for {source_folder.dir} to/inside library: {video_path}")
+    push_text_to_client(f"Move file to/inside library: {video_path}")
     static_dir = get_static_directory()
-    if source_folder.web_path in video_path:
-        relative_path = video_path.replace(source_folder.web_path, '')
-        real_path = os.path.join(static_dir, source_folder.dir, relative_path)
+    real_path, folder = get_real_path_from_url(video_path)
 
-        if not os.path.exists(real_path):
-            return ServerResponse(False, "Video file does not exist")
+    if not os.path.exists(real_path):
+        return ServerResponse(False, "Video file does not exist")
 
-        base_name = os.path.basename(real_path)
+    base_name = os.path.basename(real_path)
 
-        if subfolder and subfolder not in library_subfolders():
-            return ServerResponse(False, "Invalid subfolder name")
+    if subfolder and subfolder not in library_subfolders():
+        return ServerResponse(False, "Invalid subfolder name")
 
-        library_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
+    library_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
 
-        if os.path.exists(library_path):
-            return ServerResponse(False, f"Target exists in library: {base_name}")
+    if os.path.exists(library_path):
+        return ServerResponse(False, f"Target exists in library: {base_name}")
 
-        move_file_with_thumbnails(real_path, library_path)
-        return ServerResponse(True, f"moved {base_name} to {subfolder}")
-    else:
-        return ServerResponse(False, "Invalid video path")
+    move_file_with_thumbnails(real_path, library_path)
+    return ServerResponse(True, f"moved {base_name} to {subfolder}")
 
 
 def move_file_with_thumbnails(file_path: str, target_path: str) -> None:

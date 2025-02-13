@@ -19,8 +19,8 @@ def get_library_files():
     return jsonify(list_files(VideoFolder.library))
 
 
-@api_bp.route('/api/move_to_library', methods=['POST'])
-def mtl():
+@api_bp.route('/api/move_file', methods=['POST'])
+def mf():
     data = request.get_json()
     video_path = data.get("video_path")
     subfolder = data.get("subfolder")
@@ -28,19 +28,7 @@ def mtl():
     if not video_path:
         return jsonify(ServerResponse(False, "No video path provided")), 400
 
-    return jsonify(move_file_for(VideoFolder.videos, video_path, subfolder))
-
-
-@api_bp.route('/api/move_inside_library', methods=['POST'])
-def mil():
-    data = request.get_json()
-    video_path = data.get("video_path")
-    subfolder = data.get("subfolder")
-
-    if not video_path:
-        return jsonify(ServerResponse(False, "No video path provided")), 400
-
-    return jsonify(move_file_for(VideoFolder.library, video_path, subfolder))
+    return jsonify(move_file_for(video_path, subfolder))
 
 @api_bp.route('/api/rename', methods=['POST'])
 def rf():

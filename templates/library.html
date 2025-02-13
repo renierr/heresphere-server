@@ -3,14 +3,13 @@
 {% block title %}HSServer - Library{% endblock %}
 
 {% block content %}
+    {% set inside_library = true %}
     {% include "components/similarity_modal.html" %}
     {% include "components/server_info.html" %}
     {% include "components/filter.html" %}
 
     {% include "components/loading.html" %}
-    {% with option_move_library = true %}
     {% include "components/list_files.html" %}
-    {% endwith %}
     {% include "components/page_functions.html" %}
     <script type="module" src="/static/library.js"></script>
 {% endblock %}
