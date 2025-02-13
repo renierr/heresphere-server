@@ -109,8 +109,7 @@ export const methods = {
             .then(data => {
                 this.currentFile = file;
                 this.similarVideos = data;
-                const modal = new bootstrap.Modal(document.getElementById('similarityModal'), { backdrop: 'static' });
-                modal.show();
+                window.similarityModal.show();
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -189,8 +188,7 @@ export const methods = {
             submit: 'Update',
             action: this.updateServer,
         }
-        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-        modal.show();
+        window.confirmModal.show();
 
     },
     updateServer() { // Add this method
@@ -211,8 +209,7 @@ export const methods = {
             submit: 'Cleanup',
             action: this.cleanup,
         }
-        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-        modal.show();
+        window.confirmModal.show();
     },
     cleanup() { // Add this method
         fetch('/cleanup')
@@ -283,8 +280,7 @@ export const methods = {
             submit: 'Delete',
             action: this.deleteFile,
         }
-        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-        modal.show();
+        window.confirmModal.show();
     },
     deleteFile(confData) {
         if (!confData && !confData.file) {
@@ -320,8 +316,7 @@ export const methods = {
             </video-js>
         `;
         videojs('videoPlayer');
-        const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
-        videoModal.show();
+        window.videoModal.show();
     },
     saveSettings() {
         localStorage.setItem('settings', JSON.stringify(this.settings));
@@ -389,10 +384,10 @@ export const methods = {
         const currentName = file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.');;
         modalConfirmExtras.innerHTML = `
             <div class="d-flex align-items-center flex-column flex-md-row">
-                <input id="fileName" class="form-control" type="text" />
+                <input id="confModal_fileName" class="form-control" type="text" />
             </div>
             `;
-        const nameInput = document.getElementById('fileName');
+        const nameInput = document.getElementById('confModal_fileName');
         nameInput.value = currentName;
         this.confirmData = {
             title: 'Rename file',
@@ -408,12 +403,11 @@ export const methods = {
                 this.renameFile(confData, newName);
             },
         }
-        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-        modal.show();
+        window.confirmModal.show();
         nameInput.addEventListener('keydown', (evt) => {
             if (evt.key === 'Enter') {
                 evt.preventDefault();
-                modal.hide();
+                window.confirmModal.hide();
                 this.confirmData.action(this.confirmData)
             }
         });
@@ -491,8 +485,7 @@ export const methods = {
                 this.moveFile(confData, subfolderSelection);
             },
         }
-        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-        modal.show();
+        window.confirmModal.show();
     },
     moveFile(confData, subfolder) {
         if (!confData && !confData.file) {

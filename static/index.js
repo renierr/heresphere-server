@@ -35,7 +35,6 @@ new Vue({
                     if (stream) {
                         const video_url = data.videoUrl;
                         const audio_url = data.audioUrl;
-                        const videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
                         const videoModalTitle = document.getElementById('videoModalLabel');
                         const modalBody = document.getElementById('videoModalBody');
                         const modalFooter = document.getElementById('videoModalFooter');
@@ -60,7 +59,7 @@ new Vue({
                             downloadButton.textContent = 'Trigger Download';
                             downloadButton.classList.add('btn', 'btn-primary', 'btn-sm');
                             downloadButton.addEventListener('click', () => {
-                                videoModal.hide();
+                                window.videoModal.hide();
                                 this.redownload({ url: tempVideoUrl });
                             });
                             modalFooter.appendChild(downloadButton);
@@ -91,7 +90,7 @@ new Vue({
                                 });
                                 modalFooter.appendChild(shareExtractedButton);
                             }
-                            videoModal.show();
+                            window.videoModal.show();
                             this.videoUrl = '';
                         } else {
                             this.serverResult = 'Error: No video URL found to be played';

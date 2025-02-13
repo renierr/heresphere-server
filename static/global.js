@@ -104,6 +104,11 @@ document.addEventListener('DOMContentLoaded', () => {
             vueInstance.similarVideos = null;
         }
     });
+    // init the modals - we only use one instance of each modal
+    window.videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
+    window.confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    window.similarityModal = new bootstrap.Modal(document.getElementById('similarityModal'), { backdrop: 'static' });
+
 
     // swipe listener for select (up/down) to select option
     const applySelectOptionSwipeHandler = (selectElement) => {
