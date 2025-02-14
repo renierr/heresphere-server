@@ -163,10 +163,7 @@ export const methods = {
         file.showPreview = false;
     },
     generateThumbnails() {
-        // if we are in library url path we should use library api
-        const library = window.location.pathname.includes('/library');
-        const url = library ? '/api/library/generate_thumbnails' : '/api/generate_thumbnails';
-        fetch(url, {
+        fetch('/api/generate_thumbnails', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

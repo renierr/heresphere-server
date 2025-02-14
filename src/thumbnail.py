@@ -28,13 +28,9 @@ class ThumbnailFormat(Enum):
 
 thumbnail_bp = Blueprint('thumbnail', __name__)
 
-@thumbnail_bp.route('/api/library/generate_thumbnails', methods=['POST'])
-def glt():
-    return gts(True)
-
 @thumbnail_bp.route('/api/generate_thumbnails', methods=['POST'])
-def gts(library=False):
-    thumbnail_thread = threading.Thread(target=generate_thumbnails, args=(library,))
+def gts():
+    thumbnail_thread = threading.Thread(target=generate_thumbnails)
     thumbnail_thread.daemon = True
     thumbnail_thread.start()
 
@@ -134,49 +130,50 @@ def get_video_info(video_path, force=False):
         logger.error(f"Failed to get video info for {video_path}: {e}")
         return None
 
-def generate_thumbnails(library=False) -> ServerResponse:
+def generate_thumbnails() -> ServerResponse:
     """
-    Generate thumbnails for all videos in the static/videos or static/library folder
+    Generate thumbnails for all videos
 
-    :param library: if true use the library folder instead of videos
     :return: json object with success and generated_thumbnails
     """
     static_dir = get_static_directory()
-    video_dir = os.path.join(static_dir, VideoFolder.videos.dir if not library else VideoFolder.library.dir)
     generated_thumbnails = []
     thumbnail_errors = []
-    logger.debug(f"Generating thumbnails for {video_dir}")
-    push_text_to_client(f"Generating thumbnails for {VideoFolder.library.dir if library else VideoFolder.videos.dir}")
 
-    _, folder_state = check_folder(video_dir)
-    if folder_state != FolderState.ACCESSIBLE:
-        msg = f"Folder not accessible: {video_dir} - skipping thumbnail generation - state: {folder_state}"
-        push_text_to_client(msg)
-        logger.warning(msg)
-        return ServerResponse(False, msg)
+    for folder in VideoFolder:
+        video_dir = os.path.join(static_dir, folder.dir)
+        logger.debug(f"Generating thumbnails for {video_dir}")
+        push_text_to_client(f"Generating thumbnails for {folder.name}")
 
-    for root, dirs, files in os.walk(video_dir, followlinks=True):
-        # Exclude directories that start with a dot
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        _, folder_state = check_folder(video_dir)
+        if folder_state != FolderState.ACCESSIBLE:
+            msg = f"Folder not accessible: {video_dir} - skipping thumbnail generation - state: {folder_state}"
+            push_text_to_client(msg)
+            logger.warning(msg)
+            return ServerResponse(False, msg)
 
-        for filename in files:
-            if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
-                video_path = os.path.join(root, filename)
-                thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
+        for root, dirs, files in os.walk(video_dir, followlinks=True):
+            # Exclude directories that start with a dot
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
 
-                logger.debug(f"Checking thumbnail for {filename}")
-                # if one of the thumbs for file is missing, generate all thumbs
-                missing = False
-                for fmt in ThumbnailFormat:
-                    if not os.access(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}"), os.F_OK):
-                        missing = True
-                        break
+            for filename in files:
+                if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
+                    video_path = os.path.join(root, filename)
+                    thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
 
-                if missing:
-                    if generate_thumbnail(video_path):
-                        generated_thumbnails.append(video_path)
-                    else:
-                        thumbnail_errors.append(video_path)
+                    logger.debug(f"Checking thumbnail for {filename}")
+                    # if one of the thumbs for file is missing, generate all thumbs
+                    missing = False
+                    for fmt in ThumbnailFormat:
+                        if not os.access(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}"), os.F_OK):
+                            missing = True
+                            break
+
+                    if missing:
+                        if generate_thumbnail(video_path):
+                            generated_thumbnails.append(video_path)
+                        else:
+                            thumbnail_errors.append(video_path)
 
     push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails {'(' + str(len(thumbnail_errors)) + ' failed)' if thumbnail_errors else ''}")
     return ServerResponse(True, f"generated_thumbnails: {len(generated_thumbnails)}")
