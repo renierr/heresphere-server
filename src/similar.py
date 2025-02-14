@@ -1,4 +1,5 @@
 import os
+from typing import NamedTuple
 
 import cv2
 import numpy as np
@@ -11,6 +12,10 @@ from files import find_file_info
 from globals import get_real_path_from_url, get_thumbnail_directory
 from thumbnail import ThumbnailFormat
 
+class SimilarityFeatures(NamedTuple):
+    histogram: ndarray
+    phash: ndarray
+    hog: ndarray
 
 def _calc_cosine_similarity(phash_features_a: np.ndarray, phash_features_b: np.ndarray) -> float:
     if phash_features_a is None or phash_features_b is None:
@@ -30,7 +35,8 @@ def _calc_cosine_similarity(phash_features_a: np.ndarray, phash_features_b: np.n
     return score
 
 
-def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tuple[ndarray, ndarray, ndarray]) -> float:
+
+def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatures) -> float:
     """
     Compare the similarity of two features
     the features are a tuple of histogram and phash and hog (ndarray)
@@ -41,17 +47,17 @@ def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tu
     """
 
     # compare histogram
-    hist_features_a = features_a[0]
-    hist_features_b = features_b[0]
+    hist_features_a = features_a.histogram
+    hist_features_b = features_b.histogram
     if hist_features_a is None or hist_features_b is None:
         score_hist = 0
     else:
-        score_hist = cv2.compareHist(features_a[0], features_b[0], cv2.HISTCMP_CORREL)
+        score_hist = cv2.compareHist(hist_features_a, hist_features_b, cv2.HISTCMP_CORREL)
         score_hist = score_hist if score_hist > 0 else 0    # make sure the score is not negative, the correl algorithm can return negative values
 
     # compare phash
-    phash_features_a = features_a[1]
-    phash_features_b = features_b[1]
+    phash_features_a = features_a.phash
+    phash_features_b = features_b.phash
     if phash_features_a is None or phash_features_b is None:
         score_phash = 0
     else:
@@ -61,8 +67,8 @@ def similar_compare(features_a: tuple[ndarray, ndarray, ndarray], features_b: tu
         #score_phash = _calc_cosine_similarity(phash_features_a, phash_features_b)
 
     # compare hog
-    hog_features_a = features_a[2]
-    hog_features_b = features_b[2]
+    hog_features_a = features_a.hog
+    hog_features_b = features_b.hog
     if hog_features_a is None or hog_features_b is None:
         score_hog = 0
     else:
@@ -78,10 +84,10 @@ def clear_similarity_cache():
     _all_features.cache__clear()
 
 @cache(ttl=3600)
-def _all_features() -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray]]:
+def _all_features() -> dict[str, SimilarityFeatures]:
     with get_video_db() as db:
         all_features = db.for_similarity_table.list_similarity()
-        return {row.video.video_url: (np.frombuffer(row.histogramm, dtype=np.float32),
+        return {row.video.video_url: SimilarityFeatures(np.frombuffer(row.histogramm, dtype=np.float32),
                                       np.frombuffer(row.phash, dtype=np.int64),
                                       np.frombuffer(row.hog, dtype=np.float32)) for row in all_features}
 
@@ -116,28 +122,28 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
     return similars[:limit]
 
 
-def build_features_for_video(video_url: str) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
+def build_features_for_video(video_url: str) -> SimilarityFeatures | None:
     """
     Build the features for the given video_url and return the features
     uses the thumbnail webm file to get a histogram and phash of the video
 
     :param video_url: url of the video to build features for
-    :return: features for the video tuple (histogram, phash) or None if not possible
+    :return: features for the video tuple (histogram, phash, hog) or None if not possible
     """
 
     if not video_url:
-        return None, None, None
+        return None
 
     file_path, _ = get_real_path_from_url(video_url)
     if not file_path:
-        return None, None, None
+        return None
 
     base_name = os.path.basename(file_path)
     thumbnail_dir = get_thumbnail_directory(file_path)
     thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBP.extension}")
     if os.access(thumbnail_file, os.F_OK):
         return _create_video_features_for_similarity_compare(thumbnail_file)
-    return None, None, None
+    return None
 
 
 class VideoCaptureContext:
@@ -177,7 +183,7 @@ def _resize_and_pad(image, target_size):
 
 
 _hog_descriptor = cv2.HOGDescriptor((128, 128), (32, 32), (16, 16), (16, 16), 9)
-def _create_video_features_for_similarity_compare(webp_path: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def _create_video_features_for_similarity_compare(webp_path: str) -> SimilarityFeatures:
     hist_list = []
     phash_list = []
     hog_list = []
@@ -215,7 +221,7 @@ def _create_video_features_for_similarity_compare(webp_path: str) -> tuple[np.nd
     avg_phash = np.mean(phash_list, axis=0)
     avg_hog = np.mean(hog_list, axis=0)
     binary_avg_phash = (avg_phash > 0.5).astype(int)
-    return avg_hist, binary_avg_phash, avg_hog
+    return SimilarityFeatures(avg_hist, binary_avg_phash, avg_hog)
 
 
 def main():
