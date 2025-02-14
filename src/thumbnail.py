@@ -34,7 +34,7 @@ def gts():
     thumbnail_thread.daemon = True
     thumbnail_thread.start()
 
-    push_text_to_client(f"Generate Thumbnails {'for library' if library else ''} started in the background")
+    push_text_to_client(f"Generate Thumbnails started in the background")
     return jsonify(ServerResponse(True, "Generate Thumbnails started in the background"))
 
 @thumbnail_bp.route('/api/generate_thumbnail', methods=['POST'])
