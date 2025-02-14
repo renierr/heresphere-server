@@ -307,7 +307,6 @@ def move_file_for(video_path: str, subfolder: str) -> ServerResponse:
     Move a file for a VideoFolder to or inside the library folder
     all thumbnails will be moved as well
 
-    :param source_folder: source folder as VideoFolder enum
     :param video_path: full path to video file
     :param subfolder: subfolder in library
     :return: json object with success and library_path
@@ -315,7 +314,7 @@ def move_file_for(video_path: str, subfolder: str) -> ServerResponse:
 
     push_text_to_client(f"Move file to/inside library: {video_path}")
     static_dir = get_static_directory()
-    real_path, folder = get_real_path_from_url(video_path)
+    real_path, _ = get_real_path_from_url(video_path)
 
     if not os.path.exists(real_path):
         return ServerResponse(False, "Video file does not exist")

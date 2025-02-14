@@ -5,7 +5,7 @@ import sys
 from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple, Optional
+from typing import Tuple, Optional, NamedTuple
 
 DEBUG: bool = False
 url_counter: int = 1
@@ -13,7 +13,18 @@ url_counter: int = 1
 ID_NAME_SEPERATOR = '____'
 THUMBNAIL_DIR_NAME: str = '.thumb'
 UNKNOWN_VIDEO_EXTENSION: str = '.unknown_video'
-VideoInfo = namedtuple('VideoInfo', ['created', 'size', 'duration', 'width', 'height', 'resolution', 'stereo', 'uid', 'title', 'infos'])
+
+class VideoInfo(NamedTuple):
+    created: float
+    size: int
+    duration: int
+    width: int
+    height: int
+    resolution: str
+    stereo: str
+    uid: str
+    title: str
+    infos: Optional[dict]
 
 class VideoFolder(Enum):
     library = ("library", "/static/library/")
