@@ -2,7 +2,6 @@ import math
 import os
 import re
 import sys
-from collections import namedtuple
 from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Optional, NamedTuple
