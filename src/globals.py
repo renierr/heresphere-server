@@ -21,9 +21,9 @@ class VideoInfo(NamedTuple):
     height: int
     resolution: str
     stereo: str
-    uid: str
-    title: str
-    infos: Optional[dict]
+    uid: str | None
+    title: str | None
+    infos: dict | None
 
 class VideoFolder(Enum):
     library = ("library", "/static/library/")
