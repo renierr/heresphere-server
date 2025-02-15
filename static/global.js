@@ -168,3 +168,17 @@ Vue.config.errorHandler = function (err, vm, info) {
     const toast = new bootstrap.Toast(toastElement, { autohide: false });
     toast.show();
 };
+
+function navigate(evt, url) {
+    evt.preventDefault();
+    history.replaceState(null, '', url);
+    window.location.href = url;
+}
+
+document.querySelectorAll('a.nav-link, a.navbar-brand').forEach(link => {
+    link.addEventListener('click', function(e) {
+        console.log('Navigating to:', this.getAttribute('href'));
+        alert('Navigating to:', this.getAttribute('href'));
+        navigate(e, this.getAttribute('href'));
+    });
+});
