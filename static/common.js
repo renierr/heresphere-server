@@ -392,7 +392,7 @@ export const methods = {
             file: file.filename,
             submit: 'Rename',
             action: (confData) => {
-                let newName = document.getElementById('fileName').value;
+                let newName = nameInput.value;
                 if (newName === currentName) {
                     this.showMessage('New name is the same as the current name');
                     return;
