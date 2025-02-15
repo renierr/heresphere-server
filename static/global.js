@@ -177,8 +177,6 @@ function navigate(evt, url) {
 
 document.querySelectorAll('a.nav-link, a.navbar-brand').forEach(link => {
     link.addEventListener('click', function(e) {
-        console.log('Navigating to:', this.getAttribute('href'));
-        alert('Navigating to:', this.getAttribute('href'));
         navigate(e, this.getAttribute('href'));
     });
 });
