@@ -463,7 +463,8 @@ export const methods = {
             <div class="d-flex align-items-center flex-column flex-md-row">
                 <label for="subfolderSelect" class="form-label me-2 text-nowrap">Target Subfolder</label>
                 <select id="subfolderSelect" class="form-select">
-                    <option value="">Select a subfolder or leave for root folder</option>
+                    <option value="">Move to library root folder</option>
+                    <option value="~videos~">Move to videos root folder</option>
                     ${options}
                 </select>
             </div>

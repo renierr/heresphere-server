@@ -307,6 +307,8 @@ def move_file_for(video_path: str, subfolder: str) -> ServerResponse:
     Move a file for a VideoFolder to or inside the library folder
     all thumbnails will be moved as well
 
+    special subfolder name to move library file back to videos/direct directory: '~videos~'
+
     :param video_path: full path to video file
     :param subfolder: subfolder in library
     :return: json object with success and library_path
@@ -321,15 +323,19 @@ def move_file_for(video_path: str, subfolder: str) -> ServerResponse:
 
     base_name = os.path.basename(real_path)
 
-    if subfolder and subfolder not in library_subfolders():
+    if subfolder and subfolder not in library_subfolders() and subfolder != '~videos~':
         return ServerResponse(False, "Invalid subfolder name")
 
-    library_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
+    # check special folder name to move library file back to videos/direct directory
+    if subfolder == '~videos~':
+        target_path = os.path.join(static_dir, VideoFolder.videos.dir, 'direct', base_name)
+    else:
+        target_path = os.path.join(static_dir, VideoFolder.library.dir, subfolder, base_name)
 
-    if os.path.exists(library_path):
+    if os.path.exists(target_path):
         return ServerResponse(False, f"Target exists in library: {base_name}")
 
-    move_file_with_thumbnails(real_path, library_path)
+    move_file_with_thumbnails(real_path, target_path)
     return ServerResponse(True, f"moved {base_name} to {subfolder}")
 
 
