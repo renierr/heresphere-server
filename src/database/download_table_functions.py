@@ -35,9 +35,9 @@ class ForDownload:
         if download:
             session.delete(download)
 
-    def mark_download_failed(self, video_url) -> None:
+    def mark_download_failed(self, original_url) -> None:
         session = self.db.get_session()
-        download = session.query(Downloads).filter_by(video_url=video_url).first()
+        download = session.query(Downloads).filter_by(original_url=original_url).first()
         if download:
             download.failed = 1
 

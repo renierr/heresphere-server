@@ -31,12 +31,16 @@ class Database:
         self.engine = create_engine(f'sqlite:///{db_path}')
         self.SessionMaker = sessionmaker(bind=self.engine)
         self.session: Session | None = None
+        self._enter_count = 0
 
     def __enter__(self):
-        self.session = self.SessionMaker() if self.session is None else self.session
+        if self.session is None:
+            self.session = self.SessionMaker()
+        self._enter_count += 1
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self._enter_count -= 1
         try:
             if exc_type is None:  # No exception in the 'with' block
                 try:
@@ -49,12 +53,15 @@ class Database:
                     self.session.rollback()
                 except Exception:  # Catch exceptions during rollback
                     pass # do not raise this exception, as the original one is more important
-        finally:  # Ensure session is ALWAYS closed
-            try:
-                self.session.close()
-                self.session = None
-            except Exception:  # Catch exceptions during close
-                self.session = None # set to None even if close fails to avoid future problems
+        finally:
+            # close the last session
+            if self._enter_count <= 0:
+                self._enter_count = 0
+                try:
+                    self.session.close()
+                    self.session = None
+                except Exception:  # Catch exceptions during close
+                    self.session = None # set to None even if close fails to avoid future problems
 
     def new_session(self) -> Session:
         return self.SessionMaker()
