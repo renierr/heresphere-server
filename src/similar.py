@@ -99,6 +99,7 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
 
     :param provided_video_path: for which to find similar videos
     :param similarity_threshold: threshold for similarity default 0.4
+    :param limit: number of similar videos to return default 10
     :return: list of similar videos with similarity score (tuple)
     """
 
@@ -127,7 +128,7 @@ def build_features_for_video(video_url: str) -> SimilarityFeatures | None:
     Build the features for the given video_url and return the features
     uses the thumbnail webm file to get a histogram and phash of the video
 
-    :param video_url: url of the video to build features for
+    :param video_url: url of the video to build features
     :return: features for the video tuple (histogram, phash, hog) or None if not possible
     """
 

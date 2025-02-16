@@ -59,7 +59,7 @@ def get_video_info(video_path, force=False):
     {
         "streams": [ ... ],
         "format": { ... },
-        "infos": { "md5": "..." } // additional infos
+        "infos": { "uid": "..." } // additional infos
     }
 
     :param force: force to run ffprobe
@@ -219,7 +219,7 @@ def generate_thumbnail(video_path) -> Optional[bool]:
                 if 'display_aspect_ratio' in stream:
                     aspect_ratio = stream['display_aspect_ratio']
                 else:
-                    # try calc with width and heigth
+                    # try calc with width and height
                     width = stream['width'] if 'width' in stream else 0
                     height = stream['height'] if 'height' in stream else 0
                     # check if 2:1 aspect ratio

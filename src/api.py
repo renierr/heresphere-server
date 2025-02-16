@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
 from files import list_files, delete_file, move_file_for, rename_file_title, toggle_favorite
-from globals import VideoFolder, ServerResponse
+from globals import ServerResponse
 from similar import find_similar
 
 api_bp = Blueprint('api', __name__)

@@ -80,16 +80,14 @@ def get_static_directory() -> str:
 
     :return: static directory path
     """
-    application_path = get_application_path()
-    return os.path.join(application_path, 'static')
+    return os.path.join(get_application_path(), 'static')
 
 def get_data_directory() -> str:
     """
     Get the data directory path
     The data directory is used to store the database and other data files
     """
-    application_path = get_application_path()
-    return os.path.join(application_path, 'data')
+    return os.path.join(get_application_path(), 'data')
 
 
 def remove_ansi_codes(text) -> str:
@@ -135,7 +133,6 @@ def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
         return None, None
 
     static_dir = get_static_directory()
-    vid_folder = None
     if VideoFolder.library.web_path in url:
         relative_path = url.replace(VideoFolder.library.web_path, '')
         real_path = os.path.join(static_dir, VideoFolder.library.dir, relative_path)

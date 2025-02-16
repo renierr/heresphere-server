@@ -107,7 +107,7 @@ def check_folder(path) -> tuple[str,FolderState]:
 
 def get_mime_type(file_path):
     """
-    Determines the MIME type of a file based on its extension and content.
+    Determines the MIME type of file based on its extension and content.
 
     :param file_path: path to file
     :return: A tuple containing the MIME type (string) and encoding (string), or

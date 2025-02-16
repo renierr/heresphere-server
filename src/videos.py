@@ -7,7 +7,7 @@ from datetime import datetime
 import yt_dlp
 from flask import Blueprint, request, jsonify
 from loguru import logger
-from yt_dlp import ImpersonateTarget
+from yt_dlp.networking.impersonate import ImpersonateTarget
 
 from bus import push_text_to_client
 from database.video_database import get_video_db
