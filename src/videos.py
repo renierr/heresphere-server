@@ -181,6 +181,7 @@ def download_video(url, title):
             current_download.original_url = url
             db.session.merge(current_download)
 
+        list_files.cache__clear()
         # only generate thumbnails if download is a video check for file with extension ".unknown_video" this is not a video
         if not video_url.endswith(UNKNOWN_VIDEO_EXTENSION):
             generate_thumbnail_for_path(video_url)
@@ -197,15 +198,14 @@ def download_video(url, title):
                     similarity = Similarity(histogramm=features.histogram.tobytes(),
                                             phash=features.phash.tobytes(),
                                             hog=features.hog.tobytes())
-                video = Videos(source_url=url, file_name=basename, title=title, download_id=download_random_id,
+                video = Videos(video_url=video_url, source_url=url, file_name=basename, title=title, download_id=download_random_id,
                                video_uid=video_uid, download_date=download_date, similarity=similarity)
                 db.for_video_table.upsert_video(video_url, video)
 
-        list_files.cache__clear()
         logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
-        logger.error( f"Failed to download video: {e}")
+        logger.exception( f"Failed to download video: {e}")
         with get_video_db() as db:
             db.for_download_table.mark_download_failed(url)
         list_files.cache__clear()

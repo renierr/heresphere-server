@@ -55,6 +55,7 @@ class ForDownload:
         download_random_id = datetime.now().strftime('%Y%m%d%H%M%S')
         existing_download = session.query(Downloads).filter_by(original_url=url).first()
         if existing_download:
+            existing_download.failed = 0
             download_random_id = existing_download.file_name.split(ID_NAME_SEPERATOR)[0][:14]
             return download_random_id, existing_download
         else:

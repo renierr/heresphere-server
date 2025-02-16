@@ -12,6 +12,7 @@ class ForVideo:
         session = self.db.get_session()
         result = session.query(Videos).filter_by(video_url=video_url).first()
         if result:
+            exclude_fields.append('video_url')
             for key, value in vars(video).items():
                 if not key.startswith('_') and key not in exclude_fields:  # Skip keys starting with an underscore or excluded
                     setattr(result, key, value)
