@@ -92,6 +92,5 @@ new Vue({
     mounted: function () {
         window.vueInstance = this;    // store vue instance in DOM
         this.fetchBookmarks();
-        this.openAndHandleSSEConnection();
     }
 });
