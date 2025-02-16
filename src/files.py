@@ -118,18 +118,15 @@ def list_files() -> list:
                         common_details['failed'] = True
                 extracted_details.append(common_details)
 
-    # check for duplicates TODO use extracted_details directly
-    duplicate_details = []
-    duplicate_details.extend(extracted_details)
-
+    # check for duplicates
     uids: dict = {}
-    for details in duplicate_details:
+    for details in extracted_details:
         uid = details.get('uid')
         if uid:
             if uid in uids:
                 original_file = uids[uid]
                 details['may_exist'] = f"id[{uid}]\n filename.[{details.get('filename')}]\n duplicate[{original_file}]"
-                for original_details in duplicate_details:
+                for original_details in extracted_details:
                     if original_details.get('filename') == original_file:
                         original_details['may_exist'] = f"id[{uid}]\n filename.[{original_file}]\n duplicate[{details.get('filename')}]"
                         break
