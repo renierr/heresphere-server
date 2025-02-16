@@ -38,24 +38,17 @@ def generate_heresphere_json(server_path):
     }
 
     subfolders = library_subfolders()
-    all_library_files = list_files(VideoFolder.library)
+    all_files = list_files()
 
-    for subfolder in [''] + subfolders:
-        files = [file for file in all_library_files if file.get('folder', '') == subfolder]
+    for subfolder in ['', 'direct', 'youtube'] + subfolders:
+        files = [file for file in all_files if file.get('folder', '') == subfolder]
         url_list = [
             f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
             for file in files
         ]
-        name = "Library" if subfolder == '' else f"Library - {subfolder}"
+        name = "Library" if subfolder == '' else f"{subfolder}"
         result_json["library"].append({"name": name, "list": url_list})
 
-    # Add Downloads section
-    files = list_files(VideoFolder.videos)
-    url_list = [
-        f"{server_path}/heresphere/{base64.urlsafe_b64encode(file['filename'].encode()).decode()}"
-        for file in files
-    ]
-    result_json["library"].append({"name": "Downloads", "list": url_list})
 
     return result_json
 

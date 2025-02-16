@@ -11,11 +11,12 @@ def video_folder_type(folder_name):
     except KeyError:
         raise argparse.ArgumentTypeError(f"Invalid folder name: {folder_name}")
 
-def multi_rename(folder: VideoFolder):
+# deprecated FIXME remove
+def multi_rename():
     print('This small script will rename all file titles (not filenames) in the video folder to a new (better) name.')
     print('By removing all _ in Title and other tweaks.\n')
 
-    files = list_files(folder)
+    files = list_files()
     count = 0
     # find rename candidates
     for file in files:
@@ -49,7 +50,6 @@ def multi_rename(folder: VideoFolder):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Rename file titles in the specified video folder.')
-    parser.add_argument('folder', type=video_folder_type, help='The folder to process')
     try:
         args = parser.parse_args()
     except Exception as e:
@@ -57,7 +57,4 @@ if __name__ == "__main__":
         print(f"Parsing error: {e}")
         exit(1)
 
-    if not args.folder:
-        parser.print_help()
-        exit(1)
-    multi_rename(args.folder)
+    multi_rename()

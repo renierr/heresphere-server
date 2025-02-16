@@ -11,13 +11,7 @@ api_bp = Blueprint('api', __name__)
 
 @api_bp.route('/api/list')
 def get_files():
-    return jsonify(list_files(VideoFolder.videos))
-
-
-@api_bp.route('/api/library/list')
-def get_library_files():
-    return jsonify(list_files(VideoFolder.library))
-
+    return jsonify(list_files())
 
 @api_bp.route('/api/move_file', methods=['POST'])
 def mf():

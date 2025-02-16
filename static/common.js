@@ -464,7 +464,7 @@ export const methods = {
                 <label for="subfolderSelect" class="form-label me-2 text-nowrap">Target Subfolder</label>
                 <select id="subfolderSelect" class="form-select">
                     <option value="">Move to library root folder</option>
-                    <option value="~videos~">Move to videos root folder</option>
+                    <option value="~videos~">Move to videos folder</option>
                     ${options}
                 </select>
             </div>

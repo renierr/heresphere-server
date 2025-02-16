@@ -44,9 +44,9 @@ def find_file_info(video_url: str) -> dict | None:
 
 
 @cache(maxsize=128, ttl=18000)
-def list_files(directory: VideoFolder) -> list:
+def list_files() -> list:
     """
-    List all files in the given directory
+    List all files
     The returned list contains dictionaries with the following keys:
 
     - title: the title of the file
@@ -71,58 +71,55 @@ def list_files(directory: VideoFolder) -> list:
     - may_exist: the possible duplicate file info
 
 
-    :param directory: the directory to list files from
     :return: list of dictionaries with file details
     """
     extracted_details = []
-    base_path = directory.web_path
 
-    folder, folder_state = check_folder(os.path.join(get_static_directory(),  directory.dir))
-    if folder_state != FolderState.ACCESSIBLE:
-        push_text_to_client(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
-        logger.warning(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
-        return extracted_details
+    for directory in VideoFolder:
+        base_path = directory.web_path
+        folder, folder_state = check_folder(os.path.join(get_static_directory(),  directory.dir))
+        if folder_state != FolderState.ACCESSIBLE:
+            push_text_to_client(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
+            logger.warning(f"(For list) Folder: {directory.dir} not accessible: {folder} - state: {folder_state}")
+            continue
 
-    with get_video_db() as db:
-        failed_downloads = [download.file_name for download in db.session.query(Downloads).filter_by(failed=True).all()]
+        with get_video_db() as db:
+            failed_downloads = [download.file_name for download in db.session.query(Downloads).filter_by(failed=True).all()]
 
-    for root, dirs, files in os.walk(folder, followlinks=True):
-        # Exclude directories that start with a dot
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
+        for root, dirs, files in os.walk(folder, followlinks=True):
+            # Exclude directories that start with a dot
+            dirs[:] = [d for d in dirs if not d.startswith('.')]
 
-        for filename in files:
-            # ignore part-Frag and ytdl files
-            if 'part-Frag' in filename or filename.endswith('.ytdl'):
-                continue
+            for filename in files:
+                # ignore part-Frag and ytdl files
+                if 'part-Frag' in filename or filename.endswith('.ytdl'):
+                    continue
 
-            # ignore symbolic links for files, cause not mounted dirs are files on os.walk
-            checkf = os.path.join(root, filename)
-            if os.path.islink(checkf):
-                continue
+                # ignore symbolic links for files, cause not mounted dirs are files on os.walk
+                checkf = os.path.join(root, filename)
+                if os.path.islink(checkf):
+                    continue
 
-            subfolder = os.path.relpath(root, folder).replace('\\', '/')
-            if subfolder == '.':
-                subfolder = ''
+                subfolder = os.path.relpath(root, folder).replace('\\', '/')
+                if subfolder == '.':
+                    subfolder = ''
 
-            # for unknown files special handling
-            if filename.endswith(UNKNOWN_VIDEO_EXTENSION):
-                common_details = generic_file_details(root, filename, base_path, subfolder)
+                # for unknown files special handling
+                if filename.endswith(UNKNOWN_VIDEO_EXTENSION):
+                    common_details = generic_file_details(root, filename, base_path, subfolder)
+                    extracted_details.append(common_details)
+                    continue
+
+                common_details = extract_file_details(root, filename, base_path, subfolder)
+
+                # only for videos directory
+                if directory == VideoFolder.videos:
+                    if filename in failed_downloads:
+                        common_details['failed'] = True
                 extracted_details.append(common_details)
-                continue
 
-            common_details = extract_file_details(root, filename, base_path, subfolder)
-
-            # only for videos directory
-            if directory == VideoFolder.videos:
-                if filename in failed_downloads:
-                    common_details['failed'] = True
-            extracted_details.append(common_details)
-
-    # check for duplicates
+    # check for duplicates TODO use extracted_details directly
     duplicate_details = []
-    if directory == VideoFolder.videos:
-        # find extracted infos for library as well and add to duplicate list
-        duplicate_details.extend(list_files(VideoFolder.library))
     duplicate_details.extend(extracted_details)
 
     uids: dict = {}
@@ -410,7 +407,7 @@ def delete_file(url: str) -> ServerResponse:
         db.for_video_table.delete_video(url)
         db.for_download_table.delete_download(url)
 
-    list_files.cache__evict(vid_folder)
+    list_files.cache__clear()
     push_text_to_client(f"File deleted: {base_name}")
     return ServerResponse(True, f"File {base_name} deleted")
 
@@ -477,7 +474,7 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
     if not new_title:
         return ServerResponse(False, "Invalid new title name")
 
-    real_path, vid_folder = get_real_path_from_url(video_path)
+    real_path, _ = get_real_path_from_url(video_path)
     if not real_path:
         return ServerResponse(False, "File not found")
 
@@ -492,7 +489,7 @@ def rename_file_title(video_path: str, new_title: str) -> ServerResponse:
 
     # clear the cache and push/return info
     get_basic_save_video_info.cache__evict(real_path)
-    list_files.cache__evict(vid_folder)
+    list_files.cache__clear()
     push_text_to_client(f"File renamed: {video_path}")
     return ServerResponse(True, f"File {video_path} renamed")
 
@@ -507,7 +504,7 @@ def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
     """
 
     push_text_to_client(f"Set favorite for: {video_path} - {favorite}")
-    real_path, vid_folder = get_real_path_from_url(video_path)
+    real_path, _ = get_real_path_from_url(video_path)
     if not real_path:
         return ServerResponse(False, "File not found")
 
@@ -529,7 +526,7 @@ def set_favorite(video_path: str, favorite: bool = None) -> ServerResponse:
 
     # clear the cache and push/return info
     get_basic_save_video_info.cache__evict(real_path)
-    list_files.cache__evict(vid_folder)
+    list_files.cache__clear()
     push_text_to_client(f"File favorite changed to {favorite}: {base_name}")
     return ServerResponse(True, f"File {base_name} favorite changed")
 

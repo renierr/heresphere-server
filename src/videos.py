@@ -201,14 +201,14 @@ def download_video(url, title):
                                video_uid=video_uid, download_date=download_date, similarity=similarity)
                 db.for_video_table.upsert_video(video_url, video)
 
-        list_files.cache__evict(VideoFolder.videos)
+        list_files.cache__clear()
         logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
         logger.error( f"Failed to download video: {e}")
         with get_video_db() as db:
             db.for_download_table.mark_download_failed(url)
-        list_files.cache__evict(VideoFolder.videos)
+        list_files.cache__clear()
         push_text_to_client(f"Download failed [{download_random_id}] - {e}")
 
 
@@ -232,7 +232,7 @@ def download_progress(d):
             if last_zero_percent == message:
                 return
             last_zero_percent = message
-            list_files.cache__evict(VideoFolder.videos)
+            list_files.cache__clear()
         elif current_time - last_call_time < throttle_delay:
             return
         last_call_time = current_time
@@ -281,7 +281,7 @@ def _add_video_to_db(file):
 
 
 def scan_for_videos():
-    files = list_files(VideoFolder.videos) + list_files(VideoFolder.library)
+    files = list_files()
     try:
         for i, file in enumerate(files):
             if i != 0 and i % 10 == 0:
