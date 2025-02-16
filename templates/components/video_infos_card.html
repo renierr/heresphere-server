@@ -40,9 +40,7 @@
         </button>
         <button v-if="!file.partial && !file.unknown" class="btn btn-outline-secondary btn-sm" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
         <button v-if="!file.partial && !file.unknown" class="btn btn-outline-warning btn-sm" @click="confirmRenameFile(file)">Rename</button>
-        {% if inside_index %}
         <button @click="confirmDeleteFile(file.filename)" class="btn btn-outline-danger btn-sm">Delete</button>
-        {% endif %}
         <button @click="confirmMoveFile(file)" class="btn btn-outline-danger btn-sm">Move To Folder</button>
     </div>
 </div>
