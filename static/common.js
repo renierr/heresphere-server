@@ -146,7 +146,7 @@ export const methods = {
                     console.error('There was an error fetching the files:', error);
                     this.loading = false;
                 })
-        }, 3000),
+        }, 2000),
     startPreview(file, evt) {
         evt.target.play()
             .then(() => file.showPreview = true)
