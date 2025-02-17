@@ -91,6 +91,8 @@ def _all_features() -> dict[str, SimilarityFeatures]:
                                       np.frombuffer(row.phash, dtype=np.int64),
                                       np.frombuffer(row.hog, dtype=np.float32)) for row in all_features}
 
+
+
 def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> list:
     """
     Find similar videos to the provided video path.
@@ -108,19 +110,23 @@ def find_similar(provided_video_path, similarity_threshold=0.6, limit=10) -> lis
     if provided_features is None:
         return []
 
+    similars = _build_similar_list(all_features, provided_features, provided_video_path, similarity_threshold)
+    return similars[:limit]
+
+
+def _build_similar_list(all_features, compare_features, compare_video_path, similarity_threshold):
     similars = []
     for video_path, features in all_features.items():
-        if video_path == provided_video_path:    # ignore myself in the comparison
+        if video_path == compare_video_path:  # ignore myself in the comparison
             continue
-        similar = similar_compare(provided_features, features)
+        similar = similar_compare(compare_features, features)
         if similar > similarity_threshold:
             file_info = find_file_info(video_path)
             if file_info:
                 similars.append((video_path, int(similar * 100), file_info))
-
     # Sort similar images by similarity score in descending order
     similars.sort(key=lambda x: x[1], reverse=True)
-    return similars[:limit]
+    return similars
 
 
 def build_features_for_video(video_url: str) -> SimilarityFeatures | None:
@@ -238,17 +244,7 @@ def find_duplicates(similarity_threshold=0.90) -> dict:
     result = {}
     all_features = _all_features()
     for video_path, features in all_features.items():
-        similars = []
-        for compare_video_path, compare_features in all_features.items():
-            if video_path == compare_video_path:    # ignore myself in the comparison
-                continue
-            similar = similar_compare(features, compare_features)
-            if similar > similarity_threshold:
-                file_info = find_file_info(compare_video_path)
-                if file_info:
-                    similars.append((compare_video_path, int(similar * 100), file_info))
-        # Sort similar images by similarity score in descending order
-        similars.sort(key=lambda x: x[2], reverse=True)
+        similars = _build_similar_list(all_features, features, video_path, similarity_threshold)
         if len(similars) > 0:
             file_info = find_file_info(video_path)
             if file_info:
