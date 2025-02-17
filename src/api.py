@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
 from files import list_files, delete_file, move_file_for, rename_file_title, toggle_favorite
 from globals import ServerResponse
-from similar import find_similar
+from similar import find_similar, find_duplicates
 
 api_bp = Blueprint('api', __name__)
 
@@ -86,3 +86,7 @@ def similar():
     similar_result = find_similar(video_path, threshold)
     similar_result = [{'video_path': x[0], 'score': x[1], 'file': x[2]} for x in similar_result]
     return jsonify(similar_result)
+
+@api_bp.route('/api/duplicates', methods=['GET'])
+def dupl():
+    return jsonify(find_duplicates())

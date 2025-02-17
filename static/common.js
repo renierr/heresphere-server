@@ -243,6 +243,17 @@ export const methods = {
               this.serverResult = 'Error clearing cache';
           });
     },
+    findDuplicates: function () {
+        fetch('/api/duplicates')
+          .then(response => response.json())
+          .then(data => {
+              this.serverResult = data;
+          })
+          .catch(error => {
+              console.error('Error:', error);
+              this.serverResult = 'Error clearing cache';
+          });
+    },
     showMessage: function (input, options = {}) {
         const { title = 'Message', stayOpen = false, asHtml = false } = options;
         const toastElement = document.getElementById('serverResultToast');
