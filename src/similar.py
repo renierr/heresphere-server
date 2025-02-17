@@ -225,29 +225,51 @@ def _create_video_features_for_similarity_compare(webp_path: str) -> SimilarityF
     return SimilarityFeatures(avg_hist, binary_avg_phash, avg_hog)
 
 
+def find_duplicates(similarity_threshold=0.90) -> dict:
+    """
+    Find duplicate videos in the database
+
+    the result should be a dictionary with the video path as key and a list of similar videos as value
+
+    :param similarity_threshold: threshold for similarity default 0.90
+    :return: list of duplicate videos with similarity score (tuple)
+    """
+
+    result = {}
+    all_features = _all_features()
+    for video_path, features in all_features.items():
+        similars = []
+        for compare_video_path, compare_features in all_features.items():
+            if video_path == compare_video_path:    # ignore myself in the comparison
+                continue
+            similar = similar_compare(features, compare_features)
+            if similar > similarity_threshold:
+                file_info = find_file_info(compare_video_path)
+                if file_info:
+                    similars.append((compare_video_path, int(similar * 100), file_info))
+        # Sort similar images by similarity score in descending order
+        similars.sort(key=lambda x: x[2], reverse=True)
+        if len(similars) > 0:
+            file_info = find_file_info(video_path)
+            if file_info:
+                sim_data = [{'video_url': sim[0], 'score': sim[1], 'file': sim[2]} for sim in similars]
+                result[video_path] = { 'file': file_info, 'similar': sim_data }
+    return result
+
+
 def main():
-    similarity_threshold = 0.99
+    similarity_threshold = 0.90
 
     print("\n\nGrouping similar videos")
-    video_data = list(_all_features().items())
-    similarity_matrix = np.array([[similar_compare(f1[1], f2[1]) for f2 in video_data] for f1 in video_data])
-    from collections import defaultdict
+    out = find_duplicates(similarity_threshold)
+    for video, similar_groups in out.items():
+        print(f"Video: [{video}] has similar videos:")
+        sim_data = similar_groups.get('similar')
+        if sim_data:
+            for similar_video in sim_data:
+                print(f"...Score: {similar_video.get('score')} - Similar to: {similar_video.get('video_url')}")
 
-    similar_groups = defaultdict(list)
-
-    for i in range(len(video_data)):
-        for j in range(i + 1, len(video_data)):
-            similarity = similarity_matrix[i][j]
-            if similarity > similarity_threshold:
-                similar_groups[video_data[i][0]].append((video_data[j][0], similarity))
-                similar_groups[video_data[j][0]].append((video_data[i][0], similarity))
-
-    for video, sim_video in similar_groups.items():
-        print(f"Video: {video}")
-        for similar_video, score in sim_video:
-            print(f"  Score: {int(score * 100)} - Similar to: {similar_video}")
-
-    print(f"Found {len(video_data)} videos")
+    print(f"Found {len(out)} videos")
 
 if __name__ == '__main__':
     main()
