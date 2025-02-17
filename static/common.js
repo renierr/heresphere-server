@@ -247,7 +247,8 @@ export const methods = {
         fetch('/api/duplicates')
           .then(response => response.json())
           .then(data => {
-              this.serverResult = data;
+              console.log(data);
+              this.serverResult = `TODO: implement nice dialog.... found ${Object.keys(data).length} duplicates`;
           })
           .catch(error => {
               console.error('Error:', error);
