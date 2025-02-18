@@ -248,7 +248,7 @@ export const methods = {
           .then(response => response.json())
           .then(data => {
               const keysList = Object.keys(data).map(key => `<li>${key}</li>`).join('');
-              const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} duplicates<br><ul>${keysList}</ul>`;
+              const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br><ul>${keysList}</ul>`;
               this.showMessage(output, { stayOpen: true, asHtml: true });
           })
           .catch(error => {
