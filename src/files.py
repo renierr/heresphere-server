@@ -6,8 +6,8 @@ from bus import push_text_to_client
 from cache import cache
 from database.video_database import get_video_db
 from database.video_models import Downloads
-from globals import get_static_directory, VideoInfo, get_real_path_from_url,  \
-    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path, get_url_from_path, get_thumbnail_directory
+from globals import get_static_directory, VideoInfo, get_real_path_from_url, \
+    VideoFolder, THUMBNAIL_DIR_NAME, ServerResponse, FolderState, UNKNOWN_VIDEO_EXTENSION, get_application_path, get_url_from_path, get_thumbnail_directory, ID_NAME_SEPERATOR
 from utils import check_folder, get_mime_type
 from thumbnail import ThumbnailFormat, get_video_info, get_thumbnails, update_file_info
 
@@ -221,6 +221,16 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
         'favorite': False,
     }
     if partial:
+        with get_video_db() as db:
+            # find stuff for current download
+            video_url = f"{download_id}{ID_NAME_SEPERATOR}downloading"
+            download = db.for_download_table.get_download(video_url)
+            if download:
+                result.update({
+                    'url': download.original_url,
+                    'download_date': download.download_date,
+                    'title': download.title,
+                })
         result.update({
             'created': os.path.getctime(realfile),
         })
