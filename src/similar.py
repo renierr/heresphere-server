@@ -90,7 +90,7 @@ def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatur
     # combine the score 4:2:4
     score = (0.4 * score_hist) + (0.2 * score_phash) + (0.4 * score_hog)
 
-    return score_hog
+    return score_phash
 
 def clear_similarity_cache():
     _all_features.cache__clear()
