@@ -247,7 +247,7 @@ export const methods = {
         let htmlOutput = '<div class="similar-videos-container">';
         for (const [videoPath, details] of Object.entries(data)) {
             htmlOutput += `<div class="video-section">
-                <p>Video: [${videoPath}] has similar videos:</p>`;
+                <p>Video: ${details.file.title} [${videoPath}] has similar videos:</p>`;
             const simData = details.similar;
             if (simData) {
                 htmlOutput += '<ul>';
