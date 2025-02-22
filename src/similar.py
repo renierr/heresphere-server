@@ -60,8 +60,9 @@ def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatur
     if hist_features_a is None or hist_features_b is None:
         score_hist = 0
     else:
-        score_hist = cv2.compareHist(hist_features_a, hist_features_b, cv2.HISTCMP_CORREL)
+        #score_hist = cv2.compareHist(hist_features_a, hist_features_b, cv2.HISTCMP_CORREL)
         #score_hist = _compare_histograms(hist_features_a, hist_features_b)
+        score_hist = _calc_cosine_similarity(hist_features_a, hist_features_b)
         score_hist = score_hist if score_hist > 0 else 0    # make sure the score is not negative, the correl algorithm can return negative values
 
     # compare phash
@@ -84,7 +85,7 @@ def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatur
         #score_hog = cv2.compareHist(hog_features_a, hog_features_b, cv2.HISTCMP_CORREL)
         #score_hog = _compare_histograms(hog_features_a, hog_features_b)
         score_hog = _calc_cosine_similarity(hog_features_a, hog_features_b)
-        #score_hog = score_hog if score_hog > 0 else 0
+        score_hog = score_hog if score_hog > 0 else 0
 
     # combine the score 4:2:4
     score = (0.4 * score_hist) + (0.2 * score_phash) + (0.4 * score_hog)
