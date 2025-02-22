@@ -81,9 +81,10 @@ def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatur
     if hog_features_a is None or hog_features_b is None:
         score_hog = 0
     else:
-        score_hog = cv2.compareHist(hog_features_a, hog_features_b, cv2.HISTCMP_CORREL)
+        #score_hog = cv2.compareHist(hog_features_a, hog_features_b, cv2.HISTCMP_CORREL)
         #score_hog = _compare_histograms(hog_features_a, hog_features_b)
-        score_hog = score_hog if score_hog > 0 else 0
+        score_hog = _calc_cosine_similarity(hog_features_a, hog_features_b)
+        #score_hog = score_hog if score_hog > 0 else 0
 
     # combine the score 4:2:4
     score = (0.4 * score_hist) + (0.2 * score_phash) + (0.4 * score_hog)
