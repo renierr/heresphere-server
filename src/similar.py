@@ -242,7 +242,7 @@ def _create_video_features_for_similarity_compare(webp_path: str) -> SimilarityF
     return SimilarityFeatures(avg_hist, binary_avg_phash, avg_hog)
 
 
-def find_duplicates(similarity_threshold=0.90) -> dict:
+def find_duplicates(similarity_threshold=0.95) -> dict:
     """
     Find duplicate videos in the database
 

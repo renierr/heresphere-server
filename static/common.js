@@ -243,20 +243,37 @@ export const methods = {
               this.serverResult = 'Error clearing cache';
           });
     },
+    outputSimilarVideos: function(data) {
+        let htmlOutput = '<div class="similar-videos-container">';
+        for (const [videoPath, details] of Object.entries(data)) {
+            htmlOutput += `<div class="video-section">
+                <p>Video: [${videoPath}] has similar videos:</p>`;
+            const simData = details.similar;
+            if (simData) {
+                htmlOutput += '<ul>';
+                simData.forEach(similarVideo => {
+                    htmlOutput += `<li><strong>Score:</strong> ${similarVideo.score} - <strong>Similar to:</strong> ${similarVideo.file.title} [${similarVideo.video_url}]</li>`;
+                });
+                htmlOutput += '</ul>';
+            }
+            htmlOutput += '</div>';
+        }
+        htmlOutput += '</div>';
+        return htmlOutput;
+    },
     findDuplicates: function () {
         this.loading = true;
         fetch('/api/duplicates')
           .then(response => response.json())
           .then(data => {
               this.loading = false;
-              const keysList = Object.keys(data).map(key => `<li>${key}</li>`).join('');
-              const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br><ul>${keysList}</ul>`;
+              const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${this.outputSimilarVideos(data)}`;
               this.showMessage(output, { stayOpen: true, asHtml: true });
           })
           .catch(error => {
               this.loading = false;
               console.error('Error:', error);
-              this.serverResult = 'Error clearing cache';
+              this.serverResult = 'Error in find duplicates';
           });
     },
     showMessage: function (input, options = {}) {
