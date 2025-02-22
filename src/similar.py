@@ -73,7 +73,6 @@ def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatur
     else:
         # hamming distance normalized by the length of the phash that a number between 0 and 1 is returned
         score_phash = 1 - (np.sum(phash_features_a != phash_features_b) / len(phash_features_a))
-        # Calculate cosine similarity
         #score_phash = _calc_cosine_similarity(phash_features_a, phash_features_b)
 
     # compare hog
@@ -90,7 +89,7 @@ def similar_compare(features_a: SimilarityFeatures, features_b: SimilarityFeatur
     # combine the score 4:2:4
     score = (0.4 * score_hist) + (0.2 * score_phash) + (0.4 * score_hog)
 
-    return score_phash
+    return score
 
 def clear_similarity_cache():
     _all_features.cache__clear()
