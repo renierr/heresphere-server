@@ -244,14 +244,17 @@ export const methods = {
           });
     },
     findDuplicates: function () {
+        this.loading = true;
         fetch('/api/duplicates')
           .then(response => response.json())
           .then(data => {
+              this.loading = false;
               const keysList = Object.keys(data).map(key => `<li>${key}</li>`).join('');
               const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br><ul>${keysList}</ul>`;
               this.showMessage(output, { stayOpen: true, asHtml: true });
           })
           .catch(error => {
+              this.loading = false;
               console.error('Error:', error);
               this.serverResult = 'Error clearing cache';
           });
