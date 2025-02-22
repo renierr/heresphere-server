@@ -268,7 +268,7 @@ export const methods = {
           .then(data => {
               this.loading = false;
               const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${this.outputSimilarVideos(data)}`;
-              this.showMessage(output, { stayOpen: true, asHtml: true });
+              this.showMessage(output, { stayOpen: true, asHtml: true, wide: true });
           })
           .catch(error => {
               this.loading = false;
@@ -277,7 +277,7 @@ export const methods = {
           });
     },
     showMessage: function (input, options = {}) {
-        const { title = 'Message', stayOpen = false, asHtml = false } = options;
+        const { title = 'Message', stayOpen = false, asHtml = false, wide = false } = options;
         const toastElement = document.getElementById('serverResultToast');
         const toastTitle = document.getElementById('serverResultTitle');
         const toastMessage = document.getElementById('serverResultMessage');
@@ -297,6 +297,10 @@ export const methods = {
         } else {
             toastTitle.textContent = title;
             toastMessage.textContent = message;
+        }
+
+        if (wide) {
+            toastElement.style.width = 'auto';
         }
 
         const toast = new bootstrap.Toast(toastElement, { autohide: !options.stayOpen });
