@@ -392,7 +392,7 @@ def delete_file(url: str) -> ServerResponse:
         return ServerResponse(False, "URL missing")
 
     # only allow to delete from videos directory
-    if VideoFolder.videos.web_path not in url:
+    if VideoFolder.videos.web_path not in url and '/duplicates' not in url:
         return ServerResponse(False, "Invalid URL - only delete from videos folders are allowed (not library)")
 
     real_path, vid_folder = get_real_path_from_url(url)
