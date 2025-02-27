@@ -436,10 +436,22 @@ def cleanup() -> ServerResponse:
             video_url = download.video_url
             if video_url:
                 check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
-                logger.debug(f"Checking file: {check_file}")
+                logger.debug(f"Cleanup for download: {check_file}")
                 if not os.access(check_file, os.F_OK):
+                    logger.debug(f"Removing: {video_url} for download")
                     to_remove.append(pk)
                     db.get_session().delete(download)
+        all_videos = db.for_video_table.list_videos()
+        for video in all_videos:
+            video_url = video.video_url
+            if video_url:
+                check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
+                logger.debug(f"Cleanup for video: {check_file}")
+                if not os.access(check_file, os.F_OK):
+                    logger.debug(f"Removing: {video_url} for video")
+                    to_remove.append(video_url)
+                    db.get_session().delete(video)
+
     logger.debug(f"removed orphan db entries: {to_remove}")
     push_text_to_client(f"Cleanup db entries finished (removed: {len(to_remove)} entries).")
 
