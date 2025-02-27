@@ -226,10 +226,12 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
             video_url = f"{download_id}{ID_NAME_SEPERATOR}downloading"
             download = db.for_download_table.get_download(video_url)
             if download:
+                split_filename = os.path.splitext(filename)[0].split('____')
+                file_title = split_filename[1] if len(split_filename) > 1 else split_filename[0]
                 result.update({
                     'url': download.original_url,
                     'download_date': download.download_date,
-                    'title': download.title,
+                    'title': download.title if download.title else file_title,
                 })
         result.update({
             'created': os.path.getctime(realfile),
