@@ -105,12 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     // init the modals - we only use one instance of each modal
+    /*
     window.videoModal = new bootstrap.Modal(document.getElementById('videoModal'));
     window.confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     const similarityModalElement = document.getElementById('similarityModal');
     if (similarityModalElement) {
         window.similarityModal = new bootstrap.Modal(similarityModalElement, {backdrop: 'static'});
     }
+    */
+
 
 
     // swipe listener for select (up/down) to select option

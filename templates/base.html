@@ -13,7 +13,6 @@
     <link href="/static/styles.css" rel="stylesheet">
     <link href="/static/css/video-js.min.css?v=8.20.0" rel="stylesheet">
     <script src="/static/js/hammer.min.js?v=2.0.8"></script>
-    <script src="/static/js/vue.global.prod.js?v=3.5.13"></script>
     <script src="/static/js/video.min.js?v=8.20.0"></script>
     <script>
         let library_subfolders = [[ library_subfolders|tojson ]];
@@ -21,6 +20,7 @@
 </head>
 
 <body class="p-2">
+    <div id="app" v-cloak class="container">
     <nav class="navbar navbar-expand-sm mb-4">
         <div class="container-fluid">
             <a class="navbar-brand {% if request.path == '/' %}active fw-bold{% endif %}" href="/">HSServer</a>
@@ -41,10 +41,8 @@
         </div>
     </nav>
 
-    <div id="app" v-cloak class="container">
         {% include 'components/confirm_modal.html' %}
         {% block content %}{% endblock %}
-    </div>
 
     <button id="scroll-to-top" class="fs-2 btn btn-info position-fixed bottom-0 end-0 m-3 rounded-circle d-none shadow d-flex align-items-center justify-content-center" title="Scroll to top">
         <i class="bi bi-arrow-up-short"></i>
@@ -63,6 +61,11 @@
     </div>
 
     {% include 'components/video_modal.html' %}
+
+    </div>
+
+    <script type="module" src="/static/index.js"></script>
+    {% include "components/server_info.html" %}
 
     <script src="/static/js/bootstrap.bundle.min.js?v=5.3.3"></script>
     <script src="/static/global.js"></script>

@@ -6,11 +6,13 @@ import {
     addSwipeNavigationForPagingListener, addKeyNavigationForPagingListener, removeKeyNavigationForPagingListener
 } from './common.js';
 
-const { createApp } = Vue;
+import { createApp } from './js/vue.esm-browser.js';
 const app = createApp({
-    data: {
-        ...data,
-        downloadProgress: {},
+    data() {
+        return {
+            ...data,
+            downloadProgress: {},
+        }
     },
     methods: {
         ...methods,
@@ -116,10 +118,10 @@ const app = createApp({
     watch: {
         ...watch,
     },
-    beforeDestroy() {
+    beforeUnmount() {
         removeKeyNavigationForPagingListener(this);
     },
-    mounted: function () {
+    mounted() {
         window.vueInstance = this;    // store vue instance in DOM
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
@@ -164,5 +166,7 @@ app.config.errorHandler = function (err, instance, info) {
     toast.show();
 };
 
+import { ServerInfo } from './js/components/server-info.js';
+app.component('server-info', ServerInfo);
 app.mount('#app');
 

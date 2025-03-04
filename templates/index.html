@@ -4,7 +4,7 @@
 
 {% block content %}
     {% include "components/similarity_modal.html" %}
-    {% include "components/server_info.html" %}
+    xx<server-info :settings="settings"></server-info>xx
     {% include "components/filter.html" %}
 
     <div class="w-100 d-flex gap-2 align-items-center flex-row p-2">
@@ -22,7 +22,5 @@
     {% include "components/loading.html" %}
     {% include "components/list_files.html" %}
     {% include "components/page_functions.html" %}
-
-    <script type="module" src="/static/index.js"></script>
 
 {% endblock %}
