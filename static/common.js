@@ -98,6 +98,9 @@ export const methods = {
             });
     },
     showSimilar(file) {
+        this.similarVideos = null;
+        this.currentFile = file;
+        window.similarityModal.show();
         fetch('/api/similar', {
             method: 'POST',
             body: JSON.stringify({ video_path: file.filename, threshold: this.settings.similarThreshold }),
@@ -107,13 +110,12 @@ export const methods = {
         })
             .then(response => response.json())
             .then(data => {
-                this.currentFile = file;
                 this.similarVideos = data;
-                window.similarityModal.show();
             })
             .catch(error => {
                 console.error('Error:', error);
                 this.serverResult = 'Error calling similars';
+                this.similarVideos = [];
             });
     },
     fetchFiles: debounce(function (restoreScrollPosition=false) {
