@@ -102,3 +102,33 @@ img.similar-thumbnail:focus {
     user-select: text !important;
     pointer-events: auto !important;
 }
+.loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.loading-bar::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #007bff;
+    animation: loading 2s infinite;
+}
+
+@keyframes loading {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
