@@ -156,21 +156,7 @@ function open_sse_connection() {
     return eventSource;
 }
 
-Vue.config.errorHandler = function (err, vm, info) {
-    // Log the error details to the console
-    console.error(`Error: ${err.toString()}\nInfo: ${info}`);
 
-    // Display a user-friendly message
-    const toastElement = document.getElementById('serverResultToast');
-    const toastTitle = document.getElementById('serverResultTitle');
-    const toastMessage = document.getElementById('serverResultMessage');
-
-    toastTitle.textContent = 'An error occurred';
-    toastMessage.textContent = err.toString();
-
-    const toast = new bootstrap.Toast(toastElement, { autohide: false });
-    toast.show();
-};
 
 function navigate(evt, url) {
     evt.preventDefault();

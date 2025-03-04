@@ -6,8 +6,8 @@ import {
     addSwipeNavigationForPagingListener, addKeyNavigationForPagingListener, removeKeyNavigationForPagingListener
 } from './common.js';
 
-new Vue({
-    el: '#app',
+const { createApp } = Vue;
+const app = createApp({
     data: {
         ...data,
         downloadProgress: {},
@@ -147,3 +147,22 @@ new Vue({
         });
     },
 });
+
+app.config.errorHandler = function (err, instance, info) {
+    // Log the error details to the console
+    console.error(`Error: ${err.toString()}\nInfo: ${info}`);
+
+    // Display a user-friendly message in Bootstrap toast
+    const toastElement = document.getElementById('serverResultToast');
+    const toastTitle = document.getElementById('serverResultTitle');
+    const toastMessage = document.getElementById('serverResultMessage');
+
+    toastTitle.textContent = 'An error occurred';
+    toastMessage.textContent = err.toString();
+
+    const toast = new bootstrap.Toast(toastElement, { autohide: false });
+    toast.show();
+};
+
+app.mount('#app');
+
