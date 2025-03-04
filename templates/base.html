@@ -21,52 +21,51 @@
 
 <body class="p-2">
     <div id="app" v-cloak class="container">
-    <nav class="navbar navbar-expand-sm mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand {% if request.path == '/' %}active fw-bold{% endif %}" href="/">HSServer</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mb-2 mb-sm-0 me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/bookmarks' %}active fw-bold{% endif %}" href="/bookmarks">Bookmarks</a>
-                    </li>
-                </ul>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="theme-toggle">
-                    <label class="form-check-label" for="theme-toggle">Dark Mode</label>
+        <nav class="navbar navbar-expand-sm mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand {% if request.path == '/' %}active fw-bold{% endif %}" href="/">HSServer</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mb-2 mb-sm-0 me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/bookmarks' %}active fw-bold{% endif %}" href="/bookmarks">Bookmarks</a>
+                        </li>
+                    </ul>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="theme-toggle">
+                        <label class="form-check-label" for="theme-toggle">Dark Mode</label>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+            {% include 'components/confirm_modal.html' %}
+            {% block content %}{% endblock %}
+
+        <button id="scroll-to-top" class="fs-2 btn btn-info position-fixed bottom-0 end-0 m-3 rounded-circle d-none shadow d-flex align-items-center justify-content-center" title="Scroll to top">
+            <i class="bi bi-arrow-up-short"></i>
+        </button>
+
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
+            <div id="serverResultToast" class="toast text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong id="serverResultTitle" class="me-auto">Message</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    <span id="serverResultMessage"></span>
                 </div>
             </div>
         </div>
-    </nav>
 
-        {% include 'components/confirm_modal.html' %}
-        {% block content %}{% endblock %}
-
-    <button id="scroll-to-top" class="fs-2 btn btn-info position-fixed bottom-0 end-0 m-3 rounded-circle d-none shadow d-flex align-items-center justify-content-center" title="Scroll to top">
-        <i class="bi bi-arrow-up-short"></i>
-    </button>
-
-    <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
-        <div id="serverResultToast" class="toast text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <strong id="serverResultTitle" class="me-auto">Message</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                <span id="serverResultMessage"></span>
-            </div>
-        </div>
-    </div>
-
-    {% include 'components/video_modal.html' %}
+        {% include 'components/video_modal.html' %}
 
     </div>
 
-    <script type="module" src="/static/index.js"></script>
     {% include "components/server_info.html" %}
-
+    <script type="module" src="/static/index.js"></script>
     <script src="/static/js/bootstrap.bundle.min.js?v=5.3.3"></script>
     <script src="/static/global.js"></script>
 </body>
