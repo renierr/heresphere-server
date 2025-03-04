@@ -81,10 +81,9 @@
                         </li>
                     </ul>
                 </div>
-                <div v-else>
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
+                <div v-else class="d-flex flex-row justify-content-center align-items-center gap-4 pt-2">
+                    <span>Loading similar Videos...</span>
+                    <div class="spinner-border" role="status"></div>
                 </div>
             </div>
             <div v-else class="modal-body">
