@@ -1,7 +1,30 @@
 import {eventBus} from "../event-bus.js";
 
+// language=Vue
+const template = `
+<div class="accordion" id="serverinfo">
+    <div class="accordion-item">
+        <h5 class="accordion-header">
+            <button class="accordion-button btn-sm p-1" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#serverinfo-collapse"
+                    aria-expanded="true" aria-controls="serverinfo-collapse"
+                    @click="toggleInfoAccordion" :class="{collapsed: !settings.infoAccordionOpen}">
+                Server Information
+            </button>
+        </h5>
+    </div>
+    <div class="accordion-item">
+        <div id="serverinfo-collapse" class="accordion-collapse collapse" :class="{ show: settings.infoAccordionOpen }">
+            <div class="accordion-body p-1">
+                <div v-text="serverOutput" class="text-muted small" style="white-space: pre-wrap; overflow-y: auto; height: 100px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+`
+
 export const ServerInfo = {
-    template: '#server-info-template',
+    template: template,
     props: {
         settings: {},
     },
