@@ -14,7 +14,6 @@ new Vue({
     methods: {
         toggleInfoAccordion: methods.toggleInfoAccordion,
         showMessage: methods.showMessage,
-        openAndHandleSSEConnection: methods.openAndHandleSSEConnection,
         fetchBookmarks() {
             this.loading = true;
             fetch('/api/bookmarks')
