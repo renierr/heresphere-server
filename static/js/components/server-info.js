@@ -1,4 +1,4 @@
-import {eventBus} from "../event-bus.js";
+import {eventBus} from "event-bus";
 
 // language=Vue
 const template = `
@@ -31,7 +31,6 @@ export const ServerInfo = {
     data() {
         return {
             serverOutput: '',
-            serverResult: '',
         };
     },
     methods: {

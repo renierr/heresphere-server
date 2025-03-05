@@ -357,14 +357,6 @@ export const methods = {
     saveSettings() {
         localStorage.setItem('settings', JSON.stringify(this.settings));
     },
-    toggleFilterAccordion() {
-        this.settings.filterAccordionOpen = !this.settings.filterAccordionOpen;
-        this.saveSettings();
-    },
-    toggleInfoAccordion() {
-        this.settings.infoAccordionOpen = !this.settings.infoAccordionOpen;
-        this.saveSettings();
-    },
     checkResolution(file) {
         if (this.selectedResolution === 'HD') {
             return file.width > 1900 || file.height > 1900;

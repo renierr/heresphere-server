@@ -17,6 +17,15 @@
     <script>
         let library_subfolders = [[ library_subfolders|tojson ]];
     </script>
+    <script type="importmap">
+        {
+          "imports": {
+            "vue": "/static/js/vue.esm-browser.js",
+            "shared-state": "/static/js/state.js"
+            "event-bus": "/static/js/event-bus.js"
+          }
+        }
+    </script>
 </head>
 
 <body class="p-2">
@@ -41,13 +50,12 @@
             </div>
         </nav>
 
-            {% include 'components/confirm_modal.html' %}
-            {% block content %}{% endblock %}
+        {% include 'components/confirm_modal.html' %}
+        {% block content %}{% endblock %}
 
         <button id="scroll-to-top" class="fs-2 btn btn-info position-fixed bottom-0 end-0 m-3 rounded-circle d-none shadow d-flex align-items-center justify-content-center" title="Scroll to top">
             <i class="bi bi-arrow-up-short"></i>
         </button>
-
         <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
             <div id="serverResultToast" class="toast text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
@@ -61,7 +69,6 @@
         </div>
 
         {% include 'components/video_modal.html' %}
-
     </div>
 
     <script type="module" src="/static/index.js"></script>

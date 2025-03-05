@@ -4,8 +4,8 @@
 
 {% block content %}
     {% include "components/similarity_modal.html" %}
-    <server-info :settings="settings"></server-info>
-    {% include "components/filter.html" %}
+    <hs-server-info :settings="settings"></hs-server-info>
+    <hs-filter :settings="settings"></hs-filter>
 
     <div class="w-100 d-flex gap-2 align-items-center flex-row p-2">
         <div class="form-floating flex-grow-1">

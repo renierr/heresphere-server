@@ -6,8 +6,8 @@ import {
     addSwipeNavigationForPagingListener, addKeyNavigationForPagingListener, removeKeyNavigationForPagingListener
 } from './common.js';
 
-import { createApp } from './js/vue.esm-browser.js';
-import { eventBus } from './js/event-bus.js';
+import { createApp } from 'vue';
+import { eventBus } from 'event-bus';
 
 const app = createApp({
     data() {
@@ -184,6 +184,9 @@ app.config.globalProperties.$saveSettings = function () {
 }
 
 import { ServerInfo } from './js/components/server-info.js';
-app.component('server-info', ServerInfo);
+import { Filter } from './js/components/filter.js';
+
+app.component('hs-server-info', ServerInfo);
+app.component('hs-filter', Filter);
 app.mount('#app');
 

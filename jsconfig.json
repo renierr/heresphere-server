@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "vue": ["./static/js/vue.esm-browser.js"],
+      "shared-state": ["./static/js/state.js"],
+      "event-bus": ["./static/js/event-bus.js"]
+    }
+  },
+  "include": ["*.js", "**/*.js"]
+}
