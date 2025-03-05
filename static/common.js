@@ -641,18 +641,6 @@ export const watch = {
             this.serverResult = null;
         }
     },
-    'settings.cardLayout': function(newValue) {
-        this.saveSettings();
-    },
-    'settings.pageSize': function(newValue) {
-        this.saveSettings();
-    },
-    'settings.showVideoPreview': function(newValue) {
-        this.saveSettings();
-    },
-    'settings.similarThreshold': function(newValue) {
-        this.saveSettings();
-    },
 };
 
 function keyNavigationForPaging(event, vueContext) {

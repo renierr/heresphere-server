@@ -122,7 +122,6 @@ const app = createApp({
         ...watch,
         settings: {
             handler() {
-                console.log('Settings changed');
                 this.saveSettings()
             },
             deep: true,
