@@ -7,11 +7,14 @@ import {
 } from './common.js';
 
 import { createApp } from './js/vue.esm-browser.js';
+import { eventBus } from './js/event-bus.js';
+
 const app = createApp({
     data() {
         return {
             ...data,
             downloadProgress: {},
+            removeSseListener: null,
         }
     },
     methods: {
@@ -120,30 +123,34 @@ const app = createApp({
     },
     beforeUnmount() {
         removeKeyNavigationForPagingListener(this);
+        if (this.removeSseListener) {
+            this.removeSseListener();
+        }
+        eventBus.events = {};
     },
     mounted() {
         window.vueInstance = this;    // store vue instance in DOM
         addKeyNavigationForPagingListener(this);
         addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
-        this.openAndHandleSSEConnection((evt) => {
-            let progressExp = evt.data.match(/(\d+.\d+)% complete/);
-            let progressId = evt.data.match(/Downloading...\[(\d+)]/);
+        this.removeSseListener = eventBus.on('sse-message', (data) => {
+            let progressExp = data.match(/(\d+.\d+)% complete/);
+            let progressId = data.match(/Downloading...\[(\d+)]/);
             if (progressId) {
                 this.downloadProgress = this.downloadProgress || {};
                 this.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
             }
 
-            if (evt.data.includes('Download failed')) {
-                let progressId = evt.data.match(/Download failed \[(\d+)]/);
+            if (data.includes('Download failed')) {
+                let progressId = data.match(/Download failed \[(\d+)]/);
                 if (progressId) {
                     this.downloadProgress[progressId[1]] = 0;
                 }
             }
 
-            if (evt.data.includes('Download finished') ||
-              evt.data.includes('Generate thumbnails finished') ||
-              evt.data.includes(' 0.0% complete')) {
+            if (data.includes('Download finished') ||
+              data.includes('Generate thumbnails finished') ||
+              data.includes(' 0.0% complete')) {
                 this.fetchFiles();
             }
         });

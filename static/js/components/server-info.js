@@ -1,3 +1,5 @@
+import {eventBus} from "../event-bus.js";
+
 export const ServerInfo = {
     template: '#server-info-template',
     props: {
@@ -27,6 +29,7 @@ export const ServerInfo = {
                     serverOutput.shift();
                 }
                 this.serverOutput = serverOutput.slice().reverse().join('\n');
+                eventBus.emit('sse-message', event.data);
                 if (call_func)  {
                     call_func(event);
                 }
