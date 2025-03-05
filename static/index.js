@@ -120,6 +120,13 @@ const app = createApp({
     },
     watch: {
         ...watch,
+        settings: {
+            handler() {
+                console.log('Settings changed');
+                this.saveSettings()
+            },
+            deep: true,
+        }
     },
     beforeUnmount() {
         removeKeyNavigationForPagingListener(this);
@@ -172,6 +179,10 @@ app.config.errorHandler = function (err, instance, info) {
     const toast = new bootstrap.Toast(toastElement, { autohide: false });
     toast.show();
 };
+
+app.config.globalProperties.$saveSettings = function () {
+    this.saveSettings();
+}
 
 import { ServerInfo } from './js/components/server-info.js';
 app.component('server-info', ServerInfo);

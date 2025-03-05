@@ -12,6 +12,9 @@ export const ServerInfo = {
         };
     },
     methods: {
+        toggleInfoAccordion() {
+            this.settings.infoAccordionOpen = !this.settings.infoAccordionOpen;
+        },
         openAndHandleSSEConnection(call_func) {
             const eventSource = new EventSource('/sse');
             window.addEventListener('beforeunload', () => {
