@@ -1,4 +1,5 @@
-import {eventBus} from "../event-bus.js";
+import {eventBus} from "event-bus";
+import {sharedState} from "shared-state";
 
 // language=Vue
 const template = `
@@ -16,23 +17,23 @@ const template = `
       <div id="filter-collapse" class="accordion-collapse collapse" :class="{ show: settings.filterAccordionOpen }">
         <div class="accordion-body p-1">
           <div class="input-group d-flex justify-content-center align-items-start mb-2 gap-2">
-            <select v-model="selectedFolder" class="form-select form-control w-auto">
+            <select v-model="sharedState.selectedFolder" class="form-select form-control w-auto">
               <option value="">All Folders</option>
               <option value="~root~">Root Folder</option>
               <option v-for="folder in uniqueFolders" :key="folder" :value="folder">{{ folder }}</option>
             </select>
             <div class="d-flex align-items-center flex-column flex-sm-row gap-1">
-              <select v-model="currentSort" class="form-select form-control w-auto ms-2">
+              <select v-model="sharedState.currentSort" class="form-select form-control w-auto ms-2">
                 <option value="created">Sort by Time</option>
                 <option value="folder created">Sort by Folder and Time</option>
                 <option value="filesize">Sort by Size</option>
                 <option value="duration">Sort by Duration</option>
               </select>
               <div class="btn-group" role="group" aria-label="Sort Direction">
-                <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: currentSortDir === 'asc' }" @click="currentSortDir = 'asc'">
+                <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: sharedState.currentSortDir === 'asc' }" @click="sharedState.currentSortDir = 'asc'">
                   <i class="bi bi-arrow-up"></i>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: currentSortDir === 'desc' }" @click="currentSortDir = 'desc'">
+                <button type="button" class="btn btn-sm btn-outline-secondary" :class="{ active: sharedState.currentSortDir === 'desc' }" @click="sharedState.currentSortDir = 'desc'">
                   <i class="bi bi-arrow-down"></i>
                 </button>
               </div>
@@ -41,29 +42,29 @@ const template = `
 
           <div class="d-flex flex-column flex-lg-row justify-content-between mb-2 gap-2">
             <div class="btn-group" role="group" aria-label="Filter by Resolution">
-              <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: selectedResolution === '' }" @click="selectedResolution = ''">All&nbsp;Resolutions</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedResolution === 'HD' }" @click="selectedResolution = 'HD'">HD+</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedResolution === '4K' }" @click="selectedResolution = '4K'">4K+</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedResolution === '8K' }" @click="selectedResolution = '8K'">8K+</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" :class="{ active: sharedState.selectedResolution === '' }" @click="sharedState.selectedResolution = ''">All&nbsp;Resolutions</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedResolution === 'HD' }" @click="sharedState.selectedResolution = 'HD'">HD+</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedResolution === '4K' }" @click="sharedState.selectedResolution = '4K'">4K+</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedResolution === '8K' }" @click="sharedState.selectedResolution = '8K'">8K+</button>
             </div>
             <div class="position-relative">
               <label for="similarThreshold" class="label small">Similarity Threshold ({{ settings.similarThreshold }}%)</label>
               <input type="range" class="form-range" id="similarThreshold" v-model.number="settings.similarThreshold" min="0" max="100" step="1">
             </div>
             <div class="btn-group" role="group" aria-label="Filter by Duration">
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 0 }" @click="selectedDuration = 0">All&nbsp;Durations</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 5 }" @click="selectedDuration = 5">+5min</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 15 }" @click="selectedDuration = 15">+15min</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 30 }" @click="selectedDuration = 30">+30min</button>
-              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: selectedDuration === 60 }" @click="selectedDuration = 60">+60min</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedDuration === 0 }" @click="sharedState.selectedDuration = 0">All&nbsp;Durations</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedDuration === 5 }" @click="sharedState.selectedDuration = 5">+5min</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedDuration === 15 }" @click="sharedState.selectedDuration = 15">+15min</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedDuration === 30 }" @click="sharedState.selectedDuration = 30">+30min</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm p-1" :class="{ active: sharedState.selectedDuration === 60 }" @click="sharedState.selectedDuration = 60">+60min</button>
             </div>
           </div>
 
           <div class="form-floating mb-3 position-relative">
             <input id="filterInput" type="text" class="form-control pe-5"
-                   placeholder="Filter files by Name..." v-model="filter">
+                   placeholder="Filter files by Name..." v-model="sharedState.filter">
             <label for="filterInput" class="text-muted">Filter files by Name...</label>
-            <button v-if="filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="filter = ''"><i class="bi bi-x"></i></button>
+            <button v-if="sharedState.filter" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="sharedState.filter = ''"><i class="bi bi-x"></i></button>
           </div>
 
           <div class="d-flex flex-column flex-lg-row justify-content-between mb-1 gap-2 align-items-center ">
@@ -103,19 +104,16 @@ export const Filter = {
     props: {
         settings: {},
     },
+    setup() {
+        return { sharedState };
+    },
     data() {
         return {
-            filter: '',
-            selectedFolder: '',
-            selectedResolution: '',
-            selectedDuration: 0,
-            currentSort: 'created',
-            currentSortDir: 'desc',
         };
     },
     computed: {
         uniqueFolders() {
-            const folders = this.files.map(file => file.folder).filter(folder => folder);
+            const folders = sharedState.files.map(file => file.folder).filter(folder => folder);
             return [...new Set(folders)].sort();
         },
     },
