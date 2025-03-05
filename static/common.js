@@ -1,5 +1,6 @@
 let previewVideoWarningAlreadyShown = false;
 
+// TODO remove me
 function localStoreSettingsLoading() {
     const defaults = { cardLayout: true, pageSize: 12,
         filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '', showVideoPreview: true, similarThreshold: 50 };
@@ -27,7 +28,7 @@ export const data = {
     totalItems: 0,
     totalSize: 0,
     confirmData: {},
-    settings: localStoreSettingsLoading(),
+    settings: localStoreSettingsLoading(), // TODO remove me
 };
 
 function debounce(func, wait) {

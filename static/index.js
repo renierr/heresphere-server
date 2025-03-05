@@ -8,6 +8,7 @@ import {
 
 import { createApp } from 'vue';
 import { eventBus } from 'event-bus';
+import { sharedState, settings } from 'shared-state';
 
 const app = createApp({
     data() {
@@ -16,6 +17,9 @@ const app = createApp({
             downloadProgress: {},
             removeSseListener: null,
         }
+    },
+    setup() {
+        return { sharedState, settings };
     },
     methods: {
         ...methods,
@@ -178,10 +182,6 @@ app.config.errorHandler = function (err, instance, info) {
     const toast = new bootstrap.Toast(toastElement, { autohide: false });
     toast.show();
 };
-
-app.config.globalProperties.$saveSettings = function () {
-    this.saveSettings();
-}
 
 import { ServerInfo } from './js/components/server-info.js';
 import { Filter } from './js/components/filter.js';

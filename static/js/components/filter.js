@@ -1,5 +1,5 @@
 import {eventBus} from "event-bus";
-import {sharedState} from "shared-state";
+import { sharedState, settings } from "shared-state";
 
 // language=Vue
 const template = `
@@ -102,10 +102,9 @@ const template = `
 export const Filter = {
     template: template,
     props: {
-        settings: {},
     },
     setup() {
-        return { sharedState };
+        return { sharedState, settings };
     },
     data() {
         return {
@@ -123,5 +122,6 @@ export const Filter = {
         },
     },
     mounted() {
+        console.log('Filter component mounted', settings);
     }
 }
