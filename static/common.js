@@ -1,5 +1,5 @@
 import {settings, sharedState} from "shared-state";
-import {changePage} from "./js/components/paging.js";
+import { showToast } from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -273,34 +273,7 @@ export const methods = {
           });
     },
     showMessage: function (input, options = {}) {
-        const { title = 'Message', stayOpen = false, asHtml = false, wide = false } = options;
-        const toastElement = document.getElementById('serverResultToast');
-        const toastTitle = document.getElementById('serverResultTitle');
-        const toastMessage = document.getElementById('serverResultMessage');
-        let message;
-        try {
-            if (input !== null && typeof input === 'object') {
-                message = input.message || JSON.stringify(input);
-            } else {
-                message = input;
-            }
-        } catch (e) {
-            message = input;
-        }
-        if (asHtml) {
-            toastTitle.innerHTML = title;
-            toastMessage.innerHTML = message;
-        } else {
-            toastTitle.textContent = title;
-            toastMessage.textContent = message;
-        }
-
-        if (wide) {
-            toastElement.style.width = 'auto';
-        }
-
-        const toast = new bootstrap.Toast(toastElement, { autohide: !options.stayOpen });
-        toast.show();
+        showToast(input, options);
     },
     confirmDeleteFile(filename) {
         this.confirmData = {

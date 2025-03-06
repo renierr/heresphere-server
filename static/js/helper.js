@@ -1,3 +1,4 @@
+import {eventBus} from "event-bus";
 
 export function formatFileSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -28,3 +29,6 @@ export function formatDate(epochSeconds) {
     return date.toLocaleDateString(undefined, options);
 }
 
+export function showToast(message, options = {}) {
+    eventBus.emit('show-toast', { message, options });
+}

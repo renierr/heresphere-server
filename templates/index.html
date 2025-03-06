@@ -6,18 +6,7 @@
     {% include "components/similarity_modal.html" %}
     <hs-server-info></hs-server-info>
     <hs-filter></hs-filter>
-
-    <div class="w-100 d-flex gap-2 align-items-center flex-row p-2">
-        <div class="form-floating flex-grow-1">
-            <input id="videoInput" type="text" v-model="videoUrl" placeholder="video URL" class="form-control" @keyup.enter="postVideoUrl(false)">
-            <label class="text-muted" for="videoInput">Video URL...</label>
-            <button v-if="videoUrl" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="videoUrl = ''"><i class="bi bi-x"></i></button>
-        </div>
-        <div class="">
-            <button @click="postVideoUrl(false)" class="btn btn-sm btn-outline-primary">Download</button>
-            <button @click="postVideoUrl(true)" class="btn btn-sm btn-outline-success">Stream</button>
-        </div>
-    </div>
+    <hs-video-url></hs-video-url>
 
     <hs-loading v-if="sharedState.loading"></hs-loading>
     {% include "components/list_files.html" %}

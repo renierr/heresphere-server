@@ -1,35 +1,39 @@
-import {showToast} from "helper";
-import {
-    data,
-    methods,
-    computed,
-    watch,
-} from './common.js';
+import { sharedState, settings } from "shared-state";
+import { showToast } from "helper";
 
-import { createApp } from 'vue';
-import { eventBus } from 'event-bus';
-import { sharedState, settings } from 'shared-state';
+// language=Vue
+const template = `
+<div class="w-100 d-flex gap-2 align-items-center flex-row p-2">
+    <div class="form-floating flex-grow-1">
+        <input id="videoInput" type="text" v-model="videoUrl" placeholder="video URL" class="form-control" @keyup.enter="postVideoUrl(false)">
+        <label class="text-muted" for="videoInput">Video URL...</label>
+        <button v-if="videoUrl" class="btn btn-outline-secondary bg-transparent border-0 position-absolute end-0 top-0 h-100" type="button" @click="videoUrl = ''"><i class="bi bi-x"></i></button>
+    </div>
+    <div class="">
+        <button @click="postVideoUrl(false)" class="btn btn-sm btn-outline-primary">Download</button>
+        <button @click="postVideoUrl(true)" class="btn btn-sm btn-outline-success">Stream</button>
+    </div>
+</div>
+`
 
-const app = createApp({
-    data() {
-        return {
-            ...data,
-            downloadProgress: {},
-            removeSseListener: null,
-        }
+export const VideoUrl = {
+    template: template,
+    props: {
     },
     setup() {
         return { sharedState, settings };
     },
+    data() {
+        return {
+            videoUrl: '',
+        }
+    },
+    computed: {
+    },
     methods: {
-        ...methods,
-        redownload(file) {
-            this.videoUrl = file.url;
-            this.postVideoUrl();
-        },
         postVideoUrl(stream=false) {
             if (this.videoUrl.trim() === '') {
-                this.serverResult = 'Please enter a URL';
+                showToast('Please enter a URL');
                 return;
             }
             fetch(stream ? '/stream' : '/download', {
@@ -94,94 +98,26 @@ const app = createApp({
                                         title: title,
                                         url: video_source,
                                     })
-                                      .then(() => console.log(`Successful shared ${tempVideoUrl}`))
-                                      .catch((error) => console.log('Error sharing', error));
+                                        .then(() => console.log(`Successful shared ${tempVideoUrl}`))
+                                        .catch((error) => console.log('Error sharing', error));
                                 });
                                 modalFooter.appendChild(shareExtractedButton);
                             }
                             window.videoModal.show();
                             this.videoUrl = '';
                         } else {
-                            this.serverResult = 'Error: No video URL found to be played';
+                            showToast('Error: No video URL found to be played');
                         }
                     } else {
-                        this.serverResult = data;
+                        showToast(data);
                     }
                 })
                 .catch(error => {
-                    this.serverResult = 'Error download/stream file: ' + error;
+                    showToast('Error download/stream file: ' + error);
                     console.error('Error:', error);
                 });
         },
     },
-    computed: {
-        ...computed,
-        getProgressForId: function () {
-            return function (id) {
-                return this.downloadProgress[id] || 0;
-            };
-        },
-    },
-    watch: {
-        ...watch,
-        settings: {
-            handler() {
-                this.saveSettings()
-            },
-            deep: true,
-        }
-    },
-    beforeUnmount() {
-        if (this.removeSseListener) {
-            this.removeSseListener();
-        }
-        eventBus.events = {};
-    },
     mounted() {
-        window.vueInstance = this;    // store vue instance in DOM
-        this.fetchFiles();
-        this.removeSseListener = eventBus.on('sse-message', (data) => {
-            let progressExp = data.match(/(\d+.\d+)% complete/);
-            let progressId = data.match(/Downloading...\[(\d+)]/);
-            if (progressId) {
-                this.downloadProgress = this.downloadProgress || {};
-                this.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
-            }
-
-            if (data.includes('Download failed')) {
-                let progressId = data.match(/Download failed \[(\d+)]/);
-                if (progressId) {
-                    this.downloadProgress[progressId[1]] = 0;
-                }
-            }
-
-            if (data.includes('Download finished') ||
-              data.includes('Generate thumbnails finished') ||
-              data.includes(' 0.0% complete')) {
-                this.fetchFiles();
-            }
-        });
-    },
-});
-
-app.config.errorHandler = function (err, instance, info) {
-    // Log the error details to the console
-    console.error(`Error: ${err.toString()}\nInfo: ${info}`);
-    showToast(err.toString(), { title: 'An error occurred', stayOpen: true });
-};
-
-import { ServerInfo } from './js/components/server-info.js';
-import { Filter } from './js/components/filter.js';
-import { Paging } from "./js/components/paging.js";
-import { Loading } from "./js/components/loading.js";
-import { ToastMessage } from "./js/components/toast-message.js";
-import { VideoUrl } from "./js/components/video-url.js";
-
-app.component('hs-server-info', ServerInfo);
-app.component('hs-filter', Filter);
-app.component('hs-paging', Paging);
-app.component('hs-loading', Loading);
-app.component('hs-video-url', VideoUrl);
-app.component('hs-toast', ToastMessage);
-app.mount('#app');
-
+    }
+}
