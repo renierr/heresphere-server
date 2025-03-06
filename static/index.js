@@ -3,7 +3,6 @@ import {
     methods,
     computed,
     watch,
-    addSwipeNavigationForPagingListener, addKeyNavigationForPagingListener, removeKeyNavigationForPagingListener
 } from './common.js';
 
 import { createApp } from 'vue';
@@ -132,7 +131,6 @@ const app = createApp({
         }
     },
     beforeUnmount() {
-        removeKeyNavigationForPagingListener(this);
         if (this.removeSseListener) {
             this.removeSseListener();
         }
@@ -140,8 +138,6 @@ const app = createApp({
     },
     mounted() {
         window.vueInstance = this;    // store vue instance in DOM
-        addKeyNavigationForPagingListener(this);
-        addSwipeNavigationForPagingListener(this);
         this.fetchFiles();
         this.removeSseListener = eventBus.on('sse-message', (data) => {
             let progressExp = data.match(/(\d+.\d+)% complete/);

@@ -9,7 +9,7 @@ const template = `
             <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
         </li>
         <li class="page-item" :class="{ disabled: sharedState.currentPage === 1 }">
-            <a class="page-link" href="#" @click.prevent="changePage(currentPage - 1)">Previous</a>
+            <a class="page-link" href="#" @click.prevent="changePage(sharedState.currentPage - 1)">Previous</a>
         </li>
         <li v-if="pagesToShow[0] > 1" class="page-item disabled d-none d-sm-block">
             <span class="page-link">...</span>
@@ -59,7 +59,7 @@ export const Paging = {
         return {};
     },
     computed: {
-        totalPages: function () {
+        totalPages() {
             return totalPagesGlobal();
         },
         pagesToShow() {
@@ -83,6 +83,65 @@ export const Paging = {
     },
     methods: {
     },
+    beforeUnmount() {
+        removeKeyNavigationForPagingListener();
+        removeSwipeNavigationForPagingListener();
+    },
     mounted() {
+        addSwipeNavigationForPagingListener();
+        addKeyNavigationForPagingListener();
+    },
+}
+
+function keyNavigationForPaging(event) {
+    // only if paging present
+    //if (sharedState.totalPages === 1) return;
+
+    // check if currently an input is focused
+    if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
+
+    if (event.key === 'ArrowLeft') {
+        changePage(sharedState.currentPage - 1);
+    } else if (event.key === 'ArrowRight') {
+        changePage(sharedState.currentPage + 1);
+    }
+}
+
+let keyNavigationForPagingHandler;
+const addKeyNavigationForPagingListener = () => {
+    if (!keyNavigationForPagingHandler) {
+        keyNavigationForPagingHandler = (event) => keyNavigationForPaging(event);
+        window.addEventListener('keyup', keyNavigationForPagingHandler);
+    }
+}
+const removeKeyNavigationForPagingListener = () => {
+    if (keyNavigationForPagingHandler) {
+        window.removeEventListener('keyup', keyNavigationForPagingHandler);
+        keyNavigationForPagingHandler = null;
+    }
+}
+
+function swipeNavigationForPaging(event) {
+    if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
+    if (event.direction === Hammer.DIRECTION_LEFT) {
+        changePage(sharedState.currentPage + 1);
+    } else if (event.direction === Hammer.DIRECTION_RIGHT) {
+        changePage(sharedState.currentPage - 1);
+    }
+}
+
+let swipeNavigationForPagingHandler;
+const hammer = new Hammer(document.body);
+hammer.get('swipe').set({threshold: 50});
+const addSwipeNavigationForPagingListener = () => {
+    if (!swipeNavigationForPagingHandler) {
+        swipeNavigationForPagingHandler = (event) => swipeNavigationForPaging(event);
+        hammer.on('swipe', swipeNavigationForPagingHandler);
+    }
+}
+const removeSwipeNavigationForPagingListener = () => {
+    if (swipeNavigationForPagingHandler) {
+        hammer.off('swipe', swipeNavigationForPagingHandler);
+        swipeNavigationForPagingHandler = null;
     }
 }
