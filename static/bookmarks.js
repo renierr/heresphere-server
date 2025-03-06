@@ -1,3 +1,4 @@
+import {sharedState} from "shared-state";
 import { data, methods, computed, watch } from './common.js';
 
 new Vue({
@@ -15,17 +16,17 @@ new Vue({
         toggleInfoAccordion: methods.toggleInfoAccordion,
         showMessage: methods.showMessage,
         fetchBookmarks() {
-            this.loading = true;
+            sharedState.loading = true;
             fetch('/api/bookmarks')
                 .then(response => response.json())
                 .then(data => {
                     this.bookmarks = data;
-                    this.loading = false;
+                    sharedState.loading = false;
                 })
                 .catch(error => {
                     this.showMessage('Error fetching bookmarks');
                     console.error('There was an error fetching the bookmarks:', error);
-                    this.loading = false;
+                    sharedState.loading = false;
                 });
         },
         editBookmark(bookmark) {

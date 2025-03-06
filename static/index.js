@@ -182,9 +182,11 @@ app.config.errorHandler = function (err, instance, info) {
 import { ServerInfo } from './js/components/server-info.js';
 import { Filter } from './js/components/filter.js';
 import { Paging } from "./js/components/paging.js";
+import { Loading } from "./js/components/loading.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
 app.component('hs-paging', Paging);
+app.component('hs-loading', Loading);
 app.mount('#app');
 

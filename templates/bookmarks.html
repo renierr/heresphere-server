@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    {% include "components/loading.html" %}
+    <hs-loading v-if="sharedState.loading"></hs-loading>
     <div v-else>
         <div v-if="bookmarks.length === 0" class="card-body text-center">No Bookmarks present</div>
         <ul class="list-group list-group-flush">

@@ -20,7 +20,6 @@ export const data = {
     selectedFolder: '',
     selectedResolution: '',
     selectedDuration: 0,
-    loading: false,
     currentSort: 'created',
     currentSortDir: 'desc',
     serverOutput: '',
@@ -119,7 +118,7 @@ export const methods = {
             const library = window.location.pathname.includes('/library');
             const scrollPosition = window.scrollY;
 
-            this.loading = true;
+            sharedState.loading = true;
             const url = library ? '/api/library/list' : '/api/list';
             fetch(url)
                 .then(response => {
@@ -133,7 +132,7 @@ export const methods = {
                         ...file,
                         showPreview: false,
                     }));
-                    this.loading = false;
+                    sharedState.loading = false;
                     if (restoreScrollPosition) {
                         console.log('Restoring scroll position', scrollPosition);
                         setTimeout(() => window.scrollTo(0, scrollPosition));
@@ -141,7 +140,7 @@ export const methods = {
                 })
                 .catch(error => {
                     console.error('There was an error fetching the files:', error);
-                    this.loading = false;
+                    sharedState.loading = false;
                 })
         }, 2000),
     startPreview(file, evt) {
@@ -259,16 +258,16 @@ export const methods = {
         return htmlOutput;
     },
     findDuplicates: function () {
-        this.loading = true;
+        sharedState.loading = true;
         fetch('/api/duplicates')
           .then(response => response.json())
           .then(data => {
-              this.loading = false;
+              sharedState.loading = false;
               const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${this.outputSimilarVideos(data)}`;
               this.showMessage(output, { stayOpen: true, asHtml: true, wide: true });
           })
           .catch(error => {
-              this.loading = false;
+              sharedState.loading = false;
               console.error('Error:', error);
               this.serverResult = 'Error in find duplicates';
           });

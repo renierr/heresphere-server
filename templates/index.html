@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    {% include "components/loading.html" %}
+    <hs-loading v-if="sharedState.loading"></hs-loading>
     {% include "components/list_files.html" %}
     {% include "components/page_functions.html" %}
 
