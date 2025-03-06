@@ -68,7 +68,6 @@ export const Paging = {
     },
     methods: {
         changePage(page) {
-            console.log('changePage', page);
             if (page < 1) {
                 sharedState.currentPage = 1;
             } else if (page > this.totalPages) {
