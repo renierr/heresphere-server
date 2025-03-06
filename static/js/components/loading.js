@@ -21,8 +21,6 @@ export const Loading = {
     setup() {
         return { sharedState, settings };
     },
-    data() {
-    },
     computed: {
     },
     methods: {

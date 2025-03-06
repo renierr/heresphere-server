@@ -32,3 +32,17 @@ export function formatDate(epochSeconds) {
 export function showToast(message, options = {}) {
     eventBus.emit('show-toast', { message, options });
 }
+
+export function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        const context = this;
+        const later = () => {
+            timeout = null;
+        };
+        const callNow = !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+}

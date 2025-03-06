@@ -10,6 +10,6 @@
 
     <hs-loading v-if="sharedState.loading"></hs-loading>
     {% include "components/list_files.html" %}
-    {% include "components/page_functions.html" %}
+    <hs-page-functions :updatePossible="[[ server_update_possible | lower ]]"></hs-page-functions>
 
 {% endblock %}

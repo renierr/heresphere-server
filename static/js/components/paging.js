@@ -55,9 +55,6 @@ export const Paging = {
     setup() {
         return {sharedState, settings, changePage};
     },
-    data() {
-        return {};
-    },
     computed: {
         totalPages() {
             return totalPagesGlobal();

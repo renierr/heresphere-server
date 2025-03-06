@@ -1,5 +1,5 @@
 import {settings, sharedState} from "shared-state";
-import { showToast } from "helper";
+import { showToast, debounce } from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -33,19 +33,6 @@ export const data = {
     settings: localStoreSettingsLoading(), // TODO remove me
 };
 
-function debounce(func, wait) {
-    let timeout;
-    return function(...args) {
-        const context = this;
-        const later = () => {
-            timeout = null;
-        };
-        const callNow = !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-}
 
 export const methods = {
     formatDate(epochSeconds) {
@@ -182,7 +169,6 @@ export const methods = {
             action: this.updateServer,
         }
         window.confirmModal.show();
-
     },
     updateServer() { // Add this method
         fetch('/update')

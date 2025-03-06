@@ -90,6 +90,7 @@ import { Paging } from "./js/components/paging.js";
 import { Loading } from "./js/components/loading.js";
 import { ToastMessage } from "./js/components/toast-message.js";
 import { VideoUrl } from "./js/components/video-url.js";
+import { PageFunctions } from "./js/components/page-functions.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
@@ -97,5 +98,6 @@ app.component('hs-paging', Paging);
 app.component('hs-loading', Loading);
 app.component('hs-video-url', VideoUrl);
 app.component('hs-toast', ToastMessage);
+app.component('hs-page-functions', PageFunctions);
 app.mount('#app');
 

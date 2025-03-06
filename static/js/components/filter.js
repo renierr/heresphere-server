@@ -106,10 +106,6 @@ export const Filter = {
     setup() {
         return { sharedState, settings };
     },
-    data() {
-        return {
-        };
-    },
     computed: {
         uniqueFolders() {
             const folders = sharedState.files.map(file => file.folder).filter(folder => folder);
