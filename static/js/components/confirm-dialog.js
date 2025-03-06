@@ -46,6 +46,10 @@ export const ConfirmDialog = {
             const confirmElement = this.$refs.confirmModal;
             if (!this.modal) {
                 this.modal = new bootstrap.Modal(confirmElement);
+                confirmElement.addEventListener('hidden.bs.modal', () => {
+                    console.log('Modal closed');
+                    this.confirmData = {};
+                });
             }
             this.modal.show();
         }
