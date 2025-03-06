@@ -1,4 +1,4 @@
-import {showToast} from "helper";
+import {showConfirmDialog, showToast} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -33,13 +33,13 @@ export const PageFunctions = {
     },
     methods: {
         confirmUpdate() {
-            this.confirmData = {
+            const confirmData = {
                 title: 'Server Update',
                 message: `This will call a Server Update. The process might be killed and connection can get lost, Are you sure you want to proceed?`,
                 submit: 'Update',
                 action: this.updateServer,
             }
-            window.confirmModal.show();
+            showConfirmDialog(confirmData);
         },
         updateServer() {
             fetch('/update')
@@ -53,6 +53,25 @@ export const PageFunctions = {
                 });
         },
         confirmCleanup() {
+            const confirmData = {
+                title: 'Cleanup files',
+                message: `This will clean the download tracked files and find orphan thumbnails and delete them, Are you sure you want to proceed?`,
+                submit: 'Cleanup',
+                action: this.cleanup,
+            }
+            showConfirmDialog(confirmData);
+        },
+        cleanup() { // Add this method
+            fetch('/cleanup')
+                .then(response => response.json())
+                .then(data => {
+                    showToast(data);
+                    this.fetchFiles();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error occurred during cleanup');
+                });
         },
         cacheClear() {
         },

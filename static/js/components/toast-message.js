@@ -75,7 +75,3 @@ export const ToastMessage = {
     }
 
 }
-
-export function showToast(message, options = {}) {
-    eventBus.emit('show-toast', { message, options });
-}

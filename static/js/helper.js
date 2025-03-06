@@ -33,6 +33,10 @@ export function showToast(message, options = {}) {
     eventBus.emit('show-toast', { message, options });
 }
 
+export function showConfirmDialog(data = {}) {
+    eventBus.emit('show-confirm-dialog', data);
+}
+
 export function debounce(func, wait) {
     let timeout;
     return function(...args) {
