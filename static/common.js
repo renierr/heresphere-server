@@ -1,4 +1,5 @@
 import {settings, sharedState} from "shared-state";
+import {changePage} from "./js/components/paging.js";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -72,15 +73,6 @@ export const methods = {
             return `${minutes}m ${secs}s`;
         } else {
             return `${secs}s`;
-        }
-    },
-    changePage(page) {
-        if (page < 1) {
-            this.currentPage = 1;
-        } else if (page > this.totalPages) {
-            this.currentPage = this.totalPages;
-        } else {
-            this.currentPage = page;
         }
     },
     generateThumbnail(file) {
@@ -560,10 +552,6 @@ export const computed = {
         const end = start + settings.pageSize;
         return filtered.slice(start, end);
     },
-    totalPages: function () {
-        if (settings.pageSize === 0) return 1;
-        return Math.ceil(this.totalItems / settings.pageSize);
-    },
     cardLayout() {
         return this.settings.cardLayout;
     },
@@ -592,15 +580,15 @@ export const watch = {
 
 function keyNavigationForPaging(event, vueContext) {
     // only if paging present
-    if (vueContext.totalPages === 1) return;
+    //if (sharedState.totalPages === 1) return;
 
     // check if currently an input is focused
     if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
 
     if (event.key === 'ArrowLeft') {
-        vueContext.changePage(vueContext.currentPage - 1);
+        changePage(sharedState.currentPage - 1);
     } else if (event.key === 'ArrowRight') {
-        vueContext.changePage(vueContext.currentPage + 1);
+        changePage(sharedState.currentPage + 1);
     }
 }
 
@@ -623,9 +611,9 @@ export const addSwipeNavigationForPagingListener = (vueContext) => {
     hammer.on('swipe', (event) => {
         if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
         if (event.direction === Hammer.DIRECTION_LEFT) {
-            vueContext.changePage(vueContext.currentPage + 1);
+            changePage(sharedState.currentPage + 1);
         } else if (event.direction === Hammer.DIRECTION_RIGHT) {
-            vueContext.changePage(vueContext.currentPage - 1);
+            changePage(sharedState.currentPage - 1);
         }
     });
 }

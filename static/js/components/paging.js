@@ -33,19 +33,34 @@ const template = `
 </div>
 `
 
+function totalPagesGlobal() {
+    if (settings.pageSize === 0) return 1;
+    return Math.ceil(sharedState.totalItems / settings.pageSize);
+}
+
+export function changePage(page) {
+    const totalPages = totalPagesGlobal();
+    if (page < 1) {
+        sharedState.currentPage = 1;
+    } else if (page > totalPages) {
+        sharedState.currentPage = totalPages;
+    } else {
+        sharedState.currentPage = page;
+    }
+}
+
 export const Paging = {
     template: template,
     props: {},
     setup() {
-        return {sharedState, settings};
+        return {sharedState, settings, changePage};
     },
     data() {
         return {};
     },
     computed: {
         totalPages: function () {
-            if (settings.pageSize === 0) return 1;
-            return Math.ceil(sharedState.totalItems / settings.pageSize);
+            return totalPagesGlobal();
         },
         pagesToShow() {
             const range = 5;
@@ -67,16 +82,6 @@ export const Paging = {
         },
     },
     methods: {
-        changePage(page) {
-            if (page < 1) {
-                sharedState.currentPage = 1;
-            } else if (page > this.totalPages) {
-                sharedState.currentPage = this.totalPages;
-            } else {
-                sharedState.currentPage = page;
-            }
-        },
-
     },
     mounted() {
     }
