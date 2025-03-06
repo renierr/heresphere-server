@@ -1,6 +1,6 @@
 <div v-else>
   <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
-  {% include "components/paging.html" %}
+  <hs-paging></hs-paging>
 
   <div v-if="cardLayout" class="container">
     <div class="row">

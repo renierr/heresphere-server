@@ -122,6 +122,5 @@ export const Filter = {
         },
     },
     mounted() {
-        console.log('Filter component mounted', settings);
     }
 }

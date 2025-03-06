@@ -16,6 +16,10 @@ export const sharedState = reactive({
     selectedDuration: 0,
     currentSort: 'created',
     currentSortDir: 'desc',
+    currentPage: 1,
+    totalItems: 0,
+    totalSize: 0,
+    loading: false,
 });
 
 export const settings = reactive({

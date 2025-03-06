@@ -185,8 +185,10 @@ app.config.errorHandler = function (err, instance, info) {
 
 import { ServerInfo } from './js/components/server-info.js';
 import { Filter } from './js/components/filter.js';
+import { Paging } from "./js/components/paging.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
+app.component('hs-paging', Paging);
 app.mount('#app');
 

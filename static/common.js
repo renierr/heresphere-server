@@ -1,3 +1,5 @@
+import {settings, sharedState} from "shared-state";
+
 let previewVideoWarningAlreadyShown = false;
 
 // TODO remove me
@@ -529,78 +531,53 @@ export const computed = {
     filteredFiles: function () {
 
         let filtered = this.files.filter(file => {
-            const matchesFolder = this.selectedFolder ? file.folder === this.selectedFolder || (file.folder === '' && this.selectedFolder === '~root~') : true;
+            const matchesFolder = sharedState.selectedFolder ? file.folder === sharedState.selectedFolder || (file.folder === '' && sharedState.selectedFolder === '~root~') : true;
             const titleCompareValue = (file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.')).toLowerCase();
-            const matchesFilter = this.filter ? titleCompareValue.includes(this.filter.toLowerCase()) : true;
-            const matchesResolution = this.selectedResolution ? this.checkResolution(file) : true;
-            const matchesDuration = this.selectedDuration ? this.checkDuration(file) : true;
+            const matchesFilter = sharedState.filter ? titleCompareValue.includes(sharedState.filter.toLowerCase()) : true;
+            const matchesResolution = sharedState.selectedResolution ? this.checkResolution(file) : true;
+            const matchesDuration = sharedState.selectedDuration ? this.checkDuration(file) : true;
             return matchesFolder && matchesFilter && matchesResolution && matchesDuration;
         });
 
-        const sortCriteria = this.currentSort.split(' ');
+        const sortCriteria = sharedState.currentSort.split(' ');
         filtered = filtered.sort((a, b) => {
             for (let criterion of sortCriteria) {
                 let modifier = 1;
-                if (this.currentSortDir === 'desc') modifier = -1;
+                if (sharedState.currentSortDir === 'desc') modifier = -1;
                 if (a[criterion] < b[criterion]) return -1 * modifier;
                 if (a[criterion] > b[criterion]) return 1 * modifier;
             }
             return 0;
         });
 
-        this.totalItems = filtered.length;
-        this.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
+        sharedState.totalItems = filtered.length;
+        sharedState.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
 
-        if (this.pageSize === 0) {
+        if (settings.pageSize === 0) {
             return filtered; // Return all items if pageSize is 0
         }
-        const start = (this.currentPage - 1) * this.pageSize;
-        const end = start + this.pageSize;
+        const start = (sharedState.currentPage - 1) * settings.pageSize;
+        const end = start + settings.pageSize;
         return filtered.slice(start, end);
     },
-    uniqueFolders() {
-        const folders = this.files.map(file => file.folder).filter(folder => folder);
-        return [...new Set(folders)].sort();
-    },
     totalPages: function () {
-        if (this.pageSize === 0) return 1;
-        return Math.ceil(this.totalItems / this.pageSize);
-    },
-    pagesToShow() {
-        const range = 5;
-        let start = Math.max(1, this.currentPage - Math.floor(range / 2));
-        let end = Math.min(this.totalPages, start + range - 1);
-
-        if (end - start < range - 1) {
-            start = Math.max(1, end - range + 1);
-        }
-
-        const pages = [];
-        for (let i = start; i <= end; i++) {
-            pages.push(i);
-        }
-        return pages;
-    },
-    formattedTotalSize() {
-        return this.formatFileSize(this.totalSize);
+        if (settings.pageSize === 0) return 1;
+        return Math.ceil(this.totalItems / settings.pageSize);
     },
     cardLayout() {
         return this.settings.cardLayout;
     },
-    pageSize() {
-        return this.settings.pageSize;
-    }
 };
 
 export const watch = {
     filter: function (newFilter, oldFilter) {
-        this.currentPage = 1;
+        sharedState.currentPage = 1;
     },
     pageSize: function (newPageSize, oldPageSize) {
-        this.currentPage = 1;
+        sharedState.currentPage = 1;
     },
     selectedFolder: function (newFolder, oldFolder) {
-        this.currentPage = 1;
+        sharedState.currentPage = 1;
     },
     cardLayout(newValue) {
         localStorage.setItem('cardLayout', newValue);
