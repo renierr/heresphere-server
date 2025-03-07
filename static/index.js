@@ -23,6 +23,9 @@ const app = createApp({
     },
     methods: {
         ...methods,
+        saveSettings() {
+            localStorage.setItem('settings', JSON.stringify(this.settings));
+        },
         redownload(file) {
             this.videoUrl = file.url;
             this.postVideoUrl();

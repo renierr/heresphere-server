@@ -1,36 +1,16 @@
 import {settings, sharedState} from "shared-state";
-import {showToast, fetchFiles} from "helper";
+import {showToast, fetchFiles, apiCall} from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
-// TODO remove me
-function localStoreSettingsLoading() {
-    const defaults = { cardLayout: true, pageSize: 12,
-        filterAccordionOpen: true, infoAccordionOpen: true, lastMoveSubfolder: '', showVideoPreview: true, similarThreshold: 50 };
-    let storedSetting = JSON.parse(localStorage.getItem('settings')) || {};
-    storedSetting = {...defaults, ...storedSetting};
-    return storedSetting;
-}
 
 // common.js
 export const data = {
-    files: [],
-    filter: '',
-    videoUrl: '',
-    selectedFolder: '',
-    selectedResolution: '',
-    selectedDuration: 0,
-    currentSort: 'created',
-    currentSortDir: 'desc',
     serverOutput: '',
     serverResult: null,
     currentFile: null,
     similarVideos: null,
-    currentPage: 1,
-    totalItems: 0,
-    totalSize: 0,
     confirmData: {},
-    settings: localStoreSettingsLoading(), // TODO remove me
 };
 
 
@@ -62,21 +42,10 @@ export const methods = {
         }
     },
     generateThumbnail(file) {
-        fetch('/api/generate_thumbnail', {
-            method: 'POST',
-            body: JSON.stringify({ video_path: file }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.serverResult = data.success ? data : 'Failed to generate thumbnail';
-            })
-            .catch(error => {
-                console.error('Error generating thumbnail:', error);
-                this.serverResult = 'Error generating thumbnails';
-            });
+        apiCall('/api/generate_thumbnail', { errorMessage: 'Error generating thumbnail',
+            showToastMessage: false,
+            options: { method: 'POST', body: JSON.stringify({ video_path: file }), headers: {'Content-Type': 'application/json'} } })
+            .then(data => showToast(data.success ? data : 'Failed to generate thumbnail'));
     },
     showSimilar(file) {
         this.similarVideos = null;
@@ -164,9 +133,7 @@ export const methods = {
         videojs('videoPlayer');
         window.videoModal.show();
     },
-    saveSettings() {
-        localStorage.setItem('settings', JSON.stringify(this.settings));
-    },
+
     checkResolution(file) {
         if (this.selectedResolution === 'HD') {
             return file.width > 1900 || file.height > 1900;
@@ -367,9 +334,6 @@ export const computed = {
         const end = start + settings.pageSize;
         return filtered.slice(start, end);
     },
-    cardLayout() {
-        return this.settings.cardLayout;
-    },
 };
 
 export const watch = {
@@ -382,10 +346,8 @@ export const watch = {
     selectedFolder: function (newFolder, oldFolder) {
         sharedState.currentPage = 1;
     },
-    cardLayout(newValue) {
-        localStorage.setItem('cardLayout', newValue);
-    },
     serverResult: function (newResult) {
+        console.log('Server result:', newResult);
         if (newResult) {
             this.showMessage(newResult);
             this.serverResult = null;
