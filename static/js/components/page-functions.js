@@ -100,8 +100,12 @@ export const PageFunctions = {
                 showToastMessage: false, onError: () => sharedState.loading = false })
                 .then(data => {
                     sharedState.loading = false;
-                    const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${outputSimilarVideos(data)}`;
-                    showToast(output, { stayOpen: true, asHtml: true, wide: true });
+                    if (data.error) {
+                        showToast(data.message, { title: data.error });
+                    } else {
+                        const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${outputSimilarVideos(data)}`;
+                        showToast(output, { stayOpen: true, asHtml: true, wide: true });
+                    }
                     console.log(data);
                 });
         },
