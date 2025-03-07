@@ -51,28 +51,30 @@ export function debounce(func, wait) {
     };
 }
 
+
 /**
  * Make an API call to the given URL
  *
  * @param url - URL to call
  * @param errorMessage - Error message to show on failure (default: 'Error fetching data')
- * @param onSuccessCallback - Callback function to call on success (default: null)
+ * @param showToastMessage  - Show the API response in a toast (default: true)
  * @param options - Fetch options (default: { method: 'GET' })
+ * @returns {Promise<any>} - Promise with the API response
  */
 export function apiCall(url,
                         { errorMessage = 'Error fetching data',
-                          onSuccessCallback,
+                            showToastMessage = true,
                           options = { method: 'GET' } }) {
-    fetch(url, options)
+    return fetch(url, options)
         .then(response => response.json())
         .then(data => {
-            showToast(data);
-            if (typeof onSuccessCallback === 'function') {
-                onSuccessCallback(data);
+            if (showToastMessage) {
+                showToast(data);
             }
+            return data;
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error(errorMessage ? errorMessage : 'Error:', error);
             showToast(errorMessage);
         });
 }

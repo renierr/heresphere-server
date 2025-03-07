@@ -54,16 +54,20 @@ export const PageFunctions = {
             showConfirmDialog(confirmData);
         },
         cleanup() { // Add this method
-            apiCall('/cleanup', { errorMessage: 'Error occurred during cleanup',
-                onSuccessCallback: this.fetchFiles });
+            apiCall('/cleanup', { errorMessage: 'Error occurred during cleanup' })
+                .then(() => this.fetchFiles());
         },
         cacheClear() {
-            apiCall('/cache/clear', {
-                errorMessage: 'Error clearing cache', onSuccessCallback: () => this.fetchFiles });
+            apiCall('/cache/clear', { errorMessage: 'Error clearing cache' })
+                .then(() => this.fetchFiles());
         },
         scanFiles() {
+            apiCall('/scan', { errorMessage: 'Error scanning files'});
         },
         generateThumbnails() {
+            apiCall('/api/generate_thumbnails', { errorMessage: 'Error generating thumbnails',
+                showToastMessage: false, options: { method: 'POST', headers: {'Content-Type': 'application/json'} } })
+                .then((data) => showToast(data.success ? data : 'Failed to generate thumbnails'));
         },
         fetchFiles() {
         },
