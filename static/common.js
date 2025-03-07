@@ -6,7 +6,6 @@ let previewVideoWarningAlreadyShown = false;
 
 // common.js
 export const data = {
-    serverOutput: '',
     serverResult: null,
     currentFile: null,
     similarVideos: null,
