@@ -106,7 +106,6 @@ export const PageFunctions = {
                         const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${outputSimilarVideos(data)}`;
                         showToast(output, { stayOpen: true, asHtml: true, wide: true });
                     }
-                    console.log(data);
                 });
         },
     },
