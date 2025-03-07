@@ -10,7 +10,7 @@ const template = `
                 <h5 class="modal-title" id="videoModalLabel">Video Player</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body position-relative" id="videoModalBody"></div>
+            <div ref="videoModalBody" class="modal-body position-relative" id="videoModalBody"></div>
             <div ref="videoModalFooter" class="modal-footer" id="videoModalFooter"></div>
         </div>
     </div>
@@ -46,6 +46,10 @@ export const VideoPlayer = {
                     const videoFooterElement = this.$refs.videoModalFooter;
                     if (videoFooterElement) {
                         videoFooterElement.innerHTML = '';
+                    }
+                    const videoBodyElement = this.$refs.videoModalBody;
+                    if (videoBodyElement) {
+                        videoBodyElement.innerHTML = '';
                     }
                 });
             }
