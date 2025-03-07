@@ -1,5 +1,5 @@
 import {settings, sharedState} from "shared-state";
-import {showToast, fetchFiles, apiCall, showConfirmDialog, hideConfirmDialog} from "helper";
+import {showToast, fetchFiles, apiCall, showConfirmDialog, hideConfirmDialog, showVideoDialog} from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -130,7 +130,7 @@ export const methods = {
             </video-js>
         `;
         videojs('videoPlayer');
-        window.videoModal.show();
+        showVideoDialog();
     },
 
     checkResolution(file) {
