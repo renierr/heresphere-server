@@ -11,7 +11,7 @@ const template = `
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body position-relative" id="videoModalBody"></div>
-            <div class="modal-footer" id="videoModalFooter"></div>
+            <div ref="videoModalFooter" class="modal-footer" id="videoModalFooter"></div>
         </div>
     </div>
 </div>
@@ -39,6 +39,14 @@ export const VideoPlayer = {
             if (!this.modal) {
                 this.modal = new bootstrap.Modal(videoElement);
                 videoElement.addEventListener('hidden.bs.modal', () => {
+                    const player = videojs('videoPlayer');
+                    if (player && typeof player.dispose === 'function') {
+                        player.dispose();
+                    }
+                    const videoFooterElement = this.$refs.videoModalFooter;
+                    if (videoFooterElement) {
+                        videoFooterElement.innerHTML = '';
+                    }
                 });
             }
             this.modal.show();
