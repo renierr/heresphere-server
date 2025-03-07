@@ -58,12 +58,13 @@ export function debounce(func, wait) {
  * @param url - URL to call
  * @param errorMessage - Error message to show on failure (default: 'Error fetching data')
  * @param showToastMessage  - Show the API response in a toast (default: true)
+ * @param onError - Function to call on error (default: null)
  * @param options - Fetch options (default: { method: 'GET' })
  * @returns {Promise<any>} - Promise with the API response
  */
 export function apiCall(url,
-                        { errorMessage = 'Error fetching data',
-                            showToastMessage = true,
+                        { errorMessage = 'Error fetching data', showToastMessage = true,
+                          onError = null,
                           options = { method: 'GET' } }) {
     return fetch(url, options)
         .then(response => response.json())
@@ -76,5 +77,8 @@ export function apiCall(url,
         .catch(error => {
             console.error(errorMessage ? errorMessage : 'Error:', error);
             showToast(errorMessage);
+            if (onError) {
+                onError(error);
+            }
         });
 }

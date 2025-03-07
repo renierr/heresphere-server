@@ -67,13 +67,41 @@ export const PageFunctions = {
         generateThumbnails() {
             apiCall('/api/generate_thumbnails', { errorMessage: 'Error generating thumbnails',
                 showToastMessage: false, options: { method: 'POST', headers: {'Content-Type': 'application/json'} } })
-                .then((data) => showToast(data.success ? data : 'Failed to generate thumbnails'));
+                .then(data => showToast(data.success ? data : 'Failed to generate thumbnails'));
         },
         fetchFiles() {
         },
         findDuplicates() {
+            sharedState.loading = true;
+            apiCall('/api/duplicates', { errorMessage: 'Error finding duplicates',
+                showToastMessage: false, onError: () => sharedState.loading = false })
+                .then(data => {
+                    sharedState.loading = false;
+                    const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${outputSimilarVideos(data)}`;
+                    showToast(output, { stayOpen: true, asHtml: true, wide: true });
+                    console.log(data);
+                });
         },
     },
     mounted() {
     }
+}
+
+function outputSimilarVideos(data) {
+    let htmlOutput = '<div class="similar-videos-container">';
+    for (const [videoPath, details] of Object.entries(data)) {
+        htmlOutput += `<div class="video-section">
+                <p>Video: ${details.file.title} [${videoPath}] has similar videos:</p>`;
+        const simData = details.similar;
+        if (simData) {
+            htmlOutput += '<ul>';
+            simData.forEach(similarVideo => {
+                htmlOutput += `<li><strong>Score:</strong> ${similarVideo.score} - <strong>Similar to:</strong> ${similarVideo.file.title} [${similarVideo.video_url}]</li>`;
+            });
+            htmlOutput += '</ul>';
+        }
+        htmlOutput += '</div>';
+    }
+    htmlOutput += '</div>';
+    return htmlOutput;
 }

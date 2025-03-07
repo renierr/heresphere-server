@@ -145,55 +145,7 @@ export const methods = {
         evt.target.pause();
         file.showPreview = false;
     },
-    generateThumbnails() {
-        fetch('/api/generate_thumbnails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.serverResult = data.success ? data : 'Failed to generate thumbnails';
-            })
-            .catch(error => {
-                console.error('Error generating thumbnails:', error);
-                this.serverResult = 'Error generating thumbnails';
-            });
-    },
-    outputSimilarVideos: function(data) {
-        let htmlOutput = '<div class="similar-videos-container">';
-        for (const [videoPath, details] of Object.entries(data)) {
-            htmlOutput += `<div class="video-section">
-                <p>Video: ${details.file.title} [${videoPath}] has similar videos:</p>`;
-            const simData = details.similar;
-            if (simData) {
-                htmlOutput += '<ul>';
-                simData.forEach(similarVideo => {
-                    htmlOutput += `<li><strong>Score:</strong> ${similarVideo.score} - <strong>Similar to:</strong> ${similarVideo.file.title} [${similarVideo.video_url}]</li>`;
-                });
-                htmlOutput += '</ul>';
-            }
-            htmlOutput += '</div>';
-        }
-        htmlOutput += '</div>';
-        return htmlOutput;
-    },
-    findDuplicates: function () {
-        sharedState.loading = true;
-        fetch('/api/duplicates')
-          .then(response => response.json())
-          .then(data => {
-              sharedState.loading = false;
-              const output = `TODO: implement nice dialog.... found ${Object.keys(data).length} possible duplicates<br>${this.outputSimilarVideos(data)}`;
-              this.showMessage(output, { stayOpen: true, asHtml: true, wide: true });
-          })
-          .catch(error => {
-              sharedState.loading = false;
-              console.error('Error:', error);
-              this.serverResult = 'Error in find duplicates';
-          });
-    },
+
     showMessage: function (input, options = {}) {
         showToast(input, options);
     },
