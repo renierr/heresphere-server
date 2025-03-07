@@ -1,5 +1,11 @@
 import {eventBus} from "event-bus";
 
+/**
+ * Format file size from bytes to human readable format
+ *
+ * @param bytes - File size in bytes
+ * @returns {string} - Formatted file size
+ */
 export function formatFileSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     if (bytes === 0) return '0 Byte';
@@ -7,6 +13,12 @@ export function formatFileSize(bytes) {
     return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
 }
 
+/**
+ * Format duration from seconds to human readable format
+ *
+ * @param seconds - Duration in seconds
+ * @returns {string} - Formatted duration
+ */
 export function formatDuration(seconds) {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -20,6 +32,12 @@ export function formatDuration(seconds) {
     }
 }
 
+/**
+ * Format a date from epoch seconds to a human readable format
+ *
+ * @param epochSeconds - Epoch seconds to format
+ * @returns {string} - Formatted date
+ */
 export function formatDate(epochSeconds) {
     if (epochSeconds < 1) {
         return '';
@@ -29,14 +47,32 @@ export function formatDate(epochSeconds) {
     return date.toLocaleDateString(undefined, options);
 }
 
+/**
+ * Show a toast message
+ *
+ * @param message - Message to show
+ * @param options - Options for the toast
+ */
 export function showToast(message, options = {}) {
     eventBus.emit('show-toast', { message, options });
 }
 
+/**
+ * Show a confirm dialog
+ *
+ * @param data - object with Data to show in the dialog
+ */
 export function showConfirmDialog(data = {}) {
     eventBus.emit('show-confirm-dialog', data);
 }
 
+/**
+ * Debounce function to limit the number of calls to a function
+ *
+ * @param func - Function to call
+ * @param wait - Time to wait before calling the function
+ * @returns {(function(...[*]): void)|*}
+ */
 export function debounce(func, wait) {
     let timeout;
     return function(...args) {
