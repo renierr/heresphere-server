@@ -1,6 +1,6 @@
 import { eventBus } from "event-bus";
 import { sharedState, settings } from "shared-state";
-import { showToast } from "helper";
+import {hideVideoDialog, showToast, showVideoDialog} from "helper";
 
 // language=Vue
 const template = `
@@ -74,8 +74,9 @@ export const VideoUrl = {
                             downloadButton.textContent = 'Trigger Download';
                             downloadButton.classList.add('btn', 'btn-primary', 'btn-sm');
                             downloadButton.addEventListener('click', () => {
-                                window.videoModal.hide();
-                                this.redownload({ url: tempVideoUrl });
+                                hideVideoDialog();
+                                this.videoUrl = tempVideoUrl;
+                                this.postVideoUrl()
                             });
                             modalFooter.appendChild(downloadButton);
 
@@ -105,7 +106,7 @@ export const VideoUrl = {
                                 });
                                 modalFooter.appendChild(shareExtractedButton);
                             }
-                            window.videoModal.show();
+                            showVideoDialog();
                             this.videoUrl = '';
                         } else {
                             showToast('Error: No video URL found to be played');

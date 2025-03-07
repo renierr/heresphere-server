@@ -91,6 +91,7 @@ import { Filter } from './js/components/filter.js';
 import { Paging } from "./js/components/paging.js";
 import { Loading } from "./js/components/loading.js";
 import { ToastMessage } from "./js/components/toast-message.js";
+import { VideoPlayer } from "./js/components/video-player.js";
 import { VideoUrl } from "./js/components/video-url.js";
 import { PageFunctions } from "./js/components/page-functions.js";
 import { ConfirmDialog } from "./js/components/confirm-dialog.js";
@@ -103,6 +104,7 @@ app.component('hs-video-url', VideoUrl);
 app.component('hs-toast', ToastMessage);
 app.component('hs-page-functions', PageFunctions);
 app.component('hs-confirm-dialog', ConfirmDialog);
+app.component('hs-video-dialog', VideoPlayer);
 
 app.mount('#app');
 

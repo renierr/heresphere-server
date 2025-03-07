@@ -35,8 +35,7 @@ export const ConfirmDialog = {
         return {
             confirmData: {},
             modal: null,
-            removeHideConfirmListener: null,
-            removeShowConfirmListener: null,
+            listener: [],
         }
     },
     computed: {
@@ -61,25 +60,17 @@ export const ConfirmDialog = {
         }
     },
     beforeUnmount() {
-        if (this.removeShowConfirmListener) {
-            this.removeShowConfirmListener();
-            this.removeShowConfirmListener = null;
-        }
-        if (this.removeHideConfirmListener) {
-            this.removeHideConfirmListener();
-            this.removeHideConfirmListener = null;
-        }
-        this.title = 'Message';
-        this.message = '';
-        this.useHtml = false;
+        this.listener.forEach(l => l());
+        this.confirmData = {};
+        this.modal = null;
     },
     mounted() {
-        this.removeShowConfirmListener = eventBus.on('show-confirm-dialog', (data) => {
+        this.listener.push(eventBus.on('show-confirm-dialog', (data) => {
             this.showConfirmDialog(data);
-        });
-        this.removeHideConfirmListener = eventBus.on('hide-confirm-dialog', () => {
+        }));
+        this.listener.push(eventBus.on('hide-confirm-dialog', () => {
             this.modal.hide();
-        });
+        }));
     }
 
 }
