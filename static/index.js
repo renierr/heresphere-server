@@ -1,4 +1,4 @@
-import {fetchFiles, showToast} from "helper";
+import {fetchFiles, showToast, videoUrl} from "helper";
 import {
     data,
     methods,
@@ -27,8 +27,7 @@ const app = createApp({
             localStorage.setItem('settings', JSON.stringify(this.settings));
         },
         redownload(file) {
-            this.videoUrl = file.url;
-            this.postVideoUrl();
+            videoUrl(file.url);
         },
     },
     computed: {

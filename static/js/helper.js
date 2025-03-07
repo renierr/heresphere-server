@@ -127,3 +127,13 @@ export function apiCall(url,
             }
         });
 }
+
+/**
+ * set the video URL and emit the event to trigger postVideoUrl
+ *
+ * @param url - URL to set
+ * @param stream - Stream the video (default: false)
+ */
+export function videoUrl(url, stream = false) {
+    eventBus.emit('video-url', { url, stream });
+}

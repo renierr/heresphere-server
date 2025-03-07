@@ -26,6 +26,7 @@ export const VideoUrl = {
     data() {
         return {
             videoUrl: '',
+            removeVideoUrlListener: null,
         }
     },
     computed: {
@@ -118,6 +119,17 @@ export const VideoUrl = {
                 });
         },
     },
+    beforeUnmount() {
+        if (this.removeVideoUrlListener) {
+            this.removeVideoUrlListener();
+            this.removeVideoUrlListener = null;
+        }
+    },
     mounted() {
+        this.removeVideoUrlListener = eventBus.on('video-url', ({url, stream = false }) => {
+            console.log('Received video URL:', url);
+            this.videoUrl = url;
+            this.postVideoUrl(stream);
+        });
     }
 }

@@ -35,12 +35,9 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-function pwaPostVideoUrl(isStream, videoUrl) {
-    const vueInstance = window.vueInstance;
-    if (vueInstance) {
-        vueInstance.videoUrl = videoUrl;
-        vueInstance.postVideoUrl(true);
-    }
+import { videoUrl } from "helper";
+function pwaPostVideoUrl(isStream, videoUrlParam) {
+    videoUrl(videoUrlParam, isStream);
 }
 
 // Function to apply the theme
