@@ -72,7 +72,7 @@ export const methods = {
             .then(() => file.showPreview = true)
             .catch(error => {
             if (error.name === 'NotAllowedError' && !previewVideoWarningAlreadyShown) {
-                this.showMessage('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
+                showToast('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
                 previewVideoWarningAlreadyShown = true;
             }
         });

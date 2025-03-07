@@ -1,7 +1,7 @@
 <div class="card h-100 d-flex flex-column">
     <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="showSimilar(file)">
         <video v-if="settings.showVideoPreview && file.preview" :poster="file.thumbnail" :src="file.preview" class="card-img-top"
-               @mouseenter="startPreview(file, this.event)" @mouseleave="stopPreview(file, this.event)"
+               @mouseenter="startPreview(file, $event)" @mouseleave="stopPreview(file, $event)"
                preload="none" loop disablePictureInPicture></video>
         <img v-else-if="file.thumbnail" :src="file.thumbnail" class="card-img-top" />
         <span v-if="file.showPreview" class="video-preview-indicator text-primary fs-3">
