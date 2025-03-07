@@ -1,4 +1,4 @@
-import {showConfirmDialog, showToast} from "helper";
+import {apiCall, showConfirmDialog, showToast} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -42,15 +42,7 @@ export const PageFunctions = {
             showConfirmDialog(confirmData);
         },
         updateServer() {
-            fetch('/update')
-                .then(response => response.json())
-                .then(data => {
-                    showToast(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Server may lost connection after update see Info box or reload page');
-                });
+            apiCall('/update', { errorMessage: 'Server may lost connection after update see Info box or reload page'})
         },
         confirmCleanup() {
             const confirmData = {
@@ -62,18 +54,12 @@ export const PageFunctions = {
             showConfirmDialog(confirmData);
         },
         cleanup() { // Add this method
-            fetch('/cleanup')
-                .then(response => response.json())
-                .then(data => {
-                    showToast(data);
-                    this.fetchFiles();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Error occurred during cleanup');
-                });
+            apiCall('/cleanup', { errorMessage: 'Error occurred during cleanup',
+                onSuccessCallback: this.fetchFiles });
         },
         cacheClear() {
+            apiCall('/cache/clear', {
+                errorMessage: 'Error clearing cache', onSuccessCallback: () => this.fetchFiles });
         },
         scanFiles() {
         },
