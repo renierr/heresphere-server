@@ -1,3 +1,4 @@
+import { eventBus } from "event-bus";
 import { sharedState, settings } from "shared-state";
 import { showToast } from "helper";
 
