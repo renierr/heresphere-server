@@ -67,6 +67,15 @@ export function showConfirmDialog(data = {}) {
 }
 
 /**
+ * Fetch files from the server
+ *
+ * @param data - object with Data to for fetching files
+ */
+export function fetchFiles(data = {}) {
+    eventBus.emit('fetch-files', data);
+}
+
+/**
  * Debounce function to limit the number of calls to a function
  *
  * @param func - Function to call

@@ -1,5 +1,5 @@
 import {settings, sharedState} from "shared-state";
-import { showToast, debounce } from "helper";
+import {showToast, fetchFiles} from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -99,37 +99,6 @@ export const methods = {
                 this.similarVideos = [];
             });
     },
-    fetchFiles: debounce(function (restoreScrollPosition=false) {
-            console.log('Fetching files');
-            // if we are in library url path we should use library api
-            const library = window.location.pathname.includes('/library');
-            const scrollPosition = window.scrollY;
-
-            sharedState.loading = true;
-            const url = library ? '/api/library/list' : '/api/list';
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    this.files = data.map(file => ({
-                        ...file,
-                        showPreview: false,
-                    }));
-                    sharedState.loading = false;
-                    if (restoreScrollPosition) {
-                        console.log('Restoring scroll position', scrollPosition);
-                        setTimeout(() => window.scrollTo(0, scrollPosition));
-                    }
-                })
-                .catch(error => {
-                    console.error('There was an error fetching the files:', error);
-                    sharedState.loading = false;
-                })
-        }, 2000),
     startPreview(file, evt) {
         evt.target.play()
             .then(() => file.showPreview = true)
@@ -174,7 +143,7 @@ export const methods = {
             .then(response => response.json())
             .then((data) => {
                 this.serverResult = data;
-                this.fetchFiles(true);
+                fetchFiles(true);
             })
             .catch(error => {
                 console.error('Error deleting bookmark:', error);
@@ -276,7 +245,7 @@ export const methods = {
             .then(response => response.json())
             .then(data => {
                 this.serverResult = data;
-                this.fetchFiles(true);
+                fetchFiles(true);
             })
             .catch(error => {
                 console.error('Error renaming file:', error);
@@ -353,7 +322,7 @@ export const methods = {
           .then(response => response.json())
           .then(data => {
               this.serverResult = data;
-              this.fetchFiles(true);
+              fetchFiles(true);
           })
           .catch(error => {
               console.error('Error moving file:', error);
@@ -368,7 +337,7 @@ export const methods = {
 export const computed = {
     filteredFiles: function () {
 
-        let filtered = this.files.filter(file => {
+        let filtered = sharedState.files.filter(file => {
             const matchesFolder = sharedState.selectedFolder ? file.folder === sharedState.selectedFolder || (file.folder === '' && sharedState.selectedFolder === '~root~') : true;
             const titleCompareValue = (file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.')).toLowerCase();
             const matchesFilter = sharedState.filter ? titleCompareValue.includes(sharedState.filter.toLowerCase()) : true;

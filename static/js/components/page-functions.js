@@ -1,4 +1,5 @@
-import {apiCall, showConfirmDialog, showToast} from "helper";
+import {eventBus} from "event-bus";
+import {apiCall, debounce, showConfirmDialog, showToast} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -28,6 +29,11 @@ export const PageFunctions = {
     },
     setup() {
         return { sharedState, settings };
+    },
+    data() {
+        return {
+            removeFetchFilesListener: null,
+        }
     },
     computed: {
     },
@@ -69,8 +75,25 @@ export const PageFunctions = {
                 showToastMessage: false, options: { method: 'POST', headers: {'Content-Type': 'application/json'} } })
                 .then(data => showToast(data.success ? data : 'Failed to generate thumbnails'));
         },
-        fetchFiles() {
-        },
+        fetchFiles: debounce(function (restoreScrollPosition=false) {
+            // if we are in library url path we should use library api
+            const scrollPosition = window.scrollY;
+
+            sharedState.loading = true;
+            apiCall('/api/list', { errorMessage: 'Error fetching files',
+                onError: () => sharedState.loading = false, showToastMessage: false })
+                .then(data => {
+                    sharedState.files = data.map(file => ({
+                        ...file,
+                        showPreview: false,
+                    }));
+                    sharedState.loading = false;
+                    if (restoreScrollPosition) {
+                        console.log('Restoring scroll position', scrollPosition);
+                        setTimeout(() => window.scrollTo(0, scrollPosition));
+                    }
+                });
+        }, 2000),
         findDuplicates() {
             sharedState.loading = true;
             apiCall('/api/duplicates', { errorMessage: 'Error finding duplicates',
@@ -83,7 +106,17 @@ export const PageFunctions = {
                 });
         },
     },
+    beforeUnmount() {
+        if (this.removeFetchFilesListener) {
+            this.removeFetchFilesListener();
+            this.removeFetchFilesListener = null;
+        }
+    },
     mounted() {
+        this.removeFetchFilesListener = eventBus.on('fetch-files', (data) => {
+            console.log('Fetching files with data:', data);
+            this.fetchFiles(data);
+        });
     }
 }
 

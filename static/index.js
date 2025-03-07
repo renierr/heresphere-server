@@ -1,4 +1,4 @@
-import {showToast} from "helper";
+import {fetchFiles, showToast} from "helper";
 import {
     data,
     methods,
@@ -53,7 +53,7 @@ const app = createApp({
     },
     mounted() {
         window.vueInstance = this;    // store vue instance in DOM
-        this.fetchFiles();
+        fetchFiles();
         this.removeSseListener = eventBus.on('sse-message', (data) => {
             let progressExp = data.match(/(\d+.\d+)% complete/);
             let progressId = data.match(/Downloading...\[(\d+)]/);
@@ -72,7 +72,7 @@ const app = createApp({
             if (data.includes('Download finished') ||
               data.includes('Generate thumbnails finished') ||
               data.includes(' 0.0% complete')) {
-                this.fetchFiles();
+                fetchFiles();
             }
         });
     },
