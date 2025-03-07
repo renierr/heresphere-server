@@ -1,4 +1,4 @@
-import {fetchFiles, showToast, videoUrl} from "helper";
+import {fetchFiles, playVideo, showToast, videoUrl} from "helper";
 import {
     data,
     methods,
@@ -19,7 +19,7 @@ const app = createApp({
         }
     },
     setup() {
-        return { sharedState, settings };
+        return { sharedState, settings, playVideo };
     },
     methods: {
         ...methods,

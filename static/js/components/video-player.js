@@ -1,4 +1,5 @@
 import {eventBus} from "event-bus";
+import {showVideoDialog} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -54,7 +55,22 @@ export const VideoPlayer = {
                 });
             }
             this.modal.show();
-        }
+        },
+        playVideo(file) {
+            const videoModalBody = document.getElementById('videoModalBody');
+            const videoModalTitle = document.getElementById('videoModalLabel');
+            const videoModalFooter = document.getElementById('videoModalFooter');
+
+            videoModalFooter.innerHTML = '';
+            videoModalTitle.textContent = file.title || 'Video Player';
+            videoModalBody.innerHTML = `
+            <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
+                <source src="${file.filename}" type="video/mp4">
+            </video-js>
+            `;
+            videojs('videoPlayer');
+            this.showPlayer();
+        },
     },
     beforeUnmount() {
         this.listener.forEach(l => l());
@@ -67,6 +83,10 @@ export const VideoPlayer = {
         this.listener.push(eventBus.on('hide-video-dialog', () => {
             this.modal.hide();
         }));
+        this.listener.push(eventBus.on('play-video', (file) => {
+            this.playVideo(file);
+        }));
+
     }
 
 }

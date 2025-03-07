@@ -78,6 +78,11 @@ export function hideVideoDialog() {
     eventBus.emit('hide-video-dialog');
 }
 
+export function playVideo(file = {}) {
+    eventBus.emit('play-video', file);
+}
+
+
 /**
  * Fetch files from the server
  *

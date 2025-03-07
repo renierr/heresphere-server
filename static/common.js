@@ -117,22 +117,6 @@ export const methods = {
                 console.error('Error deleting bookmark:', error);
             });
     },
-    playVideo(file) {
-        const videoModalBody = document.getElementById('videoModalBody');
-        const videoModalTitle = document.getElementById('videoModalLabel');
-        const videoModalFooter = document.getElementById('videoModalFooter');
-
-        videoModalFooter.innerHTML = '';
-        videoModalTitle.textContent = file.title || 'Video Player';
-        videoModalBody.innerHTML = `
-            <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
-                <source src="${file.filename}" type="video/mp4">
-            </video-js>
-        `;
-        videojs('videoPlayer');
-        showVideoDialog();
-    },
-
     checkResolution(file) {
         if (this.selectedResolution === 'HD') {
             return file.width > 1900 || file.height > 1900;
