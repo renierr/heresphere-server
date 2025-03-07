@@ -66,6 +66,10 @@ export function showConfirmDialog(data = {}) {
     eventBus.emit('show-confirm-dialog', data);
 }
 
+export function hideConfirmDialog() {
+    eventBus.emit('hide-confirm-dialog');
+}
+
 /**
  * Fetch files from the server
  *

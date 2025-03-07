@@ -13,7 +13,7 @@ const template = `
             <div class="modal-body text-center">
                 <span>{{ confirmData.message }}</span>
                 <div v-if="confirmData.file" class="small alert alert-warning text-break">{{ confirmData.file ? confirmData.file.split('/').pop() : '' }}</div>
-                <div id="confirmModalExtras" class="mt-2"></div>
+                <div ref="confirmModalExtras" id="confirmModalExtras" class="mt-2"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -35,6 +35,8 @@ export const ConfirmDialog = {
         return {
             confirmData: {},
             modal: null,
+            removeHideConfirmListener: null,
+            removeShowConfirmListener: null,
         }
     },
     computed: {
@@ -43,29 +45,40 @@ export const ConfirmDialog = {
         showConfirmDialog(data = {}) {
             this.confirmData = data;
 
+            // TODO maybe better in mounted or setup?
             const confirmElement = this.$refs.confirmModal;
             if (!this.modal) {
                 this.modal = new bootstrap.Modal(confirmElement);
                 confirmElement.addEventListener('hidden.bs.modal', () => {
-                    console.log('Modal closed');
                     this.confirmData = {};
+                    const modalConfirmExtras = this.$refs.confirmModalExtras;
+                    if (modalConfirmExtras) {
+                        modalConfirmExtras.innerHTML = '';
+                    }
                 });
             }
             this.modal.show();
         }
     },
     beforeUnmount() {
-        if (this.removeToastListener) {
-            this.removeToastListener();
-            this.removeToastListener = null;
+        if (this.removeShowConfirmListener) {
+            this.removeShowConfirmListener();
+            this.removeShowConfirmListener = null;
+        }
+        if (this.removeHideConfirmListener) {
+            this.removeHideConfirmListener();
+            this.removeHideConfirmListener = null;
         }
         this.title = 'Message';
         this.message = '';
         this.useHtml = false;
     },
     mounted() {
-        this.removeToastListener = eventBus.on('show-confirm-dialog', (data) => {
+        this.removeShowConfirmListener = eventBus.on('show-confirm-dialog', (data) => {
             this.showConfirmDialog(data);
+        });
+        this.removeHideConfirmListener = eventBus.on('hide-confirm-dialog', () => {
+            this.modal.hide();
         });
     }
 

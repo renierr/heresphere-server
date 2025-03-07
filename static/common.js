@@ -1,5 +1,5 @@
 import {settings, sharedState} from "shared-state";
-import {showToast, fetchFiles, apiCall} from "helper";
+import {showToast, fetchFiles, apiCall, showConfirmDialog, hideConfirmDialog} from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -162,7 +162,7 @@ export const methods = {
         }
     },
     confirmRenameFile(file) {
-        const modalConfirmExtras = document.getElementById('confirmModalExtras');
+        const modalConfirmExtras = document.getElementById('confirmModalExtras'); // TODO implement extras handling
         const currentName = file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.');;
         modalConfirmExtras.innerHTML = `
             <div class="d-flex align-items-center flex-column flex-md-row">
@@ -185,11 +185,12 @@ export const methods = {
                 this.renameFile(confData, newName);
             },
         }
-        window.confirmModal.show();
+        showConfirmDialog(this.confirmData);
+        //window.confirmModal.show();
         nameInput.addEventListener('keydown', (evt) => {
             if (evt.key === 'Enter') {
                 evt.preventDefault();
-                window.confirmModal.hide();
+                hideConfirmDialog();
                 this.confirmData.action(this.confirmData)
             }
         });
