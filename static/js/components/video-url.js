@@ -17,6 +17,47 @@ const template = `
 </div>
 `
 
+function shareHandlingForVideoPlayer(modalFooter, title, video_url, video_source) {
+    if (navigator.share) {
+        const shareButton = document.createElement('button');
+        shareButton.textContent = 'Share Video';
+        shareButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+        shareButton.addEventListener('click', () => {
+            navigator.share({
+                title: title,
+                url: video_url,
+            })
+                .then(() => console.log(`Successful shared ${video_url}`))
+                .catch((error) => console.log('Error sharing', error));
+        });
+        modalFooter.appendChild(shareButton);
+        const shareExtractedButton = document.createElement('button');
+        shareExtractedButton.textContent = 'Share Extracted Video';
+        shareExtractedButton.classList.add('btn', 'btn-secondary', 'btn-sm');
+        shareExtractedButton.addEventListener('click', () => {
+            navigator.share({
+                title: title,
+                url: video_source,
+            })
+                .then(() => console.log(`Successful shared ${video_url}`))
+                .catch((error) => console.log('Error sharing', error));
+        });
+        modalFooter.appendChild(shareExtractedButton);
+    }
+}
+
+function downloadHandlingForVideoPlayer(modalFooter, video_url) {
+    const downloadButton = document.createElement('button');
+    downloadButton.textContent = 'Trigger Download';
+    downloadButton.classList.add('btn', 'btn-primary', 'btn-sm');
+    downloadButton.addEventListener('click', () => {
+        hideVideoDialog();
+        this.videoUrl = video_url;
+        this.postVideoUrl()
+    });
+    modalFooter.appendChild(downloadButton);
+}
+
 export const VideoUrl = {
     template: template,
     props: {
@@ -33,6 +74,36 @@ export const VideoUrl = {
     computed: {
     },
     methods: {
+        openVideoPlayerForStream(data) {
+            const video_url = data.videoUrl;
+            const audio_url = data.audioUrl;
+            const videoModalTitle = document.getElementById('videoModalLabel');
+            const modalBody = document.getElementById('videoModalBody');
+            const modalFooter = document.getElementById('videoModalFooter');
+            if (modalBody && modalFooter && video_url) {
+                // strip trailing / from video url
+                const video_source = video_url.replace(/\/+$/, '');
+                const title = data.title || 'Video Streaming...';
+                videoModalTitle.textContent = title;
+                modalBody.innerHTML = `
+                                <video-js id="videoPlayer" class="vjs-default-skin w-100 h-100" controls autoplay>
+                                    <source src="${video_source}" type="video/webm">
+                                </video-js>
+                            `;
+                videojs('videoPlayer');
+                modalFooter.innerHTML = `
+                                <a href="${this.videoUrl}" target="_blank">Video URL provided</a>
+                                <a href="${video_source}" target="_blank">Extracted Video link</a>
+                            `;
+
+                downloadHandlingForVideoPlayer.call(this, modalFooter, this.videoUrl);
+                shareHandlingForVideoPlayer(modalFooter, title, this.videoUrl, video_source);
+                showVideoDialog();
+                this.videoUrl = '';
+            } else {
+                showToast('Error: No video URL found to be played');
+            }
+        },
         postVideoUrl(stream=false) {
             if (this.videoUrl.trim() === '') {
                 showToast('Please enter a URL');
@@ -48,69 +119,7 @@ export const VideoUrl = {
                 .then(response => response.json())
                 .then(data => {
                     if (stream) {
-                        const video_url = data.videoUrl;
-                        const audio_url = data.audioUrl;
-                        const videoModalTitle = document.getElementById('videoModalLabel');
-                        const modalBody = document.getElementById('videoModalBody');
-                        const modalFooter = document.getElementById('videoModalFooter');
-                        if (modalBody && modalFooter && video_url) {
-                            // strip trailing / from video url
-                            const video_source = video_url.replace(/\/+$/, '');
-                            const title = data.title || 'Video Streaming...';
-                            videoModalTitle.textContent = title;
-                            modalBody.innerHTML = `
-                                <video-js id="videoPlayer" class="vjs-default-skin w-100 h-100" controls autoplay>
-                                    <source src="${video_source}" type="video/webm">
-                                </video-js>
-                            `;
-                            videojs('videoPlayer');
-                            modalFooter.innerHTML = `
-                                <a href="${this.videoUrl}" target="_blank">Video URL provided</a>
-                                <a href="${video_source}" target="_blank">Extracted Video link</a>
-                            `;
-
-                            const tempVideoUrl = this.videoUrl;
-                            const downloadButton = document.createElement('button');
-                            downloadButton.textContent = 'Trigger Download';
-                            downloadButton.classList.add('btn', 'btn-primary', 'btn-sm');
-                            downloadButton.addEventListener('click', () => {
-                                hideVideoDialog();
-                                this.videoUrl = tempVideoUrl;
-                                this.postVideoUrl()
-                            });
-                            modalFooter.appendChild(downloadButton);
-
-                            if (navigator.share) {
-                                const shareButton = document.createElement('button');
-                                shareButton.textContent = 'Share Video';
-                                shareButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                                shareButton.addEventListener('click', () => {
-                                    navigator.share({
-                                        title: title,
-                                        url: tempVideoUrl,
-                                    })
-                                        .then(() => console.log(`Successful shared ${tempVideoUrl}`))
-                                        .catch((error) => console.log('Error sharing', error));
-                                });
-                                modalFooter.appendChild(shareButton);
-                                const shareExtractedButton = document.createElement('button');
-                                shareExtractedButton.textContent = 'Share Extracted Video';
-                                shareExtractedButton.classList.add('btn', 'btn-secondary', 'btn-sm');
-                                shareExtractedButton.addEventListener('click', () => {
-                                    navigator.share({
-                                        title: title,
-                                        url: video_source,
-                                    })
-                                        .then(() => console.log(`Successful shared ${tempVideoUrl}`))
-                                        .catch((error) => console.log('Error sharing', error));
-                                });
-                                modalFooter.appendChild(shareExtractedButton);
-                            }
-                            showVideoDialog();
-                            this.videoUrl = '';
-                        } else {
-                            showToast('Error: No video URL found to be played');
-                        }
+                        this.openVideoPlayerForStream(data);
                     } else {
                         showToast(data);
                     }
