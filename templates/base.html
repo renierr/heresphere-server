@@ -51,21 +51,8 @@
             </div>
         </nav>
 
-        <hs-server-info></hs-server-info>
-        <hs-filter></hs-filter>
-        <hs-video-url></hs-video-url>
 
-        <hs-loading v-if="sharedState.loading"></hs-loading>
-        <hs-list-files v-else></hs-list-files>
-        <hs-page-functions :updatePossible="[[ server_update_possible | lower ]]"></hs-page-functions>
-
-        <button id="scroll-to-top" class="fs-2 btn btn-info position-fixed bottom-0 end-0 m-3 rounded-circle d-none shadow d-flex align-items-center justify-content-center" title="Scroll to top">
-            <i class="bi bi-arrow-up-short"></i>
-        </button>
-        <hs-toast></hs-toast>
-        <hs-confirm-dialog></hs-confirm-dialog>
-        <hs-video-details></hs-video-details>
-        <hs-video-player></hs-video-player>
+        All is in index.html now - reweite bookmark and Nav code TODO
     </div>
 
     <script type="module" src="/static/index.js"></script>
