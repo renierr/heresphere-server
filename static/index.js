@@ -90,6 +90,7 @@ import { VideoUrl } from "./js/components/video-url.js";
 import { PageFunctions } from "./js/components/page-functions.js";
 import { ConfirmDialog } from "./js/components/confirm-dialog.js";
 import { ListFiles } from "./js/components/list-files.js";
+import { VideoDetails } from "./js/components/video-details.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
@@ -98,8 +99,9 @@ app.component('hs-video-url', VideoUrl);
 app.component('hs-toast', ToastMessage);
 app.component('hs-page-functions', PageFunctions);
 app.component('hs-confirm-dialog', ConfirmDialog);
-app.component('hs-video-dialog', VideoPlayer);
+app.component('hs-video-player', VideoPlayer);
 app.component('hs-list-files', ListFiles);
+app.component('hs-video-details', VideoDetails);
 
 app.mount('#app');
 

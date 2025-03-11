@@ -1,11 +1,11 @@
 import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
-import {apiCall, formatDuration, formatFileSize, showToast} from "helper";
+import { apiCall, formatDuration, formatFileSize, showToast, playVideo } from "helper";
 
 // language=Vue
 const template = `
 <div class="card h-100 d-flex flex-column">
-    <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="showSimilar(file)">
+    <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="showVideoDetails(file)">
         <video v-if="settings.showVideoPreview && file.preview" :poster="file.thumbnail" :src="file.preview" class="card-img-top"
                @mouseenter="startPreview(file, $event)" @mouseleave="stopPreview(file, $event)"
                preload="none" loop disablePictureInPicture></video>
@@ -61,7 +61,7 @@ export const VideoInfosCard = {
         file: Object,
     },
     setup() {
-        return { sharedState, settings, formatDuration, formatFileSize };
+        return { sharedState, settings, formatDuration, formatFileSize, playVideo };
     },
     computed: {
     },
@@ -100,6 +100,15 @@ export const VideoInfosCard = {
                 }).join('<br>');
                 showToast(message, {title: "Duplicates", stayOpen: true, asHtml: true, wide: true});
             }
+        },
+        generateThumbnail(file) {
+            apiCall('/api/generate_thumbnail', { errorMessage: 'Error generating thumbnail',
+                showToastMessage: false,
+                options: { method: 'POST', body: JSON.stringify({ video_path: file }), headers: {'Content-Type': 'application/json'} } })
+                .then(data => showToast(data.success ? data : 'Failed to generate thumbnail'));
+        },
+        showVideoDetails(file) {
+            eventBus.emit('video-details', file);
         },
     },
     mounted() {

@@ -70,11 +70,11 @@ export function hideConfirmDialog() {
     eventBus.emit('hide-confirm-dialog');
 }
 
-export function showVideoDialog(data = {}) {
+export function showVideoPlayer(data = {}) {
     eventBus.emit('show-video-dialog', data);
 }
 
-export function hideVideoDialog() {
+export function hideVideoPlayer() {
     eventBus.emit('hide-video-dialog');
 }
 

@@ -1,5 +1,5 @@
 import {settings, sharedState} from "shared-state";
-import {showToast, fetchFiles, apiCall, showConfirmDialog, hideConfirmDialog, showVideoDialog} from "helper";
+import {showToast, fetchFiles, apiCall, showConfirmDialog, hideConfirmDialog} from "helper";
 
 let previewVideoWarningAlreadyShown = false;
 
@@ -14,12 +14,7 @@ export const data = {
 
 
 export const methods = {
-    generateThumbnail(file) {
-        apiCall('/api/generate_thumbnail', { errorMessage: 'Error generating thumbnail',
-            showToastMessage: false,
-            options: { method: 'POST', body: JSON.stringify({ video_path: file }), headers: {'Content-Type': 'application/json'} } })
-            .then(data => showToast(data.success ? data : 'Failed to generate thumbnail'));
-    },
+
     showSimilar(file) {
         this.similarVideos = null;
         this.currentFile = file;

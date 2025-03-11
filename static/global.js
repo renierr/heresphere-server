@@ -75,23 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('similarityModal')?.addEventListener('hidden.bs.modal', function () {
-        const vueInstance = window.vueInstance;
-        if (vueInstance) {
-            console.log('Modal closed');
-            vueInstance.currentFile = null;
-            vueInstance.similarVideos = null;
-        }
-    });
-    // init the modals - we only use one instance of each modal
-    /*
-    const similarityModalElement = document.getElementById('similarityModal');
-    if (similarityModalElement) {
-        window.similarityModal = new bootstrap.Modal(similarityModalElement, {backdrop: 'static'});
-    }
-    */
-
-
 
     // swipe listener for select (up/down) to select option
     const applySelectOptionSwipeHandler = (selectElement) => {

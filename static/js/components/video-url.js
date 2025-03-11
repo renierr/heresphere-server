@@ -1,6 +1,6 @@
 import { eventBus } from "event-bus";
 import { sharedState, settings } from "shared-state";
-import {hideVideoDialog, showToast, showVideoDialog} from "helper";
+import {hideVideoPlayer, showToast, showVideoPlayer} from "helper";
 
 // language=Vue
 const template = `
@@ -51,7 +51,7 @@ function downloadHandlingForVideoPlayer(modalFooter, video_url) {
     downloadButton.textContent = 'Trigger Download';
     downloadButton.classList.add('btn', 'btn-primary', 'btn-sm');
     downloadButton.addEventListener('click', () => {
-        hideVideoDialog();
+        hideVideoPlayer();
         this.videoUrl = video_url;
         this.postVideoUrl()
     });
@@ -98,7 +98,7 @@ export const VideoUrl = {
 
                 downloadHandlingForVideoPlayer.call(this, modalFooter, this.videoUrl);
                 shareHandlingForVideoPlayer(modalFooter, title, this.videoUrl, video_source);
-                showVideoDialog();
+                showVideoPlayer();
                 this.videoUrl = '';
             } else {
                 showToast('Error: No video URL found to be played');

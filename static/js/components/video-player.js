@@ -1,5 +1,4 @@
 import {eventBus} from "event-bus";
-import {showVideoDialog} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
