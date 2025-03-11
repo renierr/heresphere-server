@@ -1,6 +1,6 @@
 import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
-import {formatDuration, formatFileSize, showToast} from "helper";
+import {apiCall, formatDuration, formatFileSize, showToast} from "helper";
 
 // language=Vue
 const template = `
@@ -80,6 +80,26 @@ export const VideoInfosCard = {
             evt.target.currentTime = 0;
             evt.target.pause();
             file.showPreview = false;
+        },
+        toggleFavorite(file) {
+            apiCall('/api/toggle_favorite', { errorMessage: 'Error favorite toggle',
+                options: { method: 'POST', body: JSON.stringify({ video_path: file.filename }), headers: { 'Content-Type': 'application/json' } } })
+                .then(data => {
+                    file.favorite = !file.favorite;
+                });
+        },
+        showDuplicateInfo(file) {
+            if (file.may_exist) {
+                let message = file.may_exist.split('\n');
+                message = message.map((line) => {
+                    if (line.includes('id[')) {
+                        return `<h5>${line}</h5>`
+                    } else {
+                        return `<p>${line}</p>`;
+                    }
+                }).join('<br>');
+                showToast(message, {title: "Duplicates", stayOpen: true, asHtml: true, wide: true});
+            }
         },
     },
     mounted() {

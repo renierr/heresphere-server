@@ -14,32 +14,6 @@ export const data = {
 
 
 export const methods = {
-    formatDate(epochSeconds) {
-        if (epochSeconds < 1) {
-            return '';
-        }
-        const date = new Date(epochSeconds * 1000);
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        return date.toLocaleDateString(undefined, options);
-    },
-    formatFileSize(bytes) {
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        if (bytes === 0) return '0 Byte';
-        const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-        return (bytes / Math.pow(1024, i)).toFixed(2) + ' ' + sizes[i];
-    },
-    formatDuration(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        if (hours > 0) {
-            return `${hours}h ${minutes}m ${secs}s`;
-        } else if (minutes > 0) {
-            return `${minutes}m ${secs}s`;
-        } else {
-            return `${secs}s`;
-        }
-    },
     generateThumbnail(file) {
         apiCall('/api/generate_thumbnail', { errorMessage: 'Error generating thumbnail',
             showToastMessage: false,
@@ -67,21 +41,7 @@ export const methods = {
                 this.similarVideos = [];
             });
     },
-    startPreview(file, evt) {
-        evt.target.play()
-            .then(() => file.showPreview = true)
-            .catch(error => {
-            if (error.name === 'NotAllowedError' && !previewVideoWarningAlreadyShown) {
-                showToast('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
-                previewVideoWarningAlreadyShown = true;
-            }
-        });
-    },
-    stopPreview(file, evt) {
-        evt.target.currentTime = 0;
-        evt.target.pause();
-        file.showPreview = false;
-    },
+
 
     showMessage: function (input, options = {}) {
         showToast(input, options);
@@ -118,19 +78,7 @@ export const methods = {
             });
     },
 
-    showDuplicateInfo(file) {
-        if (file.may_exist) {
-            let message = file.may_exist.split('\n');
-            message = message.map((line) => {
-                if (line.includes('id[')) {
-                    return `<h5>${line}</h5>`
-                } else {
-                    return `<p>${line}</p>`;
-                }
-            }).join('<br>');
-            this.showMessage(message, {title: "Duplicates", stayOpen: true, asHtml: true});
-        }
-    },
+
     confirmRenameFile(file) {
         const modalConfirmExtras = document.getElementById('confirmModalExtras'); // TODO implement extras handling
         const currentName = file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.');;
