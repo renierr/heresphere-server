@@ -75,11 +75,13 @@ const template = `
                                     <p v-if="similar.file.duration"><i class="bi bi-clock"></i> {{
                                         formatDuration(similar.file.duration) }}</p>
                                     <p v-if="similar.file.folder"><i class="bi bi-folder"></i> {{ similar.file.folder }}</p>
-                                    <button class="btn btn-outline-success btn-sm mt-2" @click="playVideo(similar.file)">
-                                        <i class="bi bi-play-fill"></i>&nbsp;Play
-                                    </button>
-                                    <button @click="confirmMoveFile(similar.file)" class="btn btn-outline-danger btn-sm mt-2">Move To Folder</button>
-                                    <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm mt-2">Show Similar</button>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button class="btn btn-outline-success btn-sm mt-2" @click="playVideo(similar.file)">
+                                            <i class="bi bi-play-fill"></i>&nbsp;Play
+                                        </button>
+                                        <button @click="confirmMoveFile(similar.file)" class="btn btn-outline-danger btn-sm mt-2">Move To Folder</button>
+                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm mt-2">Show Similar</button>
+                                    </div>
                                 </div>
                             </div>
                         </li>
