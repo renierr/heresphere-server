@@ -131,7 +131,7 @@ export const VideoInfosCard = {
         },
         deleteFile(confData) {
             if (!confData && !confData.file) {
-                this.showMessage('Wrong number of parameters for deleteFile');
+                showToast('Wrong number of parameters for deleteFile');
                 return;
             }
             const file = confData.file;
