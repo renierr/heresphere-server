@@ -1,6 +1,6 @@
 import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
-import {formatFileSize, formatDate, formatDuration, playVideo, apiCall, videoUrl} from "helper";
+import {formatFileSize, formatDate, formatDuration, playVideo, apiCall, videoUrl, showToast} from "helper";
 
 // language=Vue
 const template = `
@@ -144,6 +144,10 @@ export const VideoDetails = {
                     this.similarVideos = data;
                 });
         },
+        confirmMoveFile(file) {
+            this.$emit('confirm-move-file', file);
+            showToast('TODO implement common logic for Move file to folder');
+        }
     },
     beforeUnmount() {
         this.listener.forEach(l => l());
