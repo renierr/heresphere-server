@@ -1,20 +1,11 @@
-import {fetchFiles, playVideo, showToast, videoUrl} from "helper";
-import {
-    data,
-    methods,
-    computed,
-    watch,
-} from './common.js';
-
+import { sharedState, settings } from "shared-state";
+import { fetchFiles, playVideo, showToast, videoUrl } from "helper";
 import { createApp } from 'vue';
 import { eventBus } from 'event-bus';
-import { sharedState, settings } from 'shared-state';
 
 const app = createApp({
     data() {
         return {
-            ...data,
-            downloadProgress: {},
             removeSseListener: null,
         }
     },
@@ -22,19 +13,22 @@ const app = createApp({
         return { sharedState, settings, playVideo };
     },
     methods: {
-        ...methods,
         saveSettings() {
             localStorage.setItem('settings', JSON.stringify(this.settings));
         },
-        redownload(file) {
-            videoUrl(file.url);
-        },
     },
     computed: {
-        ...computed,
     },
     watch: {
-        ...watch,
+        'sharedState.filter': function (newFilter, oldFilter) {
+            sharedState.currentPage = 1;
+        },
+        'settings.pageSize': function (newPageSize, oldPageSize) {
+            sharedState.currentPage = 1;
+        },
+        'sharedState.selectedFolder': function (newFolder, oldFolder) {
+            sharedState.currentPage = 1;
+        },
         settings: {
             handler() {
                 this.saveSettings()

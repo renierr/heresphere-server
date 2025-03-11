@@ -1,41 +1,7 @@
-import {settings, sharedState} from "shared-state";
-import {showToast, fetchFiles, apiCall, showConfirmDialog, hideConfirmDialog} from "helper";
-
-let previewVideoWarningAlreadyShown = false;
-
-
-// common.js
-export const data = {
-    serverResult: null,
-    currentFile: null,
-    similarVideos: null,
-    confirmData: {},
-};
-
+import {showToast, fetchFiles,  showConfirmDialog, hideConfirmDialog} from "helper";
 
 export const methods = {
 
-    showSimilar(file) {
-        this.similarVideos = null;
-        this.currentFile = file;
-        window.similarityModal.show();
-        fetch('/api/similar', {
-            method: 'POST',
-            body: JSON.stringify({ video_path: file.filename, threshold: this.settings.similarThreshold }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                this.similarVideos = data;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                this.serverResult = 'Error calling similars';
-                this.similarVideos = [];
-            });
-    },
 
 
     showMessage: function (input, options = {}) {
@@ -133,24 +99,7 @@ export const methods = {
                 this.serverResult = 'Error renaming file: ' + error;
             });
     },
-    toggleFavorite(file) {
-        fetch('/api/toggle_favorite', {
-            method: 'POST',
-            body: JSON.stringify({ video_path: file.filename }),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-          .then(response => response.json())
-          .then(data => {
-              this.serverResult = data;
-              file.favorite = !file.favorite;
-          })
-          .catch(error => {
-              console.error('Error favorite toggle for file:', error);
-              this.serverResult = 'Error favorite toggle for file: ' + error;
-          });
-    },
+
     confirmMoveFile(file) {
         const lastFolder = this.settings.lastMoveSubfolder || '';
         const modalConfirmExtras = document.getElementById('confirmModalExtras');
@@ -215,57 +164,5 @@ export const methods = {
 
 };
 
-export const computed = {
-    filteredFiles: function () {
 
-        let filtered = sharedState.files.filter(file => {
-            const matchesFolder = sharedState.selectedFolder ? file.folder === sharedState.selectedFolder || (file.folder === '' && sharedState.selectedFolder === '~root~') : true;
-            const titleCompareValue = (file.title || file.filename.split('/').pop().split('.').slice(0, -1).join('.')).toLowerCase();
-            const matchesFilter = sharedState.filter ? titleCompareValue.includes(sharedState.filter.toLowerCase()) : true;
-            const matchesResolution = sharedState.selectedResolution ? this.checkResolution(file) : true;
-            const matchesDuration = sharedState.selectedDuration ? this.checkDuration(file) : true;
-            return matchesFolder && matchesFilter && matchesResolution && matchesDuration;
-        });
-
-        const sortCriteria = sharedState.currentSort.split(' ');
-        filtered = filtered.sort((a, b) => {
-            for (let criterion of sortCriteria) {
-                let modifier = 1;
-                if (sharedState.currentSortDir === 'desc') modifier = -1;
-                if (a[criterion] < b[criterion]) return -1 * modifier;
-                if (a[criterion] > b[criterion]) return 1 * modifier;
-            }
-            return 0;
-        });
-
-        sharedState.totalItems = filtered.length;
-        sharedState.totalSize = filtered.reduce((acc, file) => acc + (file.filesize || 0), 0);
-
-        if (settings.pageSize === 0) {
-            return filtered; // Return all items if pageSize is 0
-        }
-        const start = (sharedState.currentPage - 1) * settings.pageSize;
-        const end = start + settings.pageSize;
-        return filtered.slice(start, end);
-    },
-};
-
-export const watch = {
-    filter: function (newFilter, oldFilter) {
-        sharedState.currentPage = 1;
-    },
-    pageSize: function (newPageSize, oldPageSize) {
-        sharedState.currentPage = 1;
-    },
-    selectedFolder: function (newFolder, oldFolder) {
-        sharedState.currentPage = 1;
-    },
-    serverResult: function (newResult) {
-        console.log('Server result:', newResult);
-        if (newResult) {
-            this.showMessage(newResult);
-            this.serverResult = null;
-        }
-    },
-};
 

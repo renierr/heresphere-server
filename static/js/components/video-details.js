@@ -1,6 +1,6 @@
 import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
-import {formatFileSize, formatDate, formatDuration, playVideo, apiCall} from "helper";
+import {formatFileSize, formatDate, formatDuration, playVideo, apiCall, videoUrl} from "helper";
 
 // language=Vue
 const template = `
@@ -45,7 +45,7 @@ const template = `
                             <a v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1"
                                :href="currentFile.url" target="_blank">Original Link</a>
                             <button v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1"
-                                    data-bs-dismiss="modal" @click="redownload(currentFile)">Download again (id={{
+                                    data-bs-dismiss="modal" @click="videoUrl(currentFile.url)">Download again (id={{
                                 currentFile.download_id }})
                             </button>
                         </div>
@@ -103,7 +103,7 @@ export const VideoDetails = {
     props: {
     },
     setup() {
-        return { sharedState, settings, formatFileSize, formatDate, formatDuration, playVideo};
+        return { sharedState, settings, formatFileSize, formatDate, formatDuration, playVideo, videoUrl};
     },
     data() {
         return {
