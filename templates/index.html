@@ -9,7 +9,7 @@
     <hs-video-url></hs-video-url>
 
     <hs-loading v-if="sharedState.loading"></hs-loading>
-    {% include "components/list_files.html" %}
+    <hs-list-files v-else></hs-list-files>
     <hs-page-functions :updatePossible="[[ server_update_possible | lower ]]"></hs-page-functions>
 
 {% endblock %}

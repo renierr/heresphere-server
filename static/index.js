@@ -32,11 +32,6 @@ const app = createApp({
     },
     computed: {
         ...computed,
-        getProgressForId: function () {
-            return function (id) {
-                return this.downloadProgress[id] || 0;
-            };
-        },
     },
     watch: {
         ...watch,
@@ -60,14 +55,14 @@ const app = createApp({
             let progressExp = data.match(/(\d+.\d+)% complete/);
             let progressId = data.match(/Downloading...\[(\d+)]/);
             if (progressId) {
-                this.downloadProgress = this.downloadProgress || {};
-                this.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
+                sharedState.downloadProgress = sharedState.downloadProgress || {};
+                sharedState.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
             }
 
             if (data.includes('Download failed')) {
                 let progressId = data.match(/Download failed \[(\d+)]/);
                 if (progressId) {
-                    this.downloadProgress[progressId[1]] = 0;
+                    sharedState.downloadProgress[progressId[1]] = 0;
                 }
             }
 
@@ -88,23 +83,23 @@ app.config.errorHandler = function (err, instance, info) {
 
 import { ServerInfo } from './js/components/server-info.js';
 import { Filter } from './js/components/filter.js';
-import { Paging } from "./js/components/paging.js";
 import { Loading } from "./js/components/loading.js";
 import { ToastMessage } from "./js/components/toast-message.js";
 import { VideoPlayer } from "./js/components/video-player.js";
 import { VideoUrl } from "./js/components/video-url.js";
 import { PageFunctions } from "./js/components/page-functions.js";
 import { ConfirmDialog } from "./js/components/confirm-dialog.js";
+import { ListFiles } from "./js/components/list-files.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
-app.component('hs-paging', Paging);
 app.component('hs-loading', Loading);
 app.component('hs-video-url', VideoUrl);
 app.component('hs-toast', ToastMessage);
 app.component('hs-page-functions', PageFunctions);
 app.component('hs-confirm-dialog', ConfirmDialog);
 app.component('hs-video-dialog', VideoPlayer);
+app.component('hs-list-files', ListFiles);
 
 app.mount('#app');
 

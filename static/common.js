@@ -117,20 +117,7 @@ export const methods = {
                 console.error('Error deleting bookmark:', error);
             });
     },
-    checkResolution(file) {
-        if (this.selectedResolution === 'HD') {
-            return file.width > 1900 || file.height > 1900;
-        } else if (this.selectedResolution === '4K') {
-            return file.width >= 3800 || file.height >= 3800;
-        } else if (this.selectedResolution === '8K') {
-            return file.width >= 8000 || file.height >= 8000;
-        }
-        return true;
-    },
-    checkDuration(file) {
-        const durationInMinutes = file.duration / 60;
-        return durationInMinutes >= this.selectedDuration;
-    },
+
     showDuplicateInfo(file) {
         if (file.may_exist) {
             let message = file.may_exist.split('\n');

@@ -1,3 +1,9 @@
+import {eventBus} from "event-bus";
+import { sharedState, settings } from "shared-state";
+import {formatDuration, formatFileSize, showToast} from "helper";
+
+// language=Vue
+const template = `
 <div class="card h-100 d-flex flex-column">
     <div class="thumbnail-wrapper position-relative w-100 cursor-pointer" @click="showSimilar(file)">
         <video v-if="settings.showVideoPreview && file.preview" :poster="file.thumbnail" :src="file.preview" class="card-img-top"
@@ -5,8 +11,8 @@
                preload="none" loop disablePictureInPicture></video>
         <img v-else-if="file.thumbnail" :src="file.thumbnail" class="card-img-top" />
         <span v-if="file.showPreview" class="video-preview-indicator text-primary fs-3">
-            <i class="bi bi-play-circle-fill"></i>
-        </span>
+        <i class="bi bi-play-circle-fill"></i>
+    </span>
         <span v-if="file.partial" class="position-absolute text-danger h3" style="left: .5rem; top: 1rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-circle-fill partial-icon"></i>  Partial <span class="fs-6">({{file.download_id}})</span><span v-if="file.failed"> - failed</span></span>
         <span v-if="file.unknown" class="position-absolute text-warning h3" style="left: .5rem; top: 1rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-circle-fill partial-icon"></i>  Not a Video</span>
         <span v-if="file.may_exist" :title="'Possible duplicate file: ' + file.may_exist" @click.stop.prevent="showDuplicateInfo(file)" class="position-absolute text-warning h3" style="left: 0.5rem; top: 3rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-triangle-fill exist-icon"></i> Duplicate?</span>
@@ -27,12 +33,14 @@
             </a>
         </h5>
         <p class="mb-0">
-            <span v-if="file.duration"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</span>
+            <span v-if="file.duration"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}&nbsp;</span>
             <span v-if="file.width && file.height"><i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}</span>
         </p>
-        <p v-if="file.unknown" class="mb-0"><span v-if="file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(file.filesize) }}</span></p>
+        <p class="mb-0">
+            <span v-if="file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(file.filesize) }}&nbsp;</span>
+            <span v-if="file.folder" class="mb-0"><i class="bi bi-folder"></i> {{ file.folder }}</span>
+        </p>
         <p v-if="file.unknown" class="mb-0"><span v-if="file.mimetype"><i class="bi bi-braces"></i> {{ file.mimetype }}</span></p>
-        <p v-if="file.folder" class="mb-0"><i class="bi bi-folder"></i> {{ file.folder }}</p>
     </div>
     <div class="card-footer p-2 d-flex flex-wrap gap-2">
         <button v-if="!file.unknown" class="btn btn-outline-success btn-sm" @click="playVideo(file)">
@@ -44,3 +52,36 @@
         <button @click="confirmMoveFile(file)" class="btn btn-outline-danger btn-sm">Move To Folder</button>
     </div>
 </div>
+`
+
+let previewVideoWarningAlreadyShown = false;
+export const VideoInfosCard = {
+    template: template,
+    props: {
+        file: Object,
+    },
+    setup() {
+        return { sharedState, settings, formatDuration, formatFileSize };
+    },
+    computed: {
+    },
+    methods: {
+        startPreview(file, evt) {
+            evt.target.play()
+                .then(() => file.showPreview = true)
+                .catch(error => {
+                    if (error.name === 'NotAllowedError' && !previewVideoWarningAlreadyShown) {
+                        showToast('Please interact with the document (e.g., click or press a key) before video preview playing is allowed.');
+                        previewVideoWarningAlreadyShown = true;
+                    }
+                });
+        },
+        stopPreview(file, evt) {
+            evt.target.currentTime = 0;
+            evt.target.pause();
+            file.showPreview = false;
+        },
+    },
+    mounted() {
+    }
+}

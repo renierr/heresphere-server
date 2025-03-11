@@ -20,6 +20,7 @@ export const sharedState = reactive({
     totalItems: 0,
     totalSize: 0,
     loading: false,
+    downloadProgress: {},
 });
 
 export const settings = reactive({
