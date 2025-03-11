@@ -1,5 +1,4 @@
 import {sharedState} from "shared-state";
-import { data, methods, computed, watch } from './common.js';
 
 new Vue({
     el: '#app',
@@ -13,8 +12,6 @@ new Vue({
         confirmData: {},
     },
     methods: {
-        toggleInfoAccordion: methods.toggleInfoAccordion,
-        showMessage: methods.showMessage,
         fetchBookmarks() {
             sharedState.loading = true;
             fetch('/api/bookmarks')
