@@ -81,17 +81,6 @@ const template = `
               <input class="form-check-input" type="checkbox" id="videoPreviewSwitch" v-model="settings.showVideoPreview">
               <label class="form-check-label" for="videoPreviewSwitch">Show Video Preview</label>
             </div>
-              <!-- TODO: remove layout switch only card layout is supported -->
-            <div class="btn-group ms-2" role="group" aria-label="Layout Switch">
-              <button type="button" class="btn btn-outline-secondary btn-sm"
-                      :class="{ active: settings.cardLayout }" @click="settings.cardLayout = true">
-                <i class="bi bi-card-list"></i><span class="d-none d-lg-inline"> Card</span>
-              </button>
-              <button type="button" class="btn btn-outline-secondary btn-sm"
-                      :class="{ active: !settings.cardLayout }" @click="settings.cardLayout = false">
-                <i class="bi bi-list-ul"></i><span class="d-none d-lg-inline"> Detail</span>
-              </button>
-            </div>
           </div>
         </div>
       </div>
