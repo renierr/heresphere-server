@@ -141,6 +141,7 @@ export const VideoDetails = {
                 });
         },
         confirmMoveFile(file) {
+            // TODO implement common logic for Move file to folder
             this.$emit('confirm-move-file', file);
             showToast('TODO implement common logic for Move file to folder');
         }
