@@ -97,6 +97,7 @@ import { ListFiles } from "./js/components/list-files.js";
 import { VideoDetails } from "./js/components/video-details.js";
 import { Bookmarks } from "./js/components/bookmarks.js";
 import { ScrollTop } from "./js/components/scroll-top.js";
+import { DarkMode } from "./js/components/dark-mode.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
@@ -110,6 +111,7 @@ app.component('hs-list-files', ListFiles);
 app.component('hs-video-details', VideoDetails);
 app.component('hs-bookmarks', Bookmarks);
 app.component('hs-scroll-top', ScrollTop);
+app.component('hs-dark-mode', DarkMode);
 
 app.mount('#app');
 
