@@ -118,17 +118,3 @@ function open_sse_connection() {
     });
     return eventSource;
 }
-
-
-
-function navigate(evt, url) {
-    evt.preventDefault();
-    history.replaceState(null, '', url);
-    window.location.href = url;
-}
-
-document.querySelectorAll('a.nav-link, a.navbar-brand').forEach(link => {
-    link.addEventListener('click', function(e) {
-        navigate(e, this.getAttribute('href'));
-    });
-});

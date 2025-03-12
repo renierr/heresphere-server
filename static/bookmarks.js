@@ -1,3 +1,4 @@
+import {showToast} from "helper";
 import {sharedState} from "shared-state";
 
 new Vue({
@@ -32,7 +33,7 @@ new Vue({
         },
         saveBookmark() {
             if (!this.newBookmarkUrl) {
-                this.showMessage('Bookmark URL is required.');
+                showToast('Bookmark URL is required.');
                 return;
             }
 
@@ -59,13 +60,13 @@ new Vue({
                     this.fetchBookmarks();
                 })
                 .catch(error => {
-                    this.showMessage('Error adding bookmark');
+                    showToast('Error adding bookmark');
                     console.error('Error adding bookmark:', error);
                 });
         },
         deleteBookmark(url) {
             if (!url) {
-                this.showMessage('URL is required.');
+                showToast('URL is required.');
                 return;
             }
             const utf8Bytes = new TextEncoder().encode(url);

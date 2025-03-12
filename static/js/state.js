@@ -21,6 +21,7 @@ export const sharedState = reactive({
     totalSize: 0,
     loading: false,
     downloadProgress: {},
+    currentView: '',
 });
 
 export const settings = reactive({

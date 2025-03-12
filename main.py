@@ -134,13 +134,9 @@ def inject_globals():
 
 
 @app.route('/')
+@app.route('/bookmarks')
 def home():
     return render_template('index.html')
-
-
-@app.route('/bookmarks')
-def bookmarks():
-    return render_template('bookmarks.html')
 
 
 @app.route('/update')

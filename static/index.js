@@ -16,8 +16,17 @@ const app = createApp({
         saveSettings() {
             localStorage.setItem('settings', JSON.stringify(this.settings));
         },
+        handleViewChange(view) {
+            sharedState.currentView = view;
+            history.replaceState(null, '', view ? `/${view}` : '/');
+        },
     },
     computed: {
+        isActive() {
+            return (view) => {
+                return sharedState.currentView === view ? 'active fw-bold' : '';
+            };
+        }
     },
     watch: {
         'sharedState.filter': function (newFilter, oldFilter) {
@@ -43,7 +52,8 @@ const app = createApp({
         eventBus.events = {};
     },
     mounted() {
-        window.vueInstance = this;    // store vue instance in DOM
+        const path = window.location.pathname.replace('/', '');
+        sharedState.currentView = path || '';
         fetchFiles();
         this.removeSseListener = eventBus.on('sse-message', (data) => {
             let progressExp = data.match(/(\d+.\d+)% complete/);
@@ -85,6 +95,7 @@ import { PageFunctions } from "./js/components/page-functions.js";
 import { ConfirmDialog } from "./js/components/confirm-dialog.js";
 import { ListFiles } from "./js/components/list-files.js";
 import { VideoDetails } from "./js/components/video-details.js";
+import { Bookmarks } from "./js/components/bookmarks.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
@@ -96,6 +107,7 @@ app.component('hs-confirm-dialog', ConfirmDialog);
 app.component('hs-video-player', VideoPlayer);
 app.component('hs-list-files', ListFiles);
 app.component('hs-video-details', VideoDetails);
+app.component('hs-bookmarks', Bookmarks);
 
 app.mount('#app');
 

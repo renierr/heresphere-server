@@ -33,14 +33,14 @@
 <div id="app" v-cloak class="container">
     <nav class="navbar navbar-expand-sm mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand {% if request.path == '/' %}active fw-bold{% endif %}" href="/">HSServer</a>
+            <a class="navbar-brand" :class="isActive('')" href="/" @click.stop.prevent="handleViewChange('')">HSServer</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mb-2 mb-sm-0 me-auto">
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/bookmarks' %}active fw-bold{% endif %}" href="/bookmarks">Bookmarks</a>
+                        <a class="nav-link" :class="isActive('bookmarks')" href="/bookmarks" @click.stop.prevent="handleViewChange('bookmarks')">Bookmarks</a>
                     </li>
                 </ul>
                 <div class="form-check form-switch">
@@ -51,21 +51,26 @@
         </div>
     </nav>
 
-    <hs-server-info></hs-server-info>
-    <hs-filter></hs-filter>
-    <hs-video-url></hs-video-url>
+    <template v-if="sharedState.currentView === 'bookmarks'">
+        <hs-bookmarks></hs-bookmarks>
+    </template>
+    <template v-else>
+        <hs-server-info></hs-server-info>
+        <hs-filter></hs-filter>
+        <hs-video-url></hs-video-url>
 
-    <hs-loading v-if="sharedState.loading"></hs-loading>
-    <hs-list-files v-else></hs-list-files>
-    <hs-page-functions :updatePossible="[[ server_update_possible | lower ]]"></hs-page-functions>
+        <hs-loading v-if="sharedState.loading"></hs-loading>
+        <hs-list-files v-else></hs-list-files>
+        <hs-page-functions :updatePossible="[[ server_update_possible | lower ]]"></hs-page-functions>
+        <hs-video-details></hs-video-details>
+        <hs-video-player></hs-video-player>
+    </template>
 
     <button id="scroll-to-top" class="fs-2 btn btn-info position-fixed bottom-0 end-0 m-3 rounded-circle d-none shadow d-flex align-items-center justify-content-center" title="Scroll to top">
         <i class="bi bi-arrow-up-short"></i>
     </button>
-    <hs-toast></hs-toast>
     <hs-confirm-dialog></hs-confirm-dialog>
-    <hs-video-details></hs-video-details>
-    <hs-video-player></hs-video-player>
+    <hs-toast></hs-toast>
 </div>
 
 <script type="module" src="/static/index.js"></script>
