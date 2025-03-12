@@ -61,7 +61,7 @@
 
         <hs-loading v-if="sharedState.loading"></hs-loading>
         <hs-list-files v-else></hs-list-files>
-        <hs-page-functions :updatePossible="[[ server_update_possible | lower ]]"></hs-page-functions>
+        <hs-page-functions :update-possible="[[ server_update_possible | lower ]]"></hs-page-functions>
         <hs-video-details></hs-video-details>
         <hs-video-player></hs-video-player>
     </template>
