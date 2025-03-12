@@ -120,7 +120,7 @@ export const VideoDetails = {
             // TODO maybe better in mounted or setup?
             const videoElement = this.$refs.videoDetailsModal;
             if (!this.modal) {
-                this.modal = new bootstrap.Modal(videoElement);
+                this.modal = new bootstrap.Modal(videoElement, { backdrop: 'static' });
                 videoElement.addEventListener('hidden.bs.modal', () => {
                     this.currentFile = null;
                 });
