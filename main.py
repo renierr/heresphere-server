@@ -129,7 +129,8 @@ def service_worker():
 def inject_globals():
     return {
         'library_subfolders': library_subfolders(),
-        'server_update_possible': os.path.exists(UPDATE_SCRIPT_NAME)
+        'server_update_possible': os.path.exists(UPDATE_SCRIPT_NAME),
+        'DEBUG': is_debug()
     }
 
 
