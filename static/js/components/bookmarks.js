@@ -1,4 +1,3 @@
-import {eventBus} from "event-bus";
 import {showToast} from "helper";
 import { sharedState, settings } from "shared-state";
 
@@ -54,8 +53,6 @@ const template = `
 
 export const Bookmarks = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
     },
@@ -65,8 +62,6 @@ export const Bookmarks = {
             newBookmarkTitle: '',
             newBookmarkUrl: '',
         }
-    },
-    computed: {
     },
     methods: {
         fetchBookmarks() {

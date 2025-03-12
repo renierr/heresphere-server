@@ -1,4 +1,3 @@
-import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -16,15 +15,7 @@ const template = `
 
 export const Loading = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
-    },
-    computed: {
-    },
-    methods: {
-    },
-    mounted() {
     }
 }

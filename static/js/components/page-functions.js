@@ -35,8 +35,6 @@ export const PageFunctions = {
             removeFetchFilesListener: null,
         }
     },
-    computed: {
-    },
     methods: {
         confirmUpdate() {
             const confirmData = {

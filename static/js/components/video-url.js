@@ -60,8 +60,6 @@ function downloadHandlingForVideoPlayer(modalFooter, video_url) {
 
 export const VideoUrl = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
     },
@@ -70,8 +68,6 @@ export const VideoUrl = {
             videoUrl: '',
             removeVideoUrlListener: null,
         }
-    },
-    computed: {
     },
     methods: {
         openVideoPlayerForStream(data) {

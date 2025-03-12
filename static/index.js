@@ -1,5 +1,5 @@
 import { sharedState, settings } from "shared-state";
-import { fetchFiles, playVideo, showToast, videoUrl } from "helper";
+import { fetchFiles, playVideo, showToast } from "helper";
 import { createApp } from 'vue';
 import { eventBus } from 'event-bus';
 

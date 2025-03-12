@@ -1,7 +1,7 @@
 import {eventBus} from "event-bus";
 
 /**
- * Format file size from bytes to human readable format
+ * Format file size from bytes to human-readable format
  *
  * @param bytes - File size in bytes
  * @returns {string} - Formatted file size
@@ -14,7 +14,7 @@ export function formatFileSize(bytes) {
 }
 
 /**
- * Format duration from seconds to human readable format
+ * Format duration from seconds to human-readable format
  *
  * @param seconds - Duration in seconds
  * @returns {string} - Formatted duration
@@ -33,7 +33,7 @@ export function formatDuration(seconds) {
 }
 
 /**
- * Format a date from epoch seconds to a human readable format
+ * Format a date from epoch seconds to a human-readable format
  *
  * @param epochSeconds - Epoch seconds to format
  * @returns {string} - Formatted date

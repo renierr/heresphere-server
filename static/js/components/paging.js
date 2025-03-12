@@ -51,7 +51,6 @@ export function changePage(page) {
 
 export const Paging = {
     template: template,
-    props: {},
     setup() {
         return {sharedState, settings, changePage};
     },
@@ -78,8 +77,6 @@ export const Paging = {
             return formatFileSize(sharedState.totalSize);
         },
     },
-    methods: {
-    },
     beforeUnmount() {
         removeKeyNavigationForPagingListener();
         removeSwipeNavigationForPagingListener();
@@ -91,9 +88,6 @@ export const Paging = {
 }
 
 function keyNavigationForPaging(event) {
-    // only if paging present
-    //if (sharedState.totalPages === 1) return;
-
     // check if currently an input is focused
     if (document.activeElement.tagName === 'INPUT' || document.querySelector('.modal.show')) return;
 

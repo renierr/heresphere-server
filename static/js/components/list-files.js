@@ -1,4 +1,3 @@
-import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -16,17 +15,12 @@ const template = `
 </div>
 `
 
-//    <div v-for="file in filteredFiles" :key="file.filename" class="col-12 p-0 mb-4 position-relative border border-1 rounded">
-//     include "components/video_infos.html"
-
 import { Paging } from "./paging.js";
 import { FileProgress } from "./file-progress.js";
 import { VideoInfosCard } from "./video-infos-card.js";
 
 export const ListFiles = {
     template: template,
-    props: {
-    },
     components: {
         'hs-paging': Paging,
         'hs-file-progress': FileProgress,
@@ -84,7 +78,5 @@ export const ListFiles = {
             const durationInMinutes = file.duration / 60;
             return durationInMinutes >= sharedState.selectedDuration;
         },
-    },
-    mounted() {
     }
 }

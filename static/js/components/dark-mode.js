@@ -1,4 +1,3 @@
-import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -11,8 +10,6 @@ const template = `
 
 export const DarkMode = {
     template: template,
-    props: {
-    },
     data() {
         return {
             isDarkMode: false,
@@ -20,8 +17,6 @@ export const DarkMode = {
     },
     setup() {
         return { sharedState, settings };
-    },
-    computed: {
     },
     methods: {
         applyTheme(isDark) {
@@ -31,7 +26,7 @@ export const DarkMode = {
         }
     },
     watch: {
-        isDarkMode: function (newTheme, oldTheme) {
+        isDarkMode: function (newTheme) {
             this.applyTheme(newTheme);
         }
     },

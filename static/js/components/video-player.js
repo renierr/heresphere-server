@@ -19,8 +19,6 @@ const template = `
 
 export const VideoPlayer = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
     },
@@ -29,8 +27,6 @@ export const VideoPlayer = {
             modal: null,
             listener: [],
         }
-    },
-    computed: {
     },
     methods: {
         showPlayer(data = {}) {

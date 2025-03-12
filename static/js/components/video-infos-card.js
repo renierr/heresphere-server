@@ -72,8 +72,6 @@ export const VideoInfosCard = {
     setup() {
         return { sharedState, settings, formatDuration, formatFileSize, playVideo };
     },
-    computed: {
-    },
     methods: {
         startPreview(file, evt) {
             evt.target.play()
@@ -246,7 +244,5 @@ export const VideoInfosCard = {
                     fetchFiles(true);
                 });
         },
-    },
-    mounted() {
     }
 }

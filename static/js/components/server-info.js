@@ -26,8 +26,6 @@ const template = `
 
 export const ServerInfo = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
     },

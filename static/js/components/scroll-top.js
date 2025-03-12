@@ -1,4 +1,3 @@
-import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -14,12 +13,8 @@ const template = `
 let scrollListenerHandler = null;
 export const ScrollTop = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
-    },
-    computed: {
     },
     methods: {
         scrollTop() {

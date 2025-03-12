@@ -19,8 +19,6 @@ const template = `
 
 export const ToastMessage = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
     },
@@ -32,8 +30,6 @@ export const ToastMessage = {
             useHtml: false,
             wide: false,
         }
-    },
-    computed: {
     },
     methods: {
         showToast(input, options = {}) {

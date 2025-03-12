@@ -75,12 +75,3 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     observer.observe(document.body, {childList: true, subtree: true});
 });
-
-function open_sse_connection() {
-    const eventSource = new EventSource('/sse');
-    window.addEventListener('beforeunload', () => {
-        eventSource.close();
-        console.log('EventSource connection closed');
-    });
-    return eventSource;
-}

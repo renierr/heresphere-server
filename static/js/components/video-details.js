@@ -102,8 +102,6 @@ const template = `
 
 export const VideoDetails = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings, formatFileSize, formatDate, formatDuration, playVideo, videoUrl};
     },
@@ -114,8 +112,6 @@ export const VideoDetails = {
             currentFile: null,
             similarVideos: null,
         }
-    },
-    computed: {
     },
     methods: {
         showDetails(file) {
@@ -159,6 +155,4 @@ export const VideoDetails = {
         }));
 
     }
-
 }
-

@@ -26,8 +26,6 @@ const template = `
 
 export const ConfirmDialog = {
     template: template,
-    props: {
-    },
     setup() {
         return { sharedState, settings };
     },
@@ -37,8 +35,6 @@ export const ConfirmDialog = {
             modal: null,
             listener: [],
         }
-    },
-    computed: {
     },
     methods: {
         showConfirmDialog(data = {}) {
@@ -72,6 +68,5 @@ export const ConfirmDialog = {
             this.modal.hide();
         }));
     }
-
 }
 

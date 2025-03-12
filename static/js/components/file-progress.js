@@ -1,4 +1,3 @@
-import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -22,9 +21,5 @@ export const FileProgress = {
                 return sharedState.downloadProgress[id] || 0;
             };
         },
-    },
-    methods: {
-    },
-    mounted() {
     }
 }
