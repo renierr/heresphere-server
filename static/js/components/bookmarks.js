@@ -4,7 +4,7 @@ import { sharedState, settings } from "shared-state";
 
 // language=Vue
 const template = `
-    <h1>A List of Bookmarks</h1>
+    <h3 class="mt-4">A List of Bookmarks</h3>
     <div class="row mt-2 mb-3">
         <div class="col-md-5">
             <div class="form-floating">

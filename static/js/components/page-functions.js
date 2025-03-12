@@ -117,7 +117,6 @@ export const PageFunctions = {
     },
     mounted() {
         this.removeFetchFilesListener = eventBus.on('fetch-files', (data) => {
-            console.log('Fetching files with data:', data);
             this.fetchFiles(data);
         });
     }

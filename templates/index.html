@@ -51,11 +51,11 @@
         </div>
     </nav>
 
+    <hs-server-info></hs-server-info>
     <template v-if="sharedState.currentView === 'bookmarks'">
         <hs-bookmarks></hs-bookmarks>
     </template>
     <template v-else>
-        <hs-server-info></hs-server-info>
         <hs-filter></hs-filter>
         <hs-video-url></hs-video-url>
 
