@@ -89,7 +89,6 @@ export const PageFunctions = {
                     }));
                     sharedState.loading = false;
                     if (restoreScrollPosition) {
-                        console.log('Restoring scroll position', scrollPosition);
                         setTimeout(() => window.scrollTo(0, scrollPosition));
                     }
                 });
