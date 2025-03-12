@@ -96,6 +96,7 @@ import { ConfirmDialog } from "./js/components/confirm-dialog.js";
 import { ListFiles } from "./js/components/list-files.js";
 import { VideoDetails } from "./js/components/video-details.js";
 import { Bookmarks } from "./js/components/bookmarks.js";
+import { ScrollTop } from "./js/components/scroll-top.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
@@ -108,6 +109,7 @@ app.component('hs-video-player', VideoPlayer);
 app.component('hs-list-files', ListFiles);
 app.component('hs-video-details', VideoDetails);
 app.component('hs-bookmarks', Bookmarks);
+app.component('hs-scroll-top', ScrollTop);
 
 app.mount('#app');
 

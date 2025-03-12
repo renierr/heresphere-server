@@ -62,20 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', newTheme);
     });
 
-    // scroll back to top button
-    const scrollButton = document.getElementById('scroll-to-top');
-    scrollButton?.addEventListener('click', () => {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    });
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-            scrollButton.classList.remove('d-none');
-        } else {
-            scrollButton.classList.add('d-none');
-        }
-    });
-
-
     // swipe listener for select (up/down) to select option
     const applySelectOptionSwipeHandler = (selectElement) => {
         if (selectElement.dataset.hammerApplied) {
