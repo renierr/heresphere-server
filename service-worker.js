@@ -6,8 +6,8 @@ self.addEventListener('install', event => {
         caches.open('v1').then(cache => {
             return cache.addAll([
                 //'/',
-                //'/static/index.js',
-                //'/static/styles.css',
+                //'/static/js/index.js',
+                //'/static/css/styles.css',
                 '/static/favicon.png',
                 '/static/icons/icon-192x192.png',
                 '/static/icons/icon-512x512.png'

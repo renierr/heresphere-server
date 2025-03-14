@@ -85,19 +85,19 @@ app.config.errorHandler = function (err, instance, info) {
     showToast(err.toString(), { title: 'An error occurred', stayOpen: true });
 };
 
-import { ServerInfo } from './js/components/server-info.js';
-import { Filter } from './js/components/filter.js';
-import { Loading } from "./js/components/loading.js";
-import { ToastMessage } from "./js/components/toast-message.js";
-import { VideoPlayer } from "./js/components/video-player.js";
-import { VideoUrl } from "./js/components/video-url.js";
-import { PageFunctions } from "./js/components/page-functions.js";
-import { ConfirmDialog } from "./js/components/confirm-dialog.js";
-import { ListFiles } from "./js/components/list-files.js";
-import { VideoDetails } from "./js/components/video-details.js";
-import { Bookmarks } from "./js/components/bookmarks.js";
-import { ScrollTop } from "./js/components/scroll-top.js";
-import { DarkMode } from "./js/components/dark-mode.js";
+import { ServerInfo } from './components/server-info.js';
+import { Filter } from './components/filter.js';
+import { Loading } from "./components/loading.js";
+import { ToastMessage } from "./components/toast-message.js";
+import { VideoPlayer } from "./components/video-player.js";
+import { VideoUrl } from "./components/video-url.js";
+import { PageFunctions } from "./components/page-functions.js";
+import { ConfirmDialog } from "./components/confirm-dialog.js";
+import { ListFiles } from "./components/list-files.js";
+import { VideoDetails } from "./components/video-details.js";
+import { Bookmarks } from "./components/bookmarks.js";
+import { ScrollTop } from "./components/scroll-top.js";
+import { DarkMode } from "./components/dark-mode.js";
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);

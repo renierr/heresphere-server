@@ -10,17 +10,17 @@
     <link rel="manifest" href="/manifest.json">
     <link href="/static/css/bootstrap.min.css?v=5.3.3" rel="stylesheet">
     <link href="/static/css/bootstrap-icons.min.css?v=1.11.3" rel="stylesheet">
-    <link href="/static/styles.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
     <link href="/static/css/video-js.min.css?v=8.20.0" rel="stylesheet">
-    <script src="/static/js/hammer.min.js?v=2.0.8"></script>
-    <script src="/static/js/video.min.js?v=8.20.0"></script>
+    <script src="/static/js/libs/hammer.min.js?v=2.0.8"></script>
+    <script src="/static/js/libs/video.min.js?v=8.20.0"></script>
     <script>
         let library_subfolders = [[ library_subfolders|tojson ]];
     </script>
     <script type="importmap">
         {
           "imports": {
-            "vue": "/static/js/vue.esm-browser[[ '.prod' if not DEBUG else '' ]].js",
+            "vue": "/static/js/libs/vue.esm-browser[[ '.prod' if not DEBUG else '' ]].js",
             "shared-state": "/static/js/state.js",
             "event-bus": "/static/js/event-bus.js",
             "helper": "/static/js/helper.js"
@@ -68,9 +68,9 @@
     <hs-toast></hs-toast>
 </div>
 
-<script type="module" src="/static/index.js"></script>
-<script src="/static/js/bootstrap.bundle.min.js?v=5.3.3"></script>
-<script type="module" src="/static/global.js"></script>
+<script src="/static/js/libs/bootstrap.bundle.min.js?v=5.3.3"></script>
+<script type="module" src="/static/js/index.js"></script>
+<script type="module" src="/static/js/global.js"></script>
 </body>
 
 </html>
