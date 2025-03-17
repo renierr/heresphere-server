@@ -5,7 +5,7 @@ const template = `
 <div v-if="filteredFiles.length === 0" class="card-body text-center">No Files present</div>
 <hs-paging></hs-paging>
 
-<div class="container">
+<div class="container file-list">
     <div class="row">
         <div v-for="file in filteredFiles" :key="file.filename" class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4 position-relative">
             <hs-file-progress :file></hs-file-progress>

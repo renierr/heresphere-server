@@ -3,7 +3,7 @@ import {formatFileSize} from "helper";
 
 // language=Vue
 const template = `
-<div class="pagination mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between">
+<div class="pagination mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between" style="width: 1200px;">
     <ul v-if="totalPages > 1" class="pagination mb-0">
         <li class="page-item" :class="{ disabled: sharedState.currentPage === 1 }">
             <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
@@ -125,12 +125,11 @@ let swipeNavigationForPagingHandler;
 let hammer = null;
 const addSwipeNavigationForPagingListener = () => {
     if (!swipeNavigationForPagingHandler) {
-        hammer = new Hammer(document.querySelector('.pagination'));
+        hammer = new Hammer(document.querySelector('.file-list'));
         hammer.get('swipe').set({
             threshold: 50,
             velocity: 0.3,
             direction: Hammer.DIRECTION_HORIZONTAL,
-            touchAction: 'auto'
         });
 
         swipeNavigationForPagingHandler = (event) => swipeNavigationForPaging(event);
