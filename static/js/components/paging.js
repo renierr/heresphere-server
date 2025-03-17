@@ -122,15 +122,17 @@ function swipeNavigationForPaging(event) {
 }
 
 let swipeNavigationForPagingHandler;
-const hammer = new Hammer(document.body);
-hammer.get('swipe').set({
-    threshold: 50,
-    velocity: 0.3,
-    direction: Hammer.DIRECTION_HORIZONTAL,
-    touchAction: 'auto'
-});
+let hammer = null;
 const addSwipeNavigationForPagingListener = () => {
     if (!swipeNavigationForPagingHandler) {
+        hammer = new Hammer(document.body);
+        hammer.get('swipe').set({
+            threshold: 50,
+            velocity: 0.3,
+            direction: Hammer.DIRECTION_HORIZONTAL,
+            touchAction: 'auto'
+        });
+
         swipeNavigationForPagingHandler = (event) => swipeNavigationForPaging(event);
         hammer.on('swipe', swipeNavigationForPagingHandler);
     }
@@ -139,5 +141,6 @@ const removeSwipeNavigationForPagingListener = () => {
     if (swipeNavigationForPagingHandler) {
         hammer.off('swipe', swipeNavigationForPagingHandler);
         swipeNavigationForPagingHandler = null;
+        hammer = null;
     }
 }
