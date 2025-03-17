@@ -3,7 +3,7 @@ import {formatFileSize} from "helper";
 
 // language=Vue
 const template = `
-<div class="pagination mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between" style="width: 1200px;">
+<div class="pagination mb-4 d-flex flex-column flex-md-row align-items-center justify-content-between">
     <ul v-if="totalPages > 1" class="pagination mb-0">
         <li class="page-item" :class="{ disabled: sharedState.currentPage === 1 }">
             <a class="page-link" href="#" @click.prevent="changePage(1)">First</a>
