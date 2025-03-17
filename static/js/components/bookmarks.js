@@ -29,7 +29,7 @@ const template = `
             <li v-for="bookmark in bookmarks" :key="bookmark.url" class="list-group-item mb-2 rounded border-1 p-1">
                 <div class="w-100 d-flex flex-column flex-sm-row justify-content-between align-items-start gap-1">
                     <div class="text-break flex-grow-1">
-                        <a :href="bookmark.url" target="_blank" rel="noopener noreferrer external" @click.prevent="openInNativeBrowser(bookmark.url)"> <i class="bi bi-link-45deg"></i>&nbsp;{{ bookmark.title || bookmark.url }}</a>
+                        <a :href="bookmark.url" target="_blank" rel="noopener noreferrer external"> <i class="bi bi-link-45deg"></i>&nbsp;{{ bookmark.title || bookmark.url }}</a>
                         <p class="mb-0 text-muted small">{{ bookmark.url }}</p>
                     </div>
                     <div class="bookmark-function text-end">
@@ -77,9 +77,6 @@ export const Bookmarks = {
                     console.error('There was an error fetching the bookmarks:', error);
                     sharedState.loading = false;
                 });
-        },
-        openInNativeBrowser(url) {
-            window.open(url, '_blank', 'noopener,noreferrer');
         },
         editBookmark(bookmark) {
             this.newBookmarkTitle = bookmark.title;
