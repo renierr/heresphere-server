@@ -67,9 +67,9 @@ export const ListFiles = {
         checkResolution(file) {
             if (sharedState.selectedResolution === 'HD') {
                 return file.width > 1900 || file.height > 1900;
-            } else if (this.selectedResolution === '4K') {
+            } else if (sharedState.selectedResolution === '4K') {
                 return file.width >= 3800 || file.height >= 3800;
-            } else if (this.selectedResolution === '8K') {
+            } else if (sharedState.selectedResolution === '8K') {
                 return file.width >= 8000 || file.height >= 8000;
             }
             return true;
