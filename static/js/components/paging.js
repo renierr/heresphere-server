@@ -125,7 +125,7 @@ let swipeNavigationForPagingHandler;
 let hammer = null;
 const addSwipeNavigationForPagingListener = () => {
     if (!swipeNavigationForPagingHandler) {
-        hammer = new Hammer(document.body);
+        hammer = new Hammer(document.querySelector('.pagination'));
         hammer.get('swipe').set({
             threshold: 50,
             velocity: 0.3,
