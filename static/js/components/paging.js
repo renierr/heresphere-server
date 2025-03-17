@@ -123,7 +123,12 @@ function swipeNavigationForPaging(event) {
 
 let swipeNavigationForPagingHandler;
 const hammer = new Hammer(document.body);
-hammer.get('swipe').set({threshold: 50, velocity: 0.5, direction: Hammer.DIRECTION_HORIZONTAL});
+hammer.get('swipe').set({
+    threshold: 50,
+    velocity: 0.3,
+    direction: Hammer.DIRECTION_HORIZONTAL,
+    touchAction: 'auto'
+});
 const addSwipeNavigationForPagingListener = () => {
     if (!swipeNavigationForPagingHandler) {
         swipeNavigationForPagingHandler = (event) => swipeNavigationForPaging(event);
