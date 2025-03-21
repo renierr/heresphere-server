@@ -3,18 +3,18 @@
 
 a = Analysis(
     ['main.py'],
-    pathex=[],
+    pathex=['.', './src'],
     binaries=[],
     datas=[('templates', 'templates')],
-    hiddenimports=[],
-    hookspath=[],
+    hiddenimports=['waitress'],
+    hookspath=['.'],
     hooksconfig={},
     runtime_hooks=[],
     excludes=['static/videos/*', 'static/library/*'],
     noarchive=False,
     optimize=0,
 )
-pyz = PYZ(a.pure)
+pyz = PYZ(a.pure, a.zipped_data)
 
 exe = EXE(
     pyz,
@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='main',
+    name='hserver',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
