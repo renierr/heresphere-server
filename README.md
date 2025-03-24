@@ -87,25 +87,9 @@ python3 -m venv .venv
 ```bash
 source .venv/bin/activate
 ```
-
-#### Using pyenv (great for managing multiple Python versions)
-
-1. Install pyenv, see [pyenv installation instructions](https://github.com/pyenv/pyenv).
-2. Install Python 3.11.2 (if not already installed):
-
-```bash
-pyenv install 3.11.2
-```
-3. Create a new virtual environment with Python 3.11.2:
-
-```bash
-pyenv virtualenv 3.11.2 .venv
-```
-
-4. Activate the virtual environment:
-
-```bash
-source .venv/bin/activate
+on windows
+```powershell
+.\.venv\Scripts\activate.ps1
 ```
 
 ### Dependencies
@@ -117,7 +101,7 @@ pip install -r requirements.txt
 
 Remember to deactivate your virtual environment when you're done:
 
-Using venv or pyenv:
+Using venv:
 ```bash
 deactivate
 ```
