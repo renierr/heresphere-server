@@ -105,8 +105,6 @@ def add_cache_control(response):
     if 'static' in request.path:
         if 'v' in request.args:
             response.headers['Cache-Control'] = 'public, max-age=31536000'  # Cache for 1 year
-        elif not any(request.path.endswith(ext) for ext in ['.js', '.css', '.html', '.json']):
-            response.headers['Cache-Control'] = 'public, max-age=2592000'  # Cache for 1 month
     return response
 
 
