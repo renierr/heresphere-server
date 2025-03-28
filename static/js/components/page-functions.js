@@ -18,7 +18,15 @@ const template = `
                     <li><a class="dropdown-item" href="#" @click.prevent="scanFiles"><i class="bi bi-search text-warning"></i> Scan Videos</a></li>
                 </ul>
             </div>
-            <a href="#" @click.prevent="generateThumbnails" class="btn btn-secondary btn-sm">Generate Thumbnails</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Generate Thumbnails
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" @click.prevent="generateThumbnails('force')"><i class="bi bi-images text-danger"></i> Force redo All</a></li>
+                    <li><a class="dropdown-item" href="#" @click.prevent="generateThumbnails('missing')"><i class="bi bi-image text-secondary"></i> Only Missing</a></li>
+                </ul>
+            </div>
             <a href="#" @click.prevent="fetchFiles" class="btn btn-secondary btn-sm">Reload files</a>
             <a href="#" @click.prevent="findDuplicates" class="btn btn-info btn-sm">Find Duplicates</a>
         </div>
