@@ -83,9 +83,11 @@ export const PageFunctions = {
         scanFiles() {
             apiCall('/scan', { errorMessage: 'Error scanning files'});
         },
-        generateThumbnails() {
+        generateThumbnails(mode) {
             apiCall('/api/generate_thumbnails', { errorMessage: 'Error generating thumbnails',
-                showToastMessage: false, options: { method: 'POST', headers: {'Content-Type': 'application/json'} } })
+                showToastMessage: false, options: { method: 'POST',
+                    body: JSON.stringify({ mode: mode }),    
+                    headers: {'Content-Type': 'application/json'} } })
                 .then(data => showToast(data.success ? data : 'Failed to generate thumbnails'));
         },
         fetchFiles: debounce(function (restoreScrollPosition=false) {

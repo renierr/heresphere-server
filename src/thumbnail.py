@@ -30,7 +30,10 @@ thumbnail_bp = Blueprint('thumbnail', __name__)
 
 @thumbnail_bp.route('/api/generate_thumbnails', methods=['POST'])
 def gts():
-    thumbnail_thread = threading.Thread(target=generate_thumbnails)
+    data = request.get_json()
+    mode = data.get("mode")
+
+    thumbnail_thread = threading.Thread(target=generate_thumbnails, args=(mode,))
     thumbnail_thread.daemon = True
     thumbnail_thread.start()
 
@@ -130,20 +133,22 @@ def get_video_info(video_path, force=False):
         logger.error(f"Failed to get video info for {video_path}: {e}")
         return None
 
-def generate_thumbnails() -> ServerResponse:
+def generate_thumbnails(mode) -> ServerResponse:
     """
     Generate thumbnails for all videos
 
+    :param mode: mode for generating thumbnails (e.g., 'force' or 'missing')
     :return: json object with success and generated_thumbnails
     """
     static_dir = get_static_directory()
     generated_thumbnails = []
     thumbnail_errors = []
+    force = mode == 'force'
+    push_text_to_client(f"Generating {'all thumbnails (force)' if force else 'missing thumbnails'}")
+
 
     for folder in VideoFolder:
         video_dir = os.path.join(static_dir, folder.dir)
-        logger.debug(f"Generating thumbnails for {video_dir}")
-        push_text_to_client(f"Generating thumbnails for {folder.name}")
 
         _, folder_state = check_folder(video_dir)
         if folder_state != FolderState.ACCESSIBLE:
@@ -161,15 +166,8 @@ def generate_thumbnails() -> ServerResponse:
                     video_path = os.path.join(root, filename)
                     thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
 
-                    logger.debug(f"Checking thumbnail for {filename}")
                     # if one of the thumbs for file is missing, generate all thumbs
-                    missing = False
-                    for fmt in ThumbnailFormat:
-                        if not os.access(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}"), os.F_OK):
-                            missing = True
-                            break
-
-                    if missing:
+                    if force or any(not os.access(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}"), os.F_OK) for fmt in ThumbnailFormat):
                         if generate_thumbnail(video_path):
                             generated_thumbnails.append(video_path)
                         else:
