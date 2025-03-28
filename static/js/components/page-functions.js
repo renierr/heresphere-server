@@ -15,9 +15,9 @@ const template = `
                     <li v-if="updatePossible"><a class="dropdown-item" href="#" @click.prevent="confirmUpdate"><i class="bi bi-arrow-repeat text-danger"></i> Server Update</a></li>
                     <li><a class="dropdown-item" href="#" @click.prevent="confirmCleanup"><i class="bi bi-exclamation-triangle text-warning"></i> Cleanup Files</a></li>
                     <li><a class="dropdown-item" href="#" @click.prevent="cacheClear"><i class="bi bi-trash text-warning"></i> Clear all Caches</a></li>
+                    <li><a class="dropdown-item" href="#" @click.prevent="scanFiles"><i class="bi bi-search text-warning"></i> Scan Videos</a></li>
                 </ul>
             </div>
-            <a href="#" @click.prevent="scanFiles" class="btn btn-warning btn-sm">Scan Videos</a>
             <a href="#" @click.prevent="generateThumbnails" class="btn btn-secondary btn-sm">Generate Thumbnails</a>
             <a href="#" @click.prevent="fetchFiles" class="btn btn-secondary btn-sm">Reload files</a>
             <a href="#" @click.prevent="findDuplicates" class="btn btn-info btn-sm">Find Duplicates</a>
