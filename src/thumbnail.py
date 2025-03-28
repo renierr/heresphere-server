@@ -226,7 +226,7 @@ def generate_thumbnail(video_path) -> Optional[bool]:
                         aspect_ratio = '2:1'
                 break
         sbs_video = True if aspect_ratio == '2:1' else False
-        crop_filter = "" if not sbs_video else "v360=input=hequirect:output=flat:in_stereo=sbs:h_fov=140:v_fov=100,"
+        crop_filter = "" if not sbs_video else "v360=input=hequirect:output=flat:in_stereo=sbs:h_fov=120:v_fov=90,"
         clip_duration = 8
         if midpoint + clip_duration > duration:
             clip_duration = int((duration - midpoint - 1) if duration - midpoint - 1 > 0 else 1)
