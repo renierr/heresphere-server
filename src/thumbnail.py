@@ -12,6 +12,7 @@ from database.video_database import get_video_db
 from globals import is_debug, get_static_directory, get_real_path_from_url, VideoFolder, \
     THUMBNAIL_DIR_NAME, ServerResponse, FolderState, ID_NAME_SEPERATOR, get_thumbnail_directory, \
     get_url_from_path
+from database.video_models import Similarity
 from utils import check_folder
 
 
@@ -263,6 +264,19 @@ def generate_thumbnail(video_path) -> Optional[bool]:
             except subprocess.TimeoutExpired:
                 logger.error(f"Failed to generate thumbnail for webm (timeout): {video_path}")
                 return False
+
+        # re-generate similarity hash
+        video_url = get_url_from_path(video_path)
+        with get_video_db() as db:
+            video = db.for_video_table.get_video(video_url)
+            if video:
+                logger.debug(f"Generating similarity hash for {video_url}")
+                from src.similar import build_features_for_video
+                features = build_features_for_video(video_url)
+                if features:
+                    video.similarity = Similarity(histogramm=features.histogram.tobytes(),
+                                                  phash=features.phash.tobytes(),
+                                                  hog=features.hog.tobytes())
 
         return True
     except Exception as e:
