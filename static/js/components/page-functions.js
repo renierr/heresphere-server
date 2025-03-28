@@ -7,9 +7,16 @@ const template = `
 <footer class="footer py-3">
     <div class="text-center">
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <a v-if="updatePossible" href="#" @click.prevent="confirmUpdate" class="btn btn-danger btn-sm">Server Update</a>
-            <a href="#" @click.prevent="confirmCleanup" class="btn btn-danger btn-sm">Cleanup Files</a>
-            <a href="#" @click.prevent="cacheClear" class="btn btn-warning btn-sm">Clear all Caches</a>
+            <div class="btn-group">
+                <button type="button" class="btn btn-danger btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li v-if="updatePossible"><a class="dropdown-item" href="#" @click.prevent="confirmUpdate"><i class="bi bi-arrow-repeat text-danger"></i> Server Update</a></li>
+                    <li><a class="dropdown-item" href="#" @click.prevent="confirmCleanup"><i class="bi bi-exclamation-triangle text-warning"></i> Cleanup Files</a></li>
+                    <li><a class="dropdown-item" href="#" @click.prevent="cacheClear"><i class="bi bi-trash text-warning"></i> Clear all Caches</a></li>
+                </ul>
+            </div>
             <a href="#" @click.prevent="scanFiles" class="btn btn-warning btn-sm">Scan Videos</a>
             <a href="#" @click.prevent="generateThumbnails" class="btn btn-secondary btn-sm">Generate Thumbnails</a>
             <a href="#" @click.prevent="fetchFiles" class="btn btn-secondary btn-sm">Reload files</a>
