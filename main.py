@@ -218,8 +218,8 @@ def start_server() -> Optional[str]:
         ffprobe_version_info = subprocess.check_output(["ffprobe", "-version"], stderr=subprocess.STDOUT).decode().splitlines()[0]
         logger.info(f"found ffmpeg: {ffmpeg_version_info}")
         logger.info(f"found ffprobe: {ffprobe_version_info}")
-    except subprocess.CalledProcessError as e:
-        logger.error(f"ffmpeg or ffprobe is not available in path, can not run server. Output: {e.output.decode()}")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        logger.error(f"ffmpeg or ffprobe is not available in path, can not run server.")
         return "ffmpeg is not available in path"
     except IndexError:
         logger.error("Unexpected output format from ffmpeg or ffprobe.")
