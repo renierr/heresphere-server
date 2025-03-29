@@ -23,7 +23,7 @@ from loguru import logger
 from flask import Flask, Response, render_template, jsonify, send_from_directory, request
 from files import library_subfolders, cleanup
 from heresphere import heresphere_bp
-from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task
+from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task, last_sse_messages
 from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
 from migrate.migrate import migrate
 from thumbnail import thumbnail_bp
@@ -184,6 +184,11 @@ def sse():
     def cleanup_client():
         stop_event.set()
         client_remove(client_queue, stop_event)
+
+    if len(last_sse_messages) > 0:
+        for msg in reversed(last_sse_messages):
+            client_queue.put(f" - {msg}\n\n")
+        client_queue.put("↓↓↓↓↓↓↓↓↓↓ Last 10 messages ↓↓↓↓↓↓↓↓↓↓\n\n")
 
     # send server time on first request
     client_queue.put(f"SSE Connection to Server established at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}\n\n")

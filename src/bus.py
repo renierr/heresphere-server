@@ -1,9 +1,11 @@
+from collections import deque
 from queue import Queue, Empty
 import threading
 from loguru import logger
 import time
 
 clients = []
+last_sse_messages = deque(maxlen=10)
 
 def get_clients():
     return clients
@@ -21,8 +23,10 @@ def clean_client_task():
     cleanup_thread.start()
 
 def push_text_to_client(txt):
+    global last_sse_messages
     logger.debug(f"{txt}")
     broadcast_message(txt)
+    last_sse_messages.append(txt)
 
 def broadcast_message(message):
     for client_queue, stop_event in clients:

@@ -50,7 +50,7 @@ export const ServerInfo = {
                 // ignore Heartbeat message
                 if (event.data.includes('Heartbeat '))  return;
 
-                serverOutput.push(new Date().toLocaleTimeString() + ': ' + event.data);
+                serverOutput.push(formatMessage(event.data));
                 if (serverOutput.length > 100) {
                     serverOutput.shift();
                 }
@@ -63,4 +63,11 @@ export const ServerInfo = {
     mounted() {
         this.openAndHandleSSEConnection();
     }
+}
+
+function formatMessage(data) {
+    if (data.startsWith(" - ") || data.startsWith("↓")) {
+        return data;
+    }
+    return new Date().toLocaleTimeString() + ': ' + data;
 }
