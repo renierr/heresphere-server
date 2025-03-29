@@ -233,36 +233,39 @@ def generate_thumbnail(video_path) -> Optional[bool]:
 
         with open(os.devnull, 'w') as devnull:
             stdout = None if is_debug() else devnull
-            execution_timelimit = 120
+            execution_timelimit = 180
 
             outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBP.extension}")
-            logger.debug(f"Starting ffmpeg for webp - {outfile}")
+            push_text_to_client(f"Starting ffmpeg for webp - {base_name}")
             cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-t', str(clip_duration), '-y', '-i', video_path, '-loop', '0', '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', outfile]
             logger.debug(f"Running command - webp: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
             except subprocess.TimeoutExpired:
                 logger.error(f"Failed to generate thumbnail for webp (timeout): {video_path}")
+                push_text_to_client(f"Failed to generate thumbnail for webp (timeout): {video_path}")
                 return False
 
             outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.JPG.extension}")
-            logger.debug(f"Starting ffmpeg for jpg - {outfile}")
+            push_text_to_client(f"Starting ffmpeg for jpg - {base_name}")
             cmd = ['ffmpeg', '-ss', str(midpoint), '-an', '-y', '-i', video_path, '-vf', crop_filter + 'fps=1,scale=w=1024:h=768:force_original_aspect_ratio=decrease', '-frames:v', '1', '-update', '1', outfile]
             logger.debug(f"Running command - jpg: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
             except subprocess.TimeoutExpired:
                 logger.error(f"Failed to generate thumbnail for jpg (timeout): {video_path}")
+                push_text_to_client(f"Failed to generate thumbnail for jpg (timeout): {video_path}")
                 return False
 
             outfile = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBM.extension}")
-            logger.debug(f"Starting ffmpeg for webm - {outfile}")
+            push_text_to_client(f"Starting ffmpeg for webm - {base_name}")
             cmd = ['ffmpeg', '-ss', str(midpoint), '-t', str(clip_duration), '-y', '-i', video_path, '-vf', crop_filter + 'scale=380:-1', '-c:v', 'libvpx', '-b:v', '256k', '-c:a', 'libvorbis', outfile]
             logger.debug(f"Running command - webm: {' '.join(cmd)}")
             try:
                 subprocess.run(cmd, check=True, stdout=stdout, stderr=stdout, timeout=execution_timelimit)
             except subprocess.TimeoutExpired:
                 logger.error(f"Failed to generate thumbnail for webm (timeout): {video_path}")
+                push_text_to_client(f"Failed to generate thumbnail for webm (timeout): {video_path}")
                 return False
 
         # re-generate similarity hash
@@ -271,6 +274,7 @@ def generate_thumbnail(video_path) -> Optional[bool]:
             video = db.for_video_table.get_video(video_url)
             if video:
                 logger.debug(f"Generating similarity hash for {video_url}")
+                push_text_to_client(f"Generating similarity hash for {video_url}")
                 from src.similar import build_features_for_video
                 features = build_features_for_video(video_url)
                 if features:
