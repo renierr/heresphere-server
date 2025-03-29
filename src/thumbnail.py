@@ -148,6 +148,7 @@ def generate_thumbnails(mode) -> ServerResponse:
     push_text_to_client(f"Generating {'all thumbnails (force)' if force else 'missing thumbnails'}")
 
 
+    thumbnails_to_process = []
     for folder in VideoFolder:
         video_dir = os.path.join(static_dir, folder.dir)
 
@@ -166,24 +167,30 @@ def generate_thumbnails(mode) -> ServerResponse:
                 if filename.endswith(('.mp4', '.mkv', '.avi', '.webm')):
                     video_path = os.path.join(root, filename)
                     thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
-
                     # if one of the thumbs for file is missing, generate all thumbs
                     if force or any(not os.access(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}"), os.F_OK) for fmt in ThumbnailFormat):
-                        if generate_thumbnail(video_path):
-                            generated_thumbnails.append(video_path)
-                        else:
-                            thumbnail_errors.append(video_path)
+                        thumbnails_to_process.append(video_path)
+
+    thumbnails_process_count = len(thumbnails_to_process)
+    push_text_to_client(f"{thumbnails_process_count} thumbnails will be generated")
+    for index, video_path in enumerate(thumbnails_to_process):
+            if generate_thumbnail(video_path, index + 1, thumbnails_process_count):
+                generated_thumbnails.append(video_path)
+            else:
+                thumbnail_errors.append(video_path)
 
     push_text_to_client(f"Generate thumbnails finished with {len(generated_thumbnails)} thumbnails {'(' + str(len(thumbnail_errors)) + ' failed)' if thumbnail_errors else ''}")
     return ServerResponse(True, f"generated_thumbnails: {len(generated_thumbnails)}")
 
 
-def generate_thumbnail(video_path) -> Optional[bool]:
+def generate_thumbnail(video_path, currentCount = 0, maxCount = 0) -> Optional[bool]:
     """
     Generate thumbnail for video file using ffmpeg
     this method will generate a webp, jpg and webm thumbnails
 
     :param video_path: full path to video file
+    :param currentCount: optional current count  - default 0
+    :param maxCount:  optional max count - default 0
     :return: true if success, false if failed
     """
     try:
@@ -195,7 +202,7 @@ def generate_thumbnail(video_path) -> Optional[bool]:
             return False
 
         base_name = os.path.basename(video_path)
-        push_text_to_client(f"Generating thumbnail and info for {base_name}")
+        push_text_to_client(f"{f'{currentCount} / {maxCount} ' if currentCount > 0 else ''}Generating thumbnail and info for {base_name}")
         logger.debug(f"Evict cache for {video_path}")
         get_thumbnails.cache__evict(video_path)   # evict cache for thumbnails
 
