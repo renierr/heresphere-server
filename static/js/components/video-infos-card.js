@@ -8,7 +8,8 @@ import {
     playVideo,
     fetchFiles,
     showConfirmDialog,
-    hideConfirmDialog
+    hideConfirmDialog,
+    videoUrl
 } from "helper";
 
 // language=Vue
@@ -60,6 +61,7 @@ const template = `
               <i class="bi bi-three-dots"></i> Actions
             </button>
             <ul class="dropdown-menu">
+                <li><button v-if="file.url" class="dropdown-item" @click="videoUrl(file.url)"><i class="bi bi-repeat text-secondary"></i> Download again</button></li>
                 <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="generateThumbnail(file.filename)"><i class="bi bi-image text-warning"></i> Generate Thumbnail</button></li>
                 <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="confirmRenameFile(file)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
                 <li><button class="dropdown-item" @click="confirmMoveFile(file)"><i class="bi bi-folder text-danger"></i> Move To Folder</button></li>
@@ -77,7 +79,7 @@ export const VideoInfosCard = {
         file: Object,
     },
     setup() {
-        return { sharedState, settings, formatDuration, formatFileSize, playVideo };
+        return { sharedState, settings, formatDuration, formatFileSize, playVideo, videoUrl };
     },
     methods: {
         startPreview(file, evt) {
