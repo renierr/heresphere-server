@@ -55,10 +55,17 @@ const template = `
         <button v-if="!file.unknown" class="btn btn-outline-success btn-sm" @click="playVideo(file)">
             <i class="bi bi-play-fill"></i> Play
         </button>
-        <button v-if="!file.partial && !file.unknown" class="btn btn-outline-secondary btn-sm" @click="generateThumbnail(file.filename)">Generate Thumbnail</button>
-        <button v-if="!file.partial && !file.unknown" class="btn btn-outline-warning btn-sm" @click="confirmRenameFile(file)">Rename</button>
-        <button @click="confirmDeleteFile(file.filename)" class="btn btn-outline-danger btn-sm">Delete</button>
-        <button @click="confirmMoveFile(file)" class="btn btn-outline-danger btn-sm">Move To Folder</button>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-three-dots"></i> Actions
+            </button>
+            <ul class="dropdown-menu">
+                <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="generateThumbnail(file.filename)"><i class="bi bi-image text-warning"></i> Generate Thumbnail</button></li>
+                <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="confirmRenameFile(file)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
+                <li><button class="dropdown-item" @click="confirmMoveFile(file)"><i class="bi bi-folder text-danger"></i> Move To Folder</button></li>
+                <li><button class="dropdown-item" @click="confirmDeleteFile(file.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
+            </ul>
+        </div>
     </div>
 </div>
 `
