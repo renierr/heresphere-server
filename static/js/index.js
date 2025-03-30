@@ -56,8 +56,12 @@ const app = createApp({
         sharedState.currentView = path || '';
         fetchFiles();
         this.removeSseListener = eventBus.on('sse-message', (data) => {
+            // ignore messages starting with " - ", because they belong to last message output
+            if (data.startsWith(' - ')) {
+                return;
+            }
             let progressExp = data.match(/(\d+.\d+)% complete/);
-            let progressId = data.match(/^Downloading...\[(\d+)]/);
+            let progressId = data.match(/Downloading...\[(\d+)]/);
             if (progressId) {
                 sharedState.downloadProgress = sharedState.downloadProgress || {};
                 sharedState.downloadProgress[progressId[1]] = progressExp ? parseFloat(progressExp[1]) : 0;
