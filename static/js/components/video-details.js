@@ -19,15 +19,15 @@ const template = `
                          class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center">
                     <div class="text-muted">
                         <p>
-                            <span v-if="currentFile.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(currentFile.filesize) }}</span>
-                            <span v-if="currentFile.width && currentFile.height"><i class="bi bi-aspect-ratio"></i> {{ currentFile.width }}x{{ currentFile.height}}</span>
-                            <span v-if="currentFile.width && (currentFile.width > 1900 || currentFile.height > 1900)"><i
-                                class="bi bi-badge-hd-fill"></i></span>
-                            <span v-if="currentFile.width && (currentFile.width >= 8000 || currentFile.height >= 8000)"><i
-                                class="bi bi-badge-8k-fill"></i></span>
-                            <span v-else-if="currentFile.width && (currentFile.width > 3800 || currentFile.height > 3800)"><i
-                                class="bi bi-badge-4k-fill"></i></span>
-                            <span v-if="currentFile.stereo"><i class="bi bi-badge-3d-fill"></i></span>
+                            <span v-if="currentFile.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(currentFile.filesize) }}&nbsp;</span>
+                            <span v-if="currentFile.width && currentFile.height">&nbsp;<i class="bi bi-aspect-ratio"></i> {{ currentFile.width }}x{{ currentFile.height}}&nbsp;</span>
+                            <span v-if="currentFile.width && (currentFile.width > 1900 || currentFile.height > 1900)">
+                              &nbsp;<i class="bi bi-badge-hd-fill"></i></span>
+                            <span v-if="currentFile.width && (currentFile.width >= 8000 || currentFile.height >= 8000)">
+                              &nbsp;<i class="bi bi-badge-8k-fill"></i></span>
+                            <span v-else-if="currentFile.width && (currentFile.width > 3800 || currentFile.height > 3800)">
+                              &nbsp;<i class="bi bi-badge-4k-fill"></i></span>
+                            <span v-if="currentFile.stereo">&nbsp;<i class="bi bi-badge-3d-fill"></i></span>
                         </p>
                         <p><i class="bi bi-calendar"></i> {{ formatDate(currentFile.created) }} (Created)</p>
                         <p v-if="currentFile.download_date"><i class="bi bi-calendar-check"></i> {{
@@ -74,7 +74,8 @@ const template = `
                                      class="similar-thumbnail p-2 border border-secondary-subtle border-2 text-center"/>
                                 <div class="text-muted">
                                     <p v-if="similar.file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(similar.file.filesize) }}
-                                        <span v-if="similar.file.width && similar.file.height"><i class="bi bi-aspect-ratio"></i> {{ similar.file.width }}x{{ similar.file.height}}</span>
+                                        <span v-if="similar.file.width && similar.file.height"><i class="bi bi-aspect-ratio"></i> {{ similar.file.width }}x{{ similar.file.height}}&nbsp;</span>
+                                        <span v-if="similar.file.stereo">&nbsp;<i class="bi bi-badge-3d-fill"></i></span>
                                     </p>
                                     <p><i class="bi bi-calendar"></i> {{ formatDate(similar.file.created) }} (Created)</p>
                                     <p v-if="similar.file.download_date"><i class="bi bi-calendar-check"></i> {{

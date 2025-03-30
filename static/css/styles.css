@@ -91,7 +91,7 @@ img.similar-thumbnail:focus {
     color: rgba(var(--bs-link-color-rgb),var(--bs-link-opacity,1));
 }
 .icon-overlay {
-    backdrop-filter: brightness(2);
+    text-shadow: 1px 1px black;
 }
 .video-preview-indicator {
     position: absolute;

@@ -27,10 +27,7 @@ const template = `
         <span v-if="file.partial" class="position-absolute text-danger h3" style="left: .5rem; top: 1rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-circle-fill partial-icon"></i>  Partial <span class="fs-6">({{file.download_id}})</span><span v-if="file.failed"> - failed</span></span>
         <span v-if="file.unknown" class="position-absolute text-warning h3" style="left: .5rem; top: 1rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-circle-fill partial-icon"></i>  Not a Video</span>
         <span v-if="file.may_exist" :title="'Possible duplicate file: ' + file.may_exist" @click.stop.prevent="showDuplicateInfo(file)" class="position-absolute text-warning h3" style="left: 0.5rem; top: 3rem; text-shadow: 2px 2px rgba(0, 0, 0, .3);"><i class="bi bi-exclamation-triangle-fill exist-icon"></i> Duplicate?</span>
-        <div class="icon-overlay position-absolute bottom-0 end-0 pe-1 ps-1 text-secondary fs-3 lh-1 rounded">
-            <span v-if="file.width && (file.width > 1900 || file.height > 1900)"><i class="bi bi-badge-hd-fill"></i></span>
-            <span v-if="file.width && (file.width >= 8000 || file.height >= 8000)"><i class="bi bi-badge-8k-fill"></i></span>
-            <span v-else-if="file.width && (file.width > 3800 || file.height > 3800)"><i class="bi bi-badge-4k-fill"></i></span>
+        <div class="icon-overlay position-absolute bottom-0 end-0 pe-1 ps-1 text-info fs-3 lh-1 rounded">
             <span v-if="file.stereo"><i class="bi bi-badge-3d-fill"></i></span>
         </div>
         <div v-if="!file.partial" class="icon-overlay position-absolute top-0 end-0 text-primary fs-3 lh-1 rounded" data-bs-toggle="tooltip" title="Toggle Favorite">
@@ -45,7 +42,10 @@ const template = `
         </h5>
         <p class="mb-0">
             <span v-if="file.duration"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}&nbsp;</span>
-            <span v-if="file.width && file.height"><i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}</span>
+            <span v-if="file.width && file.height"><i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}&nbsp;</span>
+            <span v-if="file.width && (file.width > 1900 || file.height > 1900)">&nbsp;<i class="bi bi-badge-hd-fill"></i></span>
+            <span v-if="file.width && (file.width >= 8000 || file.height >= 8000)">&nbsp;<i class="bi bi-badge-8k-fill"></i></span>
+            <span v-else-if="file.width && (file.width > 3800 || file.height > 3800)">&nbsp;<i class="bi bi-badge-4k-fill"></i></span>
         </p>
         <p class="mb-0">
             <span v-if="file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(file.filesize) }}&nbsp;</span>
