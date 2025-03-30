@@ -62,6 +62,7 @@ const template = `
               <i class="bi bi-three-dots"></i> Actions
             </button>
             <ul class="dropdown-menu">
+                <li><a v-if="file.url" class="dropdown-item" :href="file.url" target="_blank"><i class="bi bi-link text-secondary"></i> Original Link</a></li>  
                 <li><button v-if="file.url" class="dropdown-item" @click="videoUrl(file.url)"><i class="bi bi-repeat text-secondary"></i> Download again</button></li>
                 <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="generateThumbnail(file.filename)"><i class="bi bi-image text-warning"></i> Generate Thumbnail</button></li>
                 <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="confirmRenameFile(file)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
