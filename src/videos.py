@@ -202,6 +202,7 @@ def download_video(url, title):
                                video_uid=video_uid, download_date=download_date, similarity=similarity)
                 db.for_video_table.upsert_video(video_url, video)
 
+        clear_similarity_cache()
         logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
