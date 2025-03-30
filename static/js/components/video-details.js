@@ -45,7 +45,7 @@ const template = `
                             </button>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-outline-secondary btn-sm m-1 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                  <i class="bi bi-three-dots"></i> Actions
+                                  <i class="bi bi-gear-fill"></i> Actions
                                 </button>
                                 <ul class="dropdown-menu">
                                   <li><button v-if="currentFile.url" class="dropdown-item" @click="videoUrl(currentFile.url)"><i class="bi bi-repeat text-secondary"></i> Download again</button></li>
@@ -54,7 +54,7 @@ const template = `
                                   <li><button class="dropdown-item" @click="confirmDeleteFile(currentFile.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
                                 </ul>
                             </div>
-                            <a v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1" :href="currentFile.url" target="_blank">Original Link</a>
+                            <a v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1" :href="currentFile.url" target="_blank"><i class="bi bi-link"></i> Original Link</a>
                         </div>
                     </div>
                 </div>
@@ -88,7 +88,7 @@ const template = `
                                         </button>
                                         <div class="btn-group" role="group">
                                             <button type="button" class="btn btn-outline-secondary btn-sm m-1 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                              <i class="bi bi-three-dots"></i> Actions
+                                              <i class="bi bi-gear-fill"></i> Actions
                                             </button>
                                             <ul class="dropdown-menu">
                                               <li><button v-if="!similar.file.partial && !similar.file.unknown" class="dropdown-item" @click="confirmRenameFile(similar.file)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
@@ -96,7 +96,7 @@ const template = `
                                               <li><button class="dropdown-item" @click="confirmDeleteFile(similar.file.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
                                             </ul>
                                         </div>
-                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm m-1">Show Similar</button>
+                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm m-1"><i class="bi bi-eye"></i> Show Similar</button>
                                     </div>
                                 </div>
                             </div>

@@ -59,7 +59,7 @@ const template = `
         </button>
         <div class="btn-group" role="group">
             <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-three-dots"></i> Actions
+              <i class="bi bi-gear-fill"></i> Actions
             </button>
             <ul class="dropdown-menu">
                 <li><a v-if="file.url" class="dropdown-item" :href="file.url" target="_blank"><i class="bi bi-link text-secondary"></i> Original Link</a></li>  
