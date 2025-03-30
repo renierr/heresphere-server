@@ -1,6 +1,7 @@
 import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
-import {formatFileSize, formatDate, formatDuration, playVideo, apiCall, videoUrl, showToast} from "helper";
+import {formatFileSize, formatDate, formatDuration, playVideo, apiCall, videoUrl} from "helper";
+import {confirmMoveFile, confirmDeleteFile, confirmRenameFile, generateThumbnail} from "../helpers/video-actions.js";
 
 // language=Vue
 const template = `
@@ -42,12 +43,18 @@ const template = `
                             <button class="btn btn-outline-success btn-sm m-1" @click="playVideo(currentFile)"><i
                                 class="bi bi-play-fill"></i>&nbsp;Play
                             </button>
-                            <a v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1"
-                               :href="currentFile.url" target="_blank">Original Link</a>
-                            <button v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1"
-                                    data-bs-dismiss="modal" @click="videoUrl(currentFile.url)">Download again (id={{
-                                currentFile.download_id }})
-                            </button>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm m-1 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="bi bi-three-dots"></i> Actions
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><button v-if="currentFile.url" class="dropdown-item" @click="videoUrl(currentFile.url)"><i class="bi bi-repeat text-secondary"></i> Download again</button></li>
+                                  <li><button v-if="!currentFile.partial && !currentFile.unknown" class="dropdown-item" @click="confirmRenameFile(currentFile)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
+                                  <li><button class="dropdown-item" @click="confirmMoveFile(currentFile)"><i class="bi bi-folder text-danger"></i> Move To Folder</button></li>
+                                  <li><button class="dropdown-item" @click="confirmDeleteFile(currentFile.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
+                                </ul>
+                            </div>
+                            <a v-if="currentFile.url" class="btn btn-outline-secondary btn-sm m-1" :href="currentFile.url" target="_blank">Original Link</a>
                         </div>
                     </div>
                 </div>
@@ -76,11 +83,20 @@ const template = `
                                         formatDuration(similar.file.duration) }}</p>
                                     <p v-if="similar.file.folder"><i class="bi bi-folder"></i> {{ similar.file.folder }}</p>
                                     <div class="d-flex flex-wrap gap-1">
-                                        <button class="btn btn-outline-success btn-sm mt-2" @click="playVideo(similar.file)">
+                                        <button class="btn btn-outline-success btn-sm mt-1" @click="playVideo(similar.file)">
                                             <i class="bi bi-play-fill"></i>&nbsp;Play
                                         </button>
-                                        <button @click="confirmMoveFile(similar.file)" class="btn btn-outline-danger btn-sm mt-2">Move To Folder</button>
-                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm mt-2">Show Similar</button>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm mt-1 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                              <i class="bi bi-three-dots"></i> Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                              <li><button v-if="!similar.file.partial && !similar.file.unknown" class="dropdown-item" @click="confirmRenameFile(similar.file)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
+                                              <li><button class="dropdown-item" @click="confirmMoveFile(similar.file)"><i class="bi bi-folder text-danger"></i> Move To Folder</button></li>
+                                              <li><button class="dropdown-item" @click="confirmDeleteFile(similar.file.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
+                                            </ul>
+                                        </div>
+                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm mt-1">Show Similar</button>
                                     </div>
                                 </div>
                             </div>
@@ -140,11 +156,9 @@ export const VideoDetails = {
                     this.similarVideos = data;
                 });
         },
-        confirmMoveFile(file) {
-            // TODO implement common logic for Move file to folder
-            this.$emit('confirm-move-file', file);
-            showToast('TODO implement common logic for Move file to folder');
-        }
+        confirmMoveFile,
+        confirmDeleteFile,
+        confirmRenameFile,
     },
     beforeUnmount() {
         this.listener.forEach(l => l());
