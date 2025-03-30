@@ -82,12 +82,12 @@ const template = `
                                     <p v-if="similar.file.duration"><i class="bi bi-clock"></i> {{
                                         formatDuration(similar.file.duration) }}</p>
                                     <p v-if="similar.file.folder"><i class="bi bi-folder"></i> {{ similar.file.folder }}</p>
-                                    <div class="d-flex flex-wrap gap-1">
-                                        <button class="btn btn-outline-success btn-sm mt-1" @click="playVideo(similar.file)">
+                                    <div class="d-flex flex-wrap gap-1 mt-2">
+                                        <button class="btn btn-outline-success btn-sm m-1" @click="playVideo(similar.file)">
                                             <i class="bi bi-play-fill"></i>&nbsp;Play
                                         </button>
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-outline-secondary btn-sm mt-1 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm m-1 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                               <i class="bi bi-three-dots"></i> Actions
                                             </button>
                                             <ul class="dropdown-menu">
@@ -96,7 +96,7 @@ const template = `
                                               <li><button class="dropdown-item" @click="confirmDeleteFile(similar.file.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
                                             </ul>
                                         </div>
-                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm mt-1">Show Similar</button>
+                                        <button @click="showDetails(similar.file)" class="btn btn-outline-info btn-sm m-1">Show Similar</button>
                                     </div>
                                 </div>
                             </div>
