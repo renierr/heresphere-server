@@ -3,7 +3,7 @@ import { sharedState, settings } from "shared-state";
 
 // language=Vue
 const template = `
-<div aria-live="polite" aria-atomic="true" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;">
+<div aria-live="polite" aria-atomic="true" class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1100;max-width: 100%">
     <div ref="toastElement" :style="{ width: wide ? 'auto' : '' }" class="toast text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
             <strong class="me-auto">{{ title }}</strong>

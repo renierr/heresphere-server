@@ -142,22 +142,22 @@ export function generateThumbnail(file) {
 export function showDuplicateInfo(file) {
     if (file.may_exist) {
         const details = JSON.parse(file.may_exist);
-        const id = details.id;
-        const originalFile = details.file.url;
-        const originalTitle = details.file.title;
-        const duplicateFile = details.dup.url;
-        const duplicateTitle = details.dup.title;
-
         const message = `
             <div class="p-3 border rounded">
-                <h5 class="text-primary text-wrap" style="word-break: break-all">ID: ${id}</h5>
+                <h5 class="text-primary text-wrap" style="word-break: break-all">ID: ${details.id}</h5>
                 <div class="mt-3">
                     <p class="text-success"><strong>Original:</strong></p>
-                    <p class="">${originalTitle}<br>(${originalFile})</p>
+                    <div class="d-flex flex-sm-row flex-column gap-2">
+                        <img src="${details.file.img}" class="img-fluid rounded" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <p class="">${details.file.title}<br>(${details.file.url})</p>
+                    </div>
                 </div>
                 <div class="mt-3">
                     <p class="text-danger"><strong>Duplicate:</strong></p>
-                    <p class="">${duplicateTitle}<br>(${duplicateFile})</p>
+                    <div class="d-flex flex-sm-row flex-column gap-2">
+                        <img src="${details.dup.img}" class="img-fluid rounded" alt="Thumbnail" style="max-width: 100px; max-height: 100px;">
+                        <p class="">${details.dup.title}<br>(${details.dup.url})</p>
+                    </div>
                 </div>
             </div>
         `;

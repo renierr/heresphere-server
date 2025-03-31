@@ -128,15 +128,15 @@ def list_files() -> list:
                 original_file = uids[uid]
                 details['may_exist'] = json.dumps({
                     "id": uid,
-                    "file": { "url": details.get('filename'), "title": details.get('title') },
-                    "dup": { "url": original_file.get('filename'), "title": original_file.get('title') }
+                    "file": { "url": details.get('filename'), "title": details.get('title'), "img": details.get('thumbnail') },
+                    "dup": { "url": original_file.get('filename'), "title": original_file.get('title'), "img": original_file.get('thumbnail') }
                 })
                 for original_details in extracted_details:
                     if original_details == original_file:
                         original_details['may_exist'] = json.dumps({
                             "id": uid,
-                            "file": { "url": original_file.get('filename'), "title": original_file.get('title') },
-                            "dup": { "url": details.get('filename'), "title": details.get('title') }
+                            "file": { "url": original_file.get('filename'), "title": original_file.get('title'), "img": original_file.get('thumbnail') },
+                            "dup": { "url": details.get('filename'), "title": details.get('title'), "img": details.get('thumbnail') }
                         })
                         break
             else:
