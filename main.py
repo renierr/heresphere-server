@@ -186,7 +186,7 @@ def sse():
         client_remove(client_queue, stop_event)
 
     if len(last_sse_messages) > 0:
-        for msg in reversed(last_sse_messages):
+        for msg in last_sse_messages:
             client_queue.put(f" - {msg}\n\n")
         client_queue.put("↓↓↓↓↓↓↓↓↓↓ Last 10 messages ↓↓↓↓↓↓↓↓↓↓\n\n")
 
