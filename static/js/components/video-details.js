@@ -1,7 +1,7 @@
 import {eventBus} from "event-bus";
 import { sharedState, settings } from "shared-state";
 import {formatFileSize, formatDate, formatDuration, playVideo, apiCall, videoUrl} from "helper";
-import {confirmMoveFile, confirmDeleteFile, confirmRenameFile, generateThumbnail} from "../helpers/video-actions.js";
+import {confirmMoveFile, confirmDeleteFile, confirmRenameFile, showDuplicateInfo} from "../helpers/video-actions.js";
 
 // language=Vue
 const template = `
@@ -36,7 +36,7 @@ const template = `
                             formatDuration(currentFile.duration) }}</p>
                         <p v-if="currentFile.folder"><i class="bi bi-folder"></i> {{ currentFile.folder }}</p>
                         <div v-if="currentFile.may_exist" @click.stop.prevent="showDuplicateInfo(currentFile)"
-                             class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded"
+                             class="exists d-inline-block p-2 mt-2 w-100 text-center text-bg-warning rounded cursor-pointer"
                              style="word-break: break-word">Possible duplicate file
                         </div>
                         <div class="mt-2 pt-1 d-flex flex-wrap gap-2">
@@ -157,6 +157,7 @@ export const VideoDetails = {
                     this.similarVideos = data;
                 });
         },
+        showDuplicateInfo,
         confirmMoveFile,
         confirmDeleteFile,
         confirmRenameFile,

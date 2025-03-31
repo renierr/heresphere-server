@@ -11,7 +11,7 @@ import {
     hideConfirmDialog,
     videoUrl
 } from "helper";
-import { confirmDeleteFile, confirmRenameFile, confirmMoveFile, generateThumbnail } from "../helpers/video-actions.js";
+import {confirmDeleteFile, confirmRenameFile, confirmMoveFile, generateThumbnail, showDuplicateInfo} from "../helpers/video-actions.js";
 
 // language=Vue
 const template = `
@@ -106,22 +106,10 @@ export const VideoInfosCard = {
                     file.favorite = !file.favorite;
                 });
         },
-        showDuplicateInfo(file) {
-            if (file.may_exist) {
-                let message = file.may_exist.split('\n');
-                message = message.map((line) => {
-                    if (line.includes('id[')) {
-                        return `<h5>${line}</h5>`
-                    } else {
-                        return `<p>${line}</p>`;
-                    }
-                }).join('<br>');
-                showToast(message, {title: "Duplicates", stayOpen: true, asHtml: true, wide: true});
-            }
-        },
         showVideoDetails(file) {
             eventBus.emit('video-details', file);
         },
+        showDuplicateInfo,
         generateThumbnail,
         confirmDeleteFile,
         confirmRenameFile,
