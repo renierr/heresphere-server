@@ -141,14 +141,30 @@ export function generateThumbnail(file) {
 
 export function showDuplicateInfo(file) {
     if (file.may_exist) {
-        let message = file.may_exist.split('\n');
-        message = message.map((line) => {
-            if (line.includes('id[')) {
-                return `<h5>${line}</h5>`
-            } else {
-                return `<p>${line}</p>`;
-            }
-        }).join('<br>');
-        showToast(message, {title: "Duplicates", stayOpen: true, asHtml: true, wide: true});
+        const details = JSON.parse(file.may_exist);
+        const id = details.id;
+        const filename = details.filename;
+        const duplicate = details.duplicate;
+
+        const message = `
+            <div class="p-3 border rounded">
+                <h5 class="text-primary text-wrap" style="word-break: break-all">ID: ${id}</h5>
+                <div class="mt-3">
+                    <p class="text-success"><strong>Original:</strong></p>
+                    <p class="">${filename}</p>
+                </div>
+                <div class="mt-3">
+                    <p class="text-danger"><strong>Duplicate:</strong></p>
+                    <p class="">${duplicate}</p>
+                </div>
+            </div>
+        `;
+
+        showToast(message, {
+            title: "Duplicates",
+            stayOpen: true,
+            asHtml: true,
+            wide: true
+        });
     }
 }

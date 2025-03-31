@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 
@@ -125,10 +126,18 @@ def list_files() -> list:
         if uid:
             if uid in uids:
                 original_file = uids[uid]
-                details['may_exist'] = f"id[{uid}]\n filename.[{details.get('filename')}]\n duplicate[{original_file}]"
+                details['may_exist'] = json.dumps({
+                    "id": uid,
+                    "filename": details.get('filename'),
+                    "duplicate": original_file
+                })
                 for original_details in extracted_details:
                     if original_details.get('filename') == original_file:
-                        original_details['may_exist'] = f"id[{uid}]\n filename.[{original_file}]\n duplicate[{details.get('filename')}]"
+                        original_details['may_exist'] = json.dumps({
+                            "id": uid,
+                            "filename": original_file,
+                            "duplicate": details.get('filename')
+                        })
                         break
             else:
                 uids[uid] = details.get('filename')
