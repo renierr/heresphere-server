@@ -143,19 +143,21 @@ export function showDuplicateInfo(file) {
     if (file.may_exist) {
         const details = JSON.parse(file.may_exist);
         const id = details.id;
-        const filename = details.filename;
-        const duplicate = details.duplicate;
+        const originalFile = details.file.url;
+        const originalTitle = details.file.title;
+        const duplicateFile = details.dup.url;
+        const duplicateTitle = details.dup.title;
 
         const message = `
             <div class="p-3 border rounded">
                 <h5 class="text-primary text-wrap" style="word-break: break-all">ID: ${id}</h5>
                 <div class="mt-3">
                     <p class="text-success"><strong>Original:</strong></p>
-                    <p class="">${filename}</p>
+                    <p class="">${originalTitle}<br>(${originalFile})</p>
                 </div>
                 <div class="mt-3">
                     <p class="text-danger"><strong>Duplicate:</strong></p>
-                    <p class="">${duplicate}</p>
+                    <p class="">${duplicateTitle}<br>(${duplicateFile})</p>
                 </div>
             </div>
         `;

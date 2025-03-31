@@ -128,19 +128,19 @@ def list_files() -> list:
                 original_file = uids[uid]
                 details['may_exist'] = json.dumps({
                     "id": uid,
-                    "filename": details.get('filename'),
-                    "duplicate": original_file
+                    "file": { "url": details.get('filename'), "title": details.get('title') },
+                    "dup": { "url": original_file.get('filename'), "title": original_file.get('title') }
                 })
                 for original_details in extracted_details:
-                    if original_details.get('filename') == original_file:
+                    if original_details == original_file:
                         original_details['may_exist'] = json.dumps({
                             "id": uid,
-                            "filename": original_file,
-                            "duplicate": details.get('filename')
+                            "file": { "url": original_file.get('filename'), "title": original_file.get('title') },
+                            "dup": { "url": details.get('filename'), "title": details.get('title') }
                         })
                         break
             else:
-                uids[uid] = details.get('filename')
+                uids[uid] = details
 
     extracted_details.sort(key=lambda x: x.get('created',0), reverse=True)
     return extracted_details
