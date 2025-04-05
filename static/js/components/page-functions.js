@@ -15,6 +15,7 @@ const template = `
                     <li v-if="updatePossible"><a class="dropdown-item" href="#" @click.prevent="confirmUpdate"><i class="bi bi-arrow-repeat text-danger"></i> Server Update</a></li>
                     <li><a class="dropdown-item" href="#" @click.prevent="confirmCleanup"><i class="bi bi-exclamation-triangle text-warning"></i> Cleanup Files</a></li>
                     <li><a class="dropdown-item" href="#" @click.prevent="cacheClear"><i class="bi bi-trash text-warning"></i> Clear all Caches</a></li>
+                    <li><a class="dropdown-item" href="#" @click.prevent="cacheClear('list_files')"><i class="bi bi-trash text-warning"></i> Clear files Cache only</a></li>
                     <li><a class="dropdown-item" href="#" @click.prevent="scanFiles"><i class="bi bi-search text-warning"></i> Scan Videos</a></li>
                 </ul>
             </div>
@@ -76,8 +77,9 @@ export const PageFunctions = {
             apiCall('/cleanup', { errorMessage: 'Error occurred during cleanup' })
                 .then(() => this.fetchFiles());
         },
-        cacheClear() {
-            apiCall('/cache/clear', { errorMessage: 'Error clearing cache' })
+        cacheClear(name) {
+            const cacheApi = name ? `/cache/clear/${name}` : '/cache/clear';
+            apiCall(cacheApi, { errorMessage: 'Error clearing cache' })
                 .then(() => this.fetchFiles());
         },
         scanFiles() {

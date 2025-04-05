@@ -168,11 +168,14 @@ def cache_stats():
     cache_stats = cache.get_all_cache_stats()
     return Response(json.dumps(cache_stats, cls=ServerResponseJSONEncoder), mimetype='application/json')
 
-
 @app.route('/cache/clear')
-def cache_clear():
-    ret = cache.clear_caches()
-    push_text_to_client("Clearing all caches finished")
+@app.route('/cache/clear/<path:cache_name>')
+def cache_clear(cache_name=None):
+    if cache_name:
+        ret = cache.clear_cache_by_name(cache_name)
+    else:
+        ret = cache.clear_caches()
+    push_text_to_client(f"Clearing cache {cache_name if cache_name else ''} finished")
     return ret
 
 
