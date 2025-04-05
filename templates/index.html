@@ -31,6 +31,9 @@
 
 <body class="p-2">
 <div id="app" v-cloak class="container">
+    <div v-if="error" class="alert alert-danger" role="alert">
+        Ein Fehler ist aufgetreten.
+    </div>
     <nav class="navbar navbar-expand-sm mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" :class="isActive('')" href="/" @click.stop.prevent="handleViewChange('')">HSServer</a>
@@ -42,6 +45,9 @@
                     <li class="nav-item">
                         <a class="nav-link" :class="isActive('bookmarks')" href="/bookmarks" @click.stop.prevent="handleViewChange('bookmarks')">Bookmarks</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" :class="isActive('mosaic')" href="/mosaic" @click.stop.prevent="handleViewChange('mosaic')">Mosaic</a>
+                    </li>
                 </ul>
                 <hs-dark-mode></hs-dark-mode>
             </div>
@@ -51,6 +57,9 @@
     <hs-server-info></hs-server-info>
     <template v-if="sharedState.currentView === 'bookmarks'">
         <hs-bookmarks></hs-bookmarks>
+    </template>
+    <template v-else-if="sharedState.currentView === 'mosaic'">
+        <hs-mosaic></hs-mosaic>
     </template>
     <template v-else>
         <hs-filter></hs-filter>

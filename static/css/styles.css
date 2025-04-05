@@ -39,6 +39,10 @@ footer.footer {
     white-space: normal;
     word-break: break-all;
 }
+.mosaic {
+    max-height: 300px;
+    object-fit: cover;
+}
 .thumbnail {
     max-height: 300px;
 }
