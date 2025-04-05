@@ -80,7 +80,7 @@ def get_video_info(video_path, force=False):
         infos = {}
         json_path = os.path.join(get_thumbnail_directory(video_path), os.path.basename(video_path)) + ThumbnailFormat.JSON.extension
         os.makedirs(os.path.dirname(json_path), exist_ok=True)
-        if os.access(json_path, os.F_OK):
+        if os.path.isfile(json_path):
             with open(json_path, 'r', encoding='utf-8') as f:
                 logger.debug(f"Loading pre existing video info from {json_path} - force: {force}")
                 info = json.load(f)
@@ -168,7 +168,7 @@ def generate_thumbnails(mode) -> ServerResponse:
                     video_path = os.path.join(root, filename)
                     thumbnail_dir = os.path.join(root, THUMBNAIL_DIR_NAME)
                     # if one of the thumbs for file is missing, generate all thumbs
-                    if force or any(not os.access(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}"), os.F_OK) for fmt in ThumbnailFormat):
+                    if force or any(not os.path.isfile(os.path.join(thumbnail_dir, f"{filename}{fmt.extension}")) for fmt in ThumbnailFormat):
                         thumbnails_to_process.append(video_path)
 
     thumbnails_process_count = len(thumbnails_to_process)
@@ -198,7 +198,7 @@ def generate_thumbnail(video_path, currentCount = 0, maxCount = 0) -> Optional[b
         if video_path.endswith('.part'):
             return None
 
-        if not os.access(video_path, os.F_OK):
+        if not os.path.isfile(video_path):
             return False
 
         base_name = os.path.basename(video_path)
@@ -311,7 +311,7 @@ def get_thumbnails(filename):
     return {
         fmt: f"/static/{relative_path}/{base_name}{fmt.extension}"
         for fmt in ThumbnailFormat
-        if os.access(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}"), os.F_OK)
+        if os.path.exists(os.path.join(thumbnail_directory, f"{base_name}{fmt.extension}"))
     }
 
 
@@ -332,7 +332,7 @@ def generate_thumbnail_for_path(video_path):
         logger.debug(f"Invalid video path: {video_path}")
         return ServerResponse(False, "Invalid video path")
 
-    if not os.access(real_path, os.F_OK):
+    if not os.path.isfile(real_path):
         logger.debug(f"Video file does not exist: {real_path}")
         return ServerResponse(False, "Video file does not exist")
 
@@ -354,7 +354,7 @@ def update_file_info(file_path: str, updated_dict: dict) -> None:
     """
     base_name = os.path.basename(file_path)
     json_path = os.path.join(get_thumbnail_directory(file_path), base_name) + ThumbnailFormat.JSON.extension
-    if os.access(json_path, os.F_OK):
+    if os.path.isfile(json_path):
         with open(json_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
             infos = data.get('infos')

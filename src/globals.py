@@ -103,7 +103,7 @@ def get_url_from_path(file_path, add_subfolder=None) -> Optional[str]:
     :param add_subfolder: add a subfolder to the url
     :return: url for the given file path
     """
-    if not file_path or not os.access(file_path, os.F_OK):
+    if not file_path or not os.path.isfile(file_path):
         return None
     base_name = os.path.basename(file_path)
     base_directory = os.path.dirname(file_path) if add_subfolder is None else os.path.join(os.path.dirname(file_path), add_subfolder)
@@ -143,7 +143,7 @@ def get_real_path_from_url(url) -> Tuple[Optional[str], Optional[VideoFolder]]:
         vid_folder = VideoFolder.videos
 
     real_path = os.path.normpath(real_path)
-    if not os.access(real_path, os.F_OK):
+    if not os.path.isfile(real_path):
         return None, None
 
     return real_path, vid_folder

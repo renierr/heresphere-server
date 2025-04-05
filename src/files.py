@@ -161,7 +161,7 @@ def generic_file_details(root: str, filename: str, base_weburl: str, subfolder: 
     :return:  dictionary with extracted details
     """
     realfile = os.path.join(root, filename)
-    if not os.access(realfile, os.F_OK):
+    if not os.path.isfile(realfile):
         return {}
     mimetype, _ = get_mime_type(realfile)
     result = {
@@ -210,7 +210,7 @@ def extract_file_details(root: str, filename: str, base_weburl: str, subfolder: 
     """
 
     realfile = os.path.join(root, filename)
-    if not os.access(realfile, os.F_OK):
+    if not os.path.isfile(realfile):
         return {}
 
     partial = filename.endswith('.part')
@@ -437,7 +437,7 @@ def cleanup() -> ServerResponse:
             if video_url:
                 check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
                 logger.debug(f"Cleanup for download: {check_file}")
-                if not os.access(check_file, os.F_OK):
+                if not os.path.isfile(check_file):
                     logger.debug(f"Removing: {video_url} for download")
                     to_remove.append(pk)
                     db.get_session().delete(download)
@@ -447,7 +447,7 @@ def cleanup() -> ServerResponse:
             if video_url:
                 check_file = os.path.normpath(os.path.join(get_application_path(), video_url.lstrip('/')))
                 logger.debug(f"Cleanup for video: {check_file}")
-                if not os.access(check_file, os.F_OK):
+                if not os.path.isfile(check_file):
                     logger.debug(f"Removing: {video_url} for video")
                     to_remove.append(video_url)
                     db.get_session().delete(video)

@@ -159,7 +159,7 @@ def build_features_for_video(video_url: str) -> SimilarityFeatures | None:
     base_name = os.path.basename(file_path)
     thumbnail_dir = get_thumbnail_directory(file_path)
     thumbnail_file = os.path.join(thumbnail_dir, f"{base_name}{ThumbnailFormat.WEBP.extension}")
-    if os.access(thumbnail_file, os.F_OK):
+    if os.path.isfile(thumbnail_file):
         return _create_video_features_for_similarity_compare(thumbnail_file)
     return None
 
