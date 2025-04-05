@@ -96,11 +96,6 @@ def list_files() -> list:
                 if 'part-Frag' in filename or filename.endswith('.ytdl'):
                     continue
 
-                # ignore symbolic links for files, cause not mounted dirs are files on os.walk
-                checkf = os.path.join(root, filename)
-                if os.path.islink(checkf):
-                    continue
-
                 subfolder = os.path.relpath(root, folder).replace('\\', '/')
                 if subfolder == '.':
                     subfolder = ''
