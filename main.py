@@ -4,6 +4,7 @@ import logging
 import socket
 import subprocess
 import sys
+import threading
 import time
 
 # Add the src directory to the Python path
@@ -21,7 +22,7 @@ from queue import Queue
 from threading import Event
 from loguru import logger
 from flask import Flask, Response, render_template, jsonify, send_from_directory, request
-from files import library_subfolders, cleanup
+from files import library_subfolders, cleanup, list_files
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task, last_sse_messages
 from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
@@ -252,6 +253,10 @@ def start_server() -> Optional[str]:
         os.makedirs(youtube_dir, exist_ok=True)
 
     clean_client_task()
+
+    logger.info("populating files cache in thread")
+    threading.Thread(target=list_files, daemon=True).start()
+
 
     # Get the server's IP address
     hostname = socket.gethostname()
