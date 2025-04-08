@@ -41,15 +41,18 @@ const template = `
             </a>
         </h5>
         <p class="mb-0">
-            <span v-if="file.duration"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}&nbsp;</span>
-            <span v-if="file.width && file.height"><i class="bi bi-aspect-ratio"></i> {{ file.width }}x{{ file.height}}&nbsp;</span>
-            <span v-if="file.width && (file.width > 1900 || file.height > 1900)">&nbsp;<i class="bi bi-badge-hd-fill"></i></span>
-            <span v-if="file.width && (file.width >= 8000 || file.height >= 8000)">&nbsp;<i class="bi bi-badge-8k-fill"></i></span>
-            <span v-else-if="file.width && (file.width > 3800 || file.height > 3800)">&nbsp;<i class="bi bi-badge-4k-fill"></i></span>
+            <span v-if="file.duration" class="text-nowrap me-2"><i class="bi bi-clock"></i> {{ formatDuration(file.duration) }}</span>
+            <span v-if="file.width && file.height" class="text-nowrap">
+                <span v-if="(file.width <= 1900 && file.height <= 1900)" class="me-1"><i class="bi bi-aspect-ratio"></i></span>
+                <span v-if="(file.width > 1900 || file.height > 1900)" class="me-1"><i class="bi bi-badge-hd-fill"></i></span>
+                <span v-if="(file.width >= 8000 || file.height >= 8000)" class="me-1"><i class="bi bi-badge-8k-fill"></i></span>
+                <span v-else-if="(file.width > 3800 || file.height > 3800)" class="me-1"><i class="bi bi-badge-4k-fill"></i></span>
+                <span class="me-1">{{ file.width }}x{{ file.height}}</span>
+            </span>
         </p>
         <p class="mb-0">
-            <span v-if="file.filesize"><i class="bi bi-asterisk"></i> {{ formatFileSize(file.filesize) }}&nbsp;</span>
-            <span v-if="file.folder" class="mb-0"><i class="bi bi-folder"></i> {{ file.folder }}</span>
+            <span v-if="file.filesize" class="text-nowrap me-2"><i class="bi bi-asterisk"></i> {{ formatFileSize(file.filesize) }}</span>
+            <span v-if="file.folder" class="mb-0 text-nowrap me-2"><i class="bi bi-folder"></i> {{ file.folder }}</span>
         </p>
         <p v-if="file.unknown" class="mb-0"><span v-if="file.mimetype"><i class="bi bi-braces"></i> {{ file.mimetype }}</span></p>
     </div>
