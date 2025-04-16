@@ -48,6 +48,7 @@ const template = `
                                   <i class="bi bi-gear-fill"></i> Actions
                                 </button>
                                 <ul class="dropdown-menu">
+                                  <li><button v-if="currentFile.title" class="dropdown-item" @click="filterFile(currentFile)"><i class="bi bi-funnel text-secondary"></i> Filter File</button></li>  
                                   <li><button v-if="currentFile.url" class="dropdown-item" @click="videoUrl(currentFile.url)"><i class="bi bi-repeat text-secondary"></i> Download again</button></li>
                                   <li><button v-if="!currentFile.partial && !currentFile.unknown" class="dropdown-item" @click="confirmRenameFile(currentFile)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
                                   <li><button class="dropdown-item" @click="confirmMoveFile(currentFile)"><i class="bi bi-folder text-danger"></i> Move To Folder</button></li>
@@ -92,6 +93,7 @@ const template = `
                                               <i class="bi bi-gear-fill"></i> Actions
                                             </button>
                                             <ul class="dropdown-menu">
+                                              <li><button v-if="similar.file.title" class="dropdown-item" @click="filterFile(similar.file)"><i class="bi bi-funnel text-secondary"></i> Filter File</button></li>
                                               <li><button v-if="!similar.file.partial && !similar.file.unknown" class="dropdown-item" @click="confirmRenameFile(similar.file)"><i class="bi bi-pencil-square text-warning"></i> Rename</button></li>
                                               <li><button class="dropdown-item" @click="confirmMoveFile(similar.file)"><i class="bi bi-folder text-danger"></i> Move To Folder</button></li>
                                               <li><button class="dropdown-item" @click="confirmDeleteFile(similar.file.filename)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
@@ -131,6 +133,10 @@ export const VideoDetails = {
         }
     },
     methods: {
+        filterFile(file) {
+            sharedState.filter = file.title;
+            settings.filterAccordionOpen = true;
+        },
         showDetails(file) {
             this.similarVideos = null;
             this.currentFile = file;

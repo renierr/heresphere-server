@@ -9,7 +9,7 @@ import {
     fetchFiles,
     showConfirmDialog,
     hideConfirmDialog,
-    videoUrl
+    videoUrl, handleViewChange
 } from "helper";
 import {confirmDeleteFile, confirmRenameFile, confirmMoveFile, generateThumbnail, showDuplicateInfo} from "../helpers/video-actions.js";
 
@@ -65,6 +65,7 @@ const template = `
               <i class="bi bi-gear-fill"></i> Actions
             </button>
             <ul class="dropdown-menu">
+                <li><button v-if="file.title" class="dropdown-item" @click="filterFile(file)"><i class="bi bi-funnel text-secondary"></i> Filter File</button></li>
                 <li><a v-if="file.url" class="dropdown-item" :href="file.url" target="_blank"><i class="bi bi-link text-secondary"></i> Original Link</a></li>  
                 <li><button v-if="file.url" class="dropdown-item" @click="videoUrl(file.url)"><i class="bi bi-repeat text-secondary"></i> Download again</button></li>
                 <li><button v-if="!file.partial && !file.unknown" class="dropdown-item" @click="generateThumbnail(file.filename)"><i class="bi bi-image text-warning"></i> Generate Thumbnail</button></li>
@@ -87,6 +88,10 @@ export const VideoInfosCard = {
         return { sharedState, settings, formatDuration, formatFileSize, playVideo, videoUrl };
     },
     methods: {
+        filterFile(file) {
+            sharedState.filter = file.title;
+            settings.filterAccordionOpen = true;
+        },
         startPreview(file, evt) {
             evt.target.play()
                 .then(() => file.showPreview = true)
