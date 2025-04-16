@@ -1,4 +1,4 @@
-import {showToast} from "helper";
+import {showToast, handleViewChange} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -10,21 +10,13 @@ const template = `
         <div class="container mt-4">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                 <div class="col" v-for="file in sharedState.files" :key="file.url">
-                    <div class="card">
+                    <div class="card" @click="toFile(file)">
                         <img :src="file.thumbnail" :alt="file.title" class="card-img-top mosaic">
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <footer class="footer py-3">
-        <div class="text-center mt-4">
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-              
-            </div>
-        </div>
-    </footer>
 `
 
 export const Mosaic = {
@@ -38,6 +30,16 @@ export const Mosaic = {
         }
     },
     methods: {
+        toFile(file) {
+            if (file.title) {
+                showToast(file.title, { title: 'Filter File' });
+                sharedState.filter = file.title;
+                settings.filterAccordionOpen = true;
+                handleViewChange('')
+            } else {
+                showToast("File not found", { title: 'Not Found' });
+            }
+        }
     },
     mounted() {
     }

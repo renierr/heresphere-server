@@ -1,4 +1,5 @@
 import {eventBus} from "event-bus";
+import {sharedState} from "shared-state";
 
 /**
  * Format file size from bytes to human-readable format
@@ -153,4 +154,9 @@ export function apiCall(url,
  */
 export function videoUrl(url, stream = false) {
     eventBus.emit('video-url', { url, stream });
+}
+
+export function handleViewChange(view) {
+    sharedState.currentView = view;
+    history.replaceState(null, '', view ? `/${view}` : '/');
 }
