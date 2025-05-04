@@ -1,0 +1,18 @@
+[project]
+name = "heresphere-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "flask>=3.1.0",
+    "loguru>=0.7.3",
+    "numpy>=2.2.5",
+    "opencv-python>=4.11.0.86",
+    "pillow>=11.2.1",
+    "python-magic>=0.4.27",
+    "requests>=2.32.3",
+    "sqlalchemy>=2.0.40",
+    "waitress>=3.0.2",
+    "yt-dlp[curl-cffi,default]>=2025.4.30",
+]
