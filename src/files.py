@@ -44,7 +44,7 @@ def find_file_info(video_url: str) -> dict | None:
     return extract_file_details(root, os.path.basename(file_path), folder.web_path, subfolder)
 
 
-@cache(maxsize=128, ttl=18000)
+@cache(maxsize=128)
 def list_files() -> list:
     """
     List all files
