@@ -56,25 +56,54 @@ By pressing download in the HereSphere UI, the current playing URL is sent to th
 
 You can find a link to your downloaded video from the server interface page at `http://<Link Server Address>:5000` or see the progress of the download.
 
-
 # Running from source
 
 Either download the repository or clone it locally.
 
 
 ```bash
-git clone https://github.com/zetaphor/heresphere-server
+git clone https://github.com/renierr/heresphere-server
 ```
 
-## Setup
+## Using `uv` Package Manager
 
-This application was developed against Python 3.11.2.
+The `uv` package manager can be used to manage dependencies for this project. Follow the steps below to set it up:
 
-### Virtual Environment Setup
+### Installation
 
-Before installing the dependencies, it's recommended to set up a virtual environment. This isolates your project dependencies from your global Python environment. There are several tools available for this:
+1. Install `uv` globally if you don't already have it:
 
-#### Using venv (built into Python)
+    ```bash
+    pip install uv
+    ```
+
+### Setting Up Dependencies
+
+1. Initialize `uv` in your project directory:
+
+    ```bash
+    uv init
+    ```
+
+2. Install the required dependencies from the `requirements.txt` file:
+
+    ```bash
+    uv sync -r requirements.txt
+    ```
+
+### Running the Project
+
+Once the dependencies are installed, you can run the server as usual:
+
+```bash
+uv run main.py
+```
+
+## Using Virtual Environment Setup (alternative to uv)
+
+Before installing the dependencies, it's recommended to set up a virtual environment. This isolates your project dependencies from your global Python environment.
+
+### Using venv (built into Python)
 
 1. Create a virtual environment:
 
@@ -105,8 +134,6 @@ Using venv:
 ```bash
 deactivate
 ```
-
-## Running
 
 Run the server
 ```bash
