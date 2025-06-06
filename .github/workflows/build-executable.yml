@@ -91,7 +91,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-#            dist/hserver_windows.exe
             dist/hserver_linux
             dist/hserver_mac
           draft: false
