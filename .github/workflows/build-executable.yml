@@ -38,7 +38,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install uv
           uv sync
-          uv pip install pyinstaller
         shell: bash
 
       - name: Build executable with PyInstaller
