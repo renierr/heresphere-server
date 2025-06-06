@@ -59,11 +59,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download Windows artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: hserver_windows
-          path: dist/
+#      - name: Download Windows artifact
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: hserver_windows
+#          path: dist/
       - name: Rename Linux executable
         run: mv dist/hserver.exe dist/hserver_windows.exe
         shell: bash
@@ -91,7 +91,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/hserver_windows.exe
+#            dist/hserver_windows.exe
             dist/hserver_linux
             dist/hserver_mac
           draft: false
