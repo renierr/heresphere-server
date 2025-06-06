@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: windows-latest
-            artifact_name: hserver_windows
-            output_file: hserver.exe
+          #- os: windows-latest
+          #  artifact_name: hserver_windows
+          #  output_file: hserver.exe
           - os: ubuntu-latest
             artifact_name: hserver_linux
             output_file: hserver
