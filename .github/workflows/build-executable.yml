@@ -1,4 +1,4 @@
-name: Build Windows, Linux, and macOS Executables with PyInstaller
+name: Build (Windows), Linux, and macOS Executables with PyInstaller
 
 on:
   push:
@@ -64,9 +64,9 @@ jobs:
 #        with:
 #          name: hserver_windows
 #          path: dist/
-      - name: Rename Linux executable
-        run: mv dist/hserver.exe dist/hserver_windows.exe
-        shell: bash
+#      - name: Rename Windows executable
+#        run: mv dist/hserver.exe dist/hserver_windows.exe
+#        shell: bash
 
       - name: Download Linux artifact
         uses: actions/download-artifact@v4
