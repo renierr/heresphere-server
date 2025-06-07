@@ -15,3 +15,4 @@ venv
 /static/bookmarks.json
 /update.sh
 data
+/src/heresphere_server.egg-info/
