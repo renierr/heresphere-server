@@ -33,7 +33,7 @@ jobs:
 
       - name: Build executable with PyInstaller
         run: |
-          pyinstaller ./main.spec
+          pyinstaller --log-level DEBUG ./main.spec
         shell: bash
 
       - name: list files in dist directory
