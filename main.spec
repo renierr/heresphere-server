@@ -1,16 +1,42 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
+
+def collect_static_files():
+    result = []
+    exclude_dirs = ['videos', 'library']
+
+    result.append(('templates', 'templates'))
+
+    for root, dirs, files in os.walk('static'):
+        rel_path = root[len('static')+1:] if len(root) > len('static') else ''
+
+        if any(rel_path == exclude or
+               rel_path.startswith(exclude + os.sep) or
+               rel_path.startswith(exclude + '/') or
+               rel_path.startswith(exclude + '\\')
+               for exclude in exclude_dirs):
+            continue
+
+        for file in files:
+            source_path = os.path.join(root, file)
+            target_path = os.path.join(root)
+            result.append((source_path, target_path))
+
+    return result
+datas = collect_static_files()
+print("Collected static files:", datas)
 
 a = Analysis(
     ['main.py'],
     pathex=['.', './src'],
     binaries=[],
-    datas=[('templates', 'templates')],
+    datas=datas,
     hiddenimports=['waitress'],
     hookspath=['.'],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['static/videos/*', 'static/library/*'],
+    excludes=[],
     noarchive=False,
     optimize=0,
 )

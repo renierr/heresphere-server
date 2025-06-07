@@ -25,7 +25,8 @@ from flask import Flask, Response, render_template, jsonify, send_from_directory
 from files import library_subfolders, cleanup, list_files
 from heresphere import heresphere_bp
 from bus import client_remove, client_add, event_stream, push_text_to_client, clean_client_task, last_sse_messages
-from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, get_data_directory
+from globals import get_static_directory, set_debug, is_debug, get_application_path, VideoFolder, ServerResponse, \
+    get_data_directory, get_frozen_static_directory
 from migrate.migrate import migrate
 from thumbnail import thumbnail_bp
 from videos import video_bp
@@ -55,7 +56,32 @@ cli.show_server_banner = lambda *x: None
 static_folder_path = get_static_directory()
 logger.debug(f"Static Folder Path: {static_folder_path}")
 
-app = Flask(__name__, static_folder=static_folder_path)
+class MultiStaticFlask(Flask):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.static_folders = []
+        if self.static_folder:
+            self.static_folders.append(self.static_folder)
+
+    def add_static_folder(self, folder):
+        if folder not in self.static_folders and os.path.isdir(folder):
+            self.static_folders.append(folder)
+
+    def send_static_file(self, filename):
+        for folder in self.static_folders:
+            try:
+                return send_from_directory(folder, filename)
+            except NotFound:
+                continue
+        raise NotFound()
+
+#app = Flask(__name__, static_folder=static_folder_path)
+app = MultiStaticFlask(__name__, static_folder=static_folder_path)
+frozen_static_path = get_frozen_static_directory()
+if frozen_static_path:
+    logger.debug(f"Using additional frozen static path: {frozen_static_path}")
+    app.add_static_folder(frozen_static_path)
+
 if is_debug():
     app.config['DEBUG'] = True
     app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -116,12 +142,12 @@ def favicon():
 
 @app.route('/manifest.json')
 def manifest():
-    return send_from_directory(get_application_path(), 'manifest.json', mimetype='application/json')
+    return send_from_directory(get_application_path(True), 'manifest.json', mimetype='application/json')
 
 
 @app.route('/service-worker.js')
 def service_worker():
-    return send_from_directory(get_application_path(), 'service-worker.js')
+    return send_from_directory(get_application_path(True), 'service-worker.js')
 
 
 @app.context_processor
@@ -230,10 +256,6 @@ def start_server() -> Optional[str]:
         logger.error("Unexpected output format from ffmpeg or ffprobe.")
 
     static_dir = get_static_directory()
-    if not os.path.exists(static_dir):
-        logger.error("Static directory does not exist, can not run server")
-        return "Static directory does not exist"
-
     # make sure library and video directory exists and if not create them
     library_dir = os.path.join(static_dir, VideoFolder.library.dir)
     if not os.path.exists(library_dir) and not os.path.islink(library_dir):

@@ -53,7 +53,7 @@ def is_debug() -> bool:
     return DEBUG
 
 application_path = None
-def get_application_path() -> str:
+def get_application_path(use_frozen: bool = False) -> str:
     """
     Get the application path
     The application path is the directory where the application started from
@@ -61,15 +61,27 @@ def get_application_path() -> str:
     :return: application path
     """
     global application_path
-    if application_path:
+    if application_path and not use_frozen:
         return application_path
 
-    if getattr(sys, 'frozen', False):
-        application_path = os.path.dirname(sys.executable)
+    if use_frozen and getattr(sys, 'frozen', False):
+        application_path = sys.executable
+        if hasattr(sys, '_MEIPASS'):
+            application_path = sys._MEIPASS
+        else:
+            application_path = os.path.dirname(sys.executable)
     else:
         application_path = os.getcwd()
     return application_path
 
+def get_frozen_static_directory() -> str | None:
+    if getattr(sys, 'frozen', False):
+        if hasattr(sys, '_MEIPASS'):
+            app_path = sys._MEIPASS
+        else:
+            app_path = os.path.dirname(sys.executable)
+        return os.path.join(app_path, 'static')
+    return None
 
 def get_static_directory() -> str:
     """
