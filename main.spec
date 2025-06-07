@@ -10,7 +10,7 @@ a = Analysis(
     hookspath=['.'],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['static/videos/*', 'static/library/*'],
+    excludes=['static/videos/*', 'static/library/*', 'magic'],
     noarchive=False,
     optimize=0,
 )
