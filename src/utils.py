@@ -123,14 +123,60 @@ def get_mime_type(file_path):
 
     # For more robust mime type detection (especially for files without extensions or with unusual extensions)
     if mime_type is None:
+        # Check file signature for common file types
         try:
-            import magic # python-magic library (install with: pip install python-magic)
-            mime = magic.Magic(mime=True) #Detect MIME from file content
-            mime_type = mime.from_file(str(file_path))
-        except ImportError:
-            print("python-magic is not installed. Using only extension-based MIME type detection.")
-        except magic.MagicException as e:
-            print(f"Error during magic detection: {e}")
+            with open(file_path, 'rb') as f:
+                header = f.read(16)  # Read first few bytes for signature detection
+
+                # Check for common file signatures
+                if header.startswith(b'\xFF\xD8\xFF'):  # JPEG
+                    mime_type = 'image/jpeg'
+                elif header.startswith(b'\x89PNG\r\n\x1a\n'):  # PNG
+                    mime_type = 'image/png'
+                elif header.startswith(b'GIF87a') or header.startswith(b'GIF89a'):  # GIF
+                    mime_type = 'image/gif'
+                elif header.startswith(b'%PDF'):  # PDF
+                    mime_type = 'application/pdf'
+                elif header[0:4] == b'PK\x03\x04':  # ZIP, DOCX, XLSX, etc.
+                    mime_type = 'application/zip'
+                elif header.startswith(b'\x25\x21'):  # PostScript
+                    mime_type = 'application/postscript'
+                # Video formats
+                elif header.startswith(b'\x00\x00\x00\x18ftypmp42'):  # MP4 (MPEG-4 Part 14)
+                    mime_type = 'video/mp4'
+                elif header.startswith(b'\x00\x00\x00\x1cftypmp42'):  # MP4
+                    mime_type = 'video/mp4'
+                elif header.startswith(b'\x00\x00\x00\x20ftypisom'):  # MP4 (ISO Base Media)
+                    mime_type = 'video/mp4'
+                elif header.startswith(b'\x00\x00\x00\x20ftypM4V'):  # M4V
+                    mime_type = 'video/x-m4v'
+                elif header.startswith(b'\x1A\x45\xDF\xA3'):  # MKV (Matroska)
+                    mime_type = 'video/x-matroska'
+                elif header.startswith(b'RIFF') and b'AVI' in header:  # AVI
+                    mime_type = 'video/x-msvideo'
+                elif header.startswith(b'OggS'):  # OGG (container for Theora, etc.)
+                    mime_type = 'video/ogg'
+                elif header.startswith(b'\x00\x00\x00\x14ftyf'):  # MPEG-4 video
+                    mime_type = 'video/mp4'
+                elif header.startswith(b'\x1C\x00\x00\x00') and b'webm' in header:  # WebM
+                    mime_type = 'video/webm'
+                elif header.startswith(b'\x00\x00\x01\xBA') or header.startswith(b'\x00\x00\x01\xB3'):  # MPEG (1/2)
+                    mime_type = 'video/mpeg'
+                elif header.startswith(b'FLV'):  # Flash Video
+                    mime_type = 'video/x-flv'
+                # Add more signature checks as needed
+
+        except IOError as e:
+            logger.warning(f"Could not read file for signature check: {e}")
+
+    # Try using file command if available (Unix/Linux/macOS)
+    if mime_type is None and os.name != 'nt':  # Not Windows
+        try:
+            import subprocess
+            output = subprocess.check_output(['file', '--mime-type', '-b', str(file_path)])
+            mime_type = output.decode('utf-8').strip()
+        except (subprocess.SubprocessError, FileNotFoundError):
+            logger.warning("Could not determine MIME type using 'file' command")
 
     return mime_type, encoding
 

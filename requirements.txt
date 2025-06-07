@@ -4,7 +4,6 @@ loguru
 yt_dlp
 yt-dlp[default,curl-cffi]
 waitress
-python-magic-bin
 numpy
 sqlalchemy
 opencv-python
