@@ -270,7 +270,7 @@ dependencies = [
 requires-dist = [
     { name = "flask", specifier = ">=3.1.0" },
     { name = "loguru", specifier = ">=0.7.3" },
-    { name = "numpy", specifier = ">=2.2.5" },
+    { name = "numpy", specifier = ">=2.2.5,<2.3.0" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "pillow", specifier = ">=11.2.1" },
     { name = "pyinstaller", specifier = ">=6.14.0" },

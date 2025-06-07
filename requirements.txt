@@ -42,7 +42,7 @@ markupsafe==3.0.2
     #   werkzeug
 mutagen==1.47.0
     # via yt-dlp
-numpy==2.3.0
+numpy==2.2.6
     # via
     #   heresphere-server (pyproject.toml)
     #   opencv-python
