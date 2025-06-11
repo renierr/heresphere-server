@@ -45,9 +45,8 @@ pyz = PYZ(a.pure, a.zipped_data)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='hserver',
     debug=False,
     bootloader_ignore_signals=False,
@@ -62,4 +61,15 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     icon='./static/favicon.ico',
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name='hserver',
 )
