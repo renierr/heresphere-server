@@ -16,3 +16,6 @@ venv
 /update.sh
 data
 /src/heresphere_server.egg-info/
+hserver_windows.zip
+hserver_linux.zip
+hserver_macos.zip
