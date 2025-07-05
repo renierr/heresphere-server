@@ -47,9 +47,11 @@ const app = createApp({
         }
         eventBus.events = {};
     },
-    mounted() {
+    beforeMount() {
         const path = window.location.pathname.replace('/', '');
         sharedState.currentView = path || '';
+    },
+    mounted() {
         this.removeSseListener = eventBus.on('sse-message', (data) => {
             // ignore messages starting with " - ", because they belong to last message output
             if (data.startsWith(' - ')) {

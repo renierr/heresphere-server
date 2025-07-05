@@ -60,6 +60,7 @@
     </template>
     <template v-else-if="sharedState.currentView === 'mosaic'">
         <hs-mosaic></hs-mosaic>
+        <hs-page-functions :update-possible="[[ server_update_possible | lower ]]"></hs-page-functions>
     </template>
     <template v-else-if="sharedState.currentView === 'online'">
         <hs-online></hs-online>
