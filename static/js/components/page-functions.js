@@ -88,7 +88,7 @@ export const PageFunctions = {
         generateThumbnails(mode) {
             apiCall('/api/generate_thumbnails', { errorMessage: 'Error generating thumbnails',
                 showToastMessage: false, options: { method: 'POST',
-                    body: JSON.stringify({ mode: mode }),    
+                    body: JSON.stringify({ mode: mode }),
                     headers: {'Content-Type': 'application/json'} } })
                 .then(data => showToast(data.success ? data : 'Failed to generate thumbnails'));
         },
@@ -135,6 +135,7 @@ export const PageFunctions = {
         this.removeFetchFilesListener = eventBus.on('fetch-files', (data) => {
             this.fetchFiles(data);
         });
+        this.fetchFiles();
     }
 }
 

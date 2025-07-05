@@ -50,7 +50,6 @@ const app = createApp({
     mounted() {
         const path = window.location.pathname.replace('/', '');
         sharedState.currentView = path || '';
-        fetchFiles();
         this.removeSseListener = eventBus.on('sse-message', (data) => {
             // ignore messages starting with " - ", because they belong to last message output
             if (data.startsWith(' - ')) {
