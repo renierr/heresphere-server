@@ -49,7 +49,7 @@ const template = `
                             <p class="mb-0">
                                 <span v-if="online.resolution" class="text-nowrap me-2"><i class="bi bi-aspect-ratio"></i> {{ online.resolution }}</span>
                             </p>
-                            <p v-if="online.date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.date) }} (Last Streamed)</p>
+                            <p v-if="online.date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.date) }}</p>
                             <p v-if="online.stream_count" class="mb-0"><i class="bi bi-activity"></i> {{ online.stream_count }} (Times Streamed)</p>
                         </div>
                         <div class="card-footer p-2 d-flex flex-wrap gap-2">

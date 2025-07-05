@@ -114,6 +114,14 @@ def get_stream(url) -> tuple:
     }
 
     try:
+        # find entry in DB and serve from their if available
+        with get_video_db() as db:
+            online = db.for_online_table.get_online(url)
+            if online and online.video_url:
+                online.stream_count += 1
+                logger.debug(f"Serving video from online database: {online.video_url}")
+                return online.video_url, None, online.title, None
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             video_url = audio_url = cookies = None
