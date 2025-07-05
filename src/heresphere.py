@@ -58,9 +58,10 @@ def generate_heresphere_json(server_path):
 
     # add online section from DB
     online_files = list_onlines()
+    print(online_files)
     if online_files and len(online_files) > 0:
         online_list = [
-            f"{server_path}/heresphere/online/{base64.urlsafe_b64encode(online.original_url.encode()).decode()}"
+            f"{server_path}/heresphere/online/{base64.urlsafe_b64encode(online['original_url'].encode()).decode()}"
             for online in online_files
         ]
         result_json["library"].append({"name": "Online", "list": online_list})
