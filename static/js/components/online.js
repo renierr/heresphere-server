@@ -3,7 +3,7 @@ import { sharedState, settings } from "shared-state";
 
 // language=Vue
 const template = `
-    <h3 class="mt-4">all videos streamed before and saved in DB</h3>
+    <h4 class="mt-4">Videos streamed and saved in DB</h4>
 
     <hs-loading v-if="sharedState.loading"></hs-loading>
     <div v-else>
@@ -33,6 +33,7 @@ const template = `
           </li>
         </ul>
         <span v-if="totalPages > 1" class="p-2">Page {{ currentPage }}&nbsp;/&nbsp;{{ totalPages }}</span>
+        <span class="p-2">Items&nbsp;total {{ totalItems }}</span>
       </div>
       <div class="container mt-4">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
@@ -56,7 +57,7 @@ const template = `
                                 <i class="bi bi-play-fill"></i> Play
                             </button>
                             <a v-if="online.original_url" class="btn btn-outline-secondary btn-sm m-1" :href="online.original_url" target="_blank"><i class="bi bi-link"></i> Original Link</a>
-                            <button class="btn btn-outline-danger btn-sm m-1" @click="confirmDeleteOnline(online)"><i class="bi bi-trash text-danger"></i> Delete</button>
+                            <button class="btn btn-outline-danger btn-sm m-1" @click="confirmDeleteOnline(online)"><i class="bi bi-trash"></i> Delete</button>
                         </div>
                     </div>
                 </div>

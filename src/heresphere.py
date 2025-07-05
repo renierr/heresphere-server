@@ -8,6 +8,7 @@ from flask import Blueprint, jsonify, request
 from database.video_database import get_video_db
 from files import list_files, get_basic_save_video_info, library_subfolders, set_favorite
 from globals import get_static_directory, VideoFolder
+from onlines import list_onlines
 from thumbnail import ThumbnailFormat, get_thumbnails
 
 heresphere_bp = Blueprint('heresphere', __name__)
@@ -56,14 +57,13 @@ def generate_heresphere_json(server_path):
         result_json["library"].append({"name": name, "list": url_list})
 
     # add online section from DB
-    with get_video_db() as db:
-        online_files = db.for_online_table.list_online()
-        if online_files and len(online_files) > 0:
-            online_list = [
-                f"{server_path}/heresphere/online/{base64.urlsafe_b64encode(online.original_url.encode()).decode()}"
-                for online in online_files
-            ]
-            result_json["library"].append({"name": "Online", "list": online_list})
+    online_files = list_onlines()
+    if online_files and len(online_files) > 0:
+        online_list = [
+            f"{server_path}/heresphere/online/{base64.urlsafe_b64encode(online.original_url.encode()).decode()}"
+            for online in online_files
+        ]
+        result_json["library"].append({"name": "Online", "list": online_list})
 
     return result_json
 
