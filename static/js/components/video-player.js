@@ -59,7 +59,7 @@ export const VideoPlayer = {
             videoModalFooter.innerHTML = '';
             videoModalTitle.textContent = file.title || 'Video Player';
             videoModalBody.innerHTML = `
-            <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay>
+            <video-js id="videoPlayer" class="vjs-default-skin w-100" controls autoplay referrerpolicy="no-referrer">
                 <source src="${file.filename}" type="video/mp4">
             </video-js>
             `;

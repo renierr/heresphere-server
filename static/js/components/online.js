@@ -43,7 +43,7 @@ const template = `
                         <img v-if="online.thumbnail" :src="online.thumbnail" class="card-img-top" :alt="online.title" />
                         <div class="card-body flex-grow-1">
                             <h5 class="card-title text-truncate" data-bs-toggle="tooltip" :title="online.title">
-                                <a class="video-link text-decoration-none" :href="online.url">
+                                <a class="video-link text-decoration-none" :href="online.url" rel="noreferrer">
                                     <i class="bi bi-link-45deg"></i>&nbsp;{{ online.title }}
                                 </a>
                             </h5>
@@ -64,6 +64,7 @@ const template = `
                                   <i class="bi bi-gear-fill"></i> Actions
                                 </button>
                                 <ul class="dropdown-menu">
+                                  <li><button v-if="online.original_url && !online.download_date" class="dropdown-item" @click="refreshOnlineVideo(online)"><i class="bi bi-recycle text-secondary"></i> Refresh</button></li>
                                   <li><button v-if="online.original_url && !online.download_date" class="dropdown-item" @click="downloadOnlineVideo(online)"><i class="bi bi-download text-secondary"></i> Download</button></li>
                                   <li><button class="dropdown-item" @click="confirmDeleteOnline(online)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
                                 </ul>
@@ -178,6 +179,16 @@ export const Online = {
             handleViewChange('')
             setTimeout(() => {
                 videoUrl(online.original_url);
+            })
+        },
+        refreshOnlineVideo(online) {
+            if (!online.original_url) {
+                showToast('No original URL available for refresh');
+                return;
+            }
+            handleViewChange('')
+            setTimeout(() => {
+                videoUrl(online.original_url, true);
             })
         }
     },

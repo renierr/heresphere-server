@@ -115,16 +115,6 @@ def get_stream(url) -> tuple:
     }
 
     try:
-        # clear list cache
-        list_onlines.cache__clear()
-        # find entry in DB and serve from their if available
-        with get_video_db() as db:
-            online = db.for_online_table.get_online(url)
-            if online and online.video_url:
-                online.stream_count += 1
-                logger.debug(f"Serving video from online database: {online.video_url}")
-                return online.video_url, None, online.title, None
-
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             video_url = audio_url = cookies = None
@@ -156,8 +146,11 @@ def get_stream(url) -> tuple:
                                     date=int(datetime.now().timestamp()), thumbnail_url=online_thumbnail,
                                     resolution=online_resolution, info=json.dumps(info, default=str))
                     db.for_online_table.upsert_online(url, online)
+                # clear list cache
+                list_onlines.cache__clear()
 
-            return video_url, audio_url, title, cookies
+
+        return video_url, audio_url, title, cookies
     except Exception as e:
         logger.error(f"Error retrieving video and audio streams: {e}")
         return None, None, None, None
