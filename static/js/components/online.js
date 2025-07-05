@@ -1,4 +1,4 @@
-import {showToast, handleViewChange, formatDate, playVideo} from "helper";
+import {showToast, handleViewChange, formatDate, playVideo, showConfirmDialog, apiCall, fetchFiles} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -29,6 +29,7 @@ const template = `
                                 <i class="bi bi-play-fill"></i> Play
                             </button>
                             <a v-if="online.original_url" class="btn btn-outline-secondary btn-sm m-1" :href="online.original_url" target="_blank"><i class="bi bi-link"></i> Original Link</a>
+                            <button class="btn btn-outline-danger btn-sm m-1" @click="confirmDeleteOnline(online)"><i class="bi bi-trash text-danger"></i> Delete</button>
                         </div>
                     </div>
                 </div>
@@ -69,6 +70,31 @@ export const Online = {
                 title: online.title || 'Online Video',
             };
             playVideo(file)
+        },
+        confirmDeleteOnline(online) {
+            const confirmData = {
+                title: 'Delete Online tracked entry',
+                message: `Are you sure you want to delete the tracked online entry from DB?`,
+                url: online.url,
+                file: online.title,
+                submit: 'Delete',
+                action: this.deleteOnlineEntry,
+            }
+            showConfirmDialog(confirmData);
+        },
+        deleteOnlineEntry(confData) {
+            if (!confData && !confData.file) {
+                showToast('Wrong number of parameters for OnlineEntry');
+                return;
+            }
+            const url = confData.url;
+            const utf8Bytes = new TextEncoder().encode(url);
+            const encodedUrl = btoa(String.fromCharCode(...utf8Bytes));
+            apiCall(`/api/onlines?url=${encodeURIComponent(encodedUrl)}`, { errorMessage: 'Error deleting entry',
+                options: { method: 'DELETE'} })
+                .then(data => {
+                    this.fetchOnlines();
+                });
         }
     },
     mounted() {

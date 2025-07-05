@@ -19,3 +19,8 @@ def list_onlines():
                     'stream_count': online.stream_count,
                 })
     return sorted(onlines, key=lambda x: x['date'] or '', reverse=True)
+
+def delete_online(url: str):
+    with get_video_db() as db:
+        db.for_online_table.delete_online(url)
+    return {'success': True, 'message': 'Online entry deleted successfully.'}

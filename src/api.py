@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request
 from bookmarks import list_bookmarks, save_bookmark, delete_bookmark
 from files import list_files, delete_file, move_file_for, rename_file_title, toggle_favorite
 from globals import ServerResponse
-from onlines import list_onlines
+from onlines import list_onlines, delete_online
 from similar import find_similar, find_duplicates
 
 api_bp = Blueprint('api', __name__)
@@ -93,5 +93,11 @@ def dupl():
     return jsonify(find_duplicates())
 
 @api_bp.route('/api/onlines', methods=['GET'])
-def onlines():
+def lo():
     return jsonify(list_onlines())
+
+@api_bp.route('/api/onlines', methods=['DELETE'])
+def do():
+    encoded_url = request.args.get('url')
+    decoded_url = base64.urlsafe_b64decode(encoded_url).decode('utf-8')
+    return jsonify(delete_online(decoded_url))
