@@ -43,6 +43,9 @@
                         <a class="nav-link" :class="isActive('bookmarks')" href="/bookmarks" @click.stop.prevent="handleViewChange('bookmarks')">Bookmarks</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" :class="isActive('online')" href="/online" @click.stop.prevent="handleViewChange('online')">Online</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" :class="isActive('mosaic')" href="/mosaic" @click.stop.prevent="handleViewChange('mosaic')">Mosaic</a>
                     </li>
                 </ul>
@@ -57,6 +60,10 @@
     </template>
     <template v-else-if="sharedState.currentView === 'mosaic'">
         <hs-mosaic></hs-mosaic>
+    </template>
+    <template v-else-if="sharedState.currentView === 'online'">
+        <hs-online></hs-online>
+        <hs-video-player></hs-video-player>
     </template>
     <template v-else>
         <hs-filter></hs-filter>

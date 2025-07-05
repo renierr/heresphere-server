@@ -162,6 +162,7 @@ def inject_globals():
 @app.route('/')
 @app.route('/bookmarks')
 @app.route('/mosaic')
+@app.route('/online')
 def home():
     return render_template('index.html')
 

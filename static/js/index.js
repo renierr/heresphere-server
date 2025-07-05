@@ -103,6 +103,7 @@ import { Bookmarks } from "./components/bookmarks.js";
 import { ScrollTop } from "./components/scroll-top.js";
 import { DarkMode } from "./components/dark-mode.js";
 import { Mosaic } from "./components/mosaic.js"
+import { Online } from "./components/online.js"
 
 app.component('hs-server-info', ServerInfo);
 app.component('hs-filter', Filter);
@@ -118,6 +119,7 @@ app.component('hs-bookmarks', Bookmarks);
 app.component('hs-scroll-top', ScrollTop);
 app.component('hs-dark-mode', DarkMode);
 app.component('hs-mosaic', Mosaic);
+app.component('hs-online', Online);
 
 app.mount('#app');
 
