@@ -51,3 +51,19 @@ class Similarity(VideoBase, ReprMixin):
     changed: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=func.now())
 
 
+class Online(VideoBase, ReprMixin):
+    __tablename__ = 'online'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    original_url: Mapped[str | None] = mapped_column(String)
+    video_url: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str | None] = mapped_column(String)
+    thumbnail_url: Mapped[str | None] = mapped_column(String)
+    resolution: Mapped[str | None] = mapped_column(String)
+    date: Mapped[int | None] = mapped_column(Integer)
+    stream_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    info: Mapped[str | None] = mapped_column(String)
+
+    __table_args__ = (
+        UniqueConstraint('original_url', sqlite_on_conflict='IGNORE'),
+        UniqueConstraint('video_url', sqlite_on_conflict='IGNORE'),
+    )

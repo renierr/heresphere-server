@@ -3,6 +3,7 @@ import re
 import threading
 import time
 from datetime import datetime
+import json
 
 import yt_dlp
 from flask import Blueprint, request, jsonify
@@ -11,7 +12,7 @@ from yt_dlp.networking.impersonate import ImpersonateTarget
 
 from bus import push_text_to_client
 from database.video_database import get_video_db
-from database.video_models import Videos, Similarity
+from database.video_models import Videos, Similarity, Online
 from files import list_files
 from globals import get_application_path, \
     remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR, get_real_path_from_url
@@ -135,10 +136,20 @@ def get_stream(url) -> tuple:
                 audio_url = None
                 cookies = info.get('cookies', None)
 
+            # store in online database
+            if video_url:
+                online_thumbnail = info.get('thumbnail', None)
+                online_resolution = info.get('resolution', None)
+                with get_video_db() as db:
+                    online = Online(video_url=video_url, original_url=url, title=title,
+                                    date=int(datetime.now().timestamp()), thumbnail_url=online_thumbnail,
+                                    resolution=online_resolution, info=json.dumps(info, default=str))
+                    db.for_online_table.upsert_online(url, online)
+
             return video_url, audio_url, title, cookies
     except Exception as e:
         logger.error(f"Error retrieving video and audio streams: {e}")
-        return None, None, None
+        return None, None, None, None
 
 
 def download_video(url, title):
