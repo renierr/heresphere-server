@@ -1,4 +1,4 @@
-import {showToast, handleViewChange, formatDate, playVideo, showConfirmDialog, apiCall, fetchFiles} from "helper";
+import {showToast, handleViewChange, formatDate, playVideo, showConfirmDialog, apiCall} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue

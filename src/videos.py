@@ -16,6 +16,7 @@ from database.video_models import Videos, Similarity, Online
 from files import list_files
 from globals import get_application_path, \
     remove_ansi_codes, VideoFolder, ServerResponse, UNKNOWN_VIDEO_EXTENSION, ID_NAME_SEPERATOR, get_real_path_from_url
+from onlines import list_onlines
 from similar import build_features_for_video, clear_similarity_cache
 from thumbnail import generate_thumbnail_for_path, get_video_info
 
@@ -114,6 +115,8 @@ def get_stream(url) -> tuple:
     }
 
     try:
+        # clear list cache
+        list_onlines.cache__clear()
         # find entry in DB and serve from their if available
         with get_video_db() as db:
             online = db.for_online_table.get_online(url)

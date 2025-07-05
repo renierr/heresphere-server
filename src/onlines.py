@@ -1,7 +1,7 @@
 from cache import cache
 from database.video_database import get_video_db
 
-#@cache(maxsize=128, ttl=3600)
+@cache(maxsize=128, ttl=3600)
 def list_onlines():
     onlines = []
 

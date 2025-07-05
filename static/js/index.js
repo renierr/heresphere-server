@@ -1,5 +1,5 @@
 import { sharedState, settings } from "shared-state";
-import { fetchFiles, playVideo, showToast } from "helper";
+import { fetchFiles, playVideo, showToast, handleViewChange } from "helper";
 import { createApp } from 'vue';
 import { eventBus } from 'event-bus';
 
@@ -10,15 +10,11 @@ const app = createApp({
         }
     },
     setup() {
-        return { sharedState, settings, playVideo };
+        return { sharedState, settings, playVideo, handleViewChange };
     },
     methods: {
         saveSettings() {
             localStorage.setItem('settings', JSON.stringify(this.settings));
-        },
-        handleViewChange(view) {
-            sharedState.currentView = view;
-            history.replaceState(null, '', view ? `/${view}` : '/');
         },
     },
     computed: {
