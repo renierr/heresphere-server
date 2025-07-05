@@ -1,4 +1,4 @@
-import {showToast, handleViewChange, formatDate, playVideo, showConfirmDialog, apiCall} from "helper";
+import {showToast, handleViewChange, formatDate, playVideo, showConfirmDialog, apiCall, videoUrl} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -49,7 +49,8 @@ const template = `
                             <p class="mb-0">
                                 <span v-if="online.resolution" class="text-nowrap me-2"><i class="bi bi-aspect-ratio"></i> {{ online.resolution }}</span>
                             </p>
-                            <p v-if="online.date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.date) }}</p>
+                            <p v-if="online.date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.date) }} (Added)</p>
+                            <p v-if="online.download_date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.download_date) }} (Downloaded)</p>
                             <p v-if="online.stream_count" class="mb-0"><i class="bi bi-activity"></i> {{ online.stream_count }} (Times Streamed)</p>
                         </div>
                         <div class="card-footer p-2 d-flex flex-wrap gap-2">
@@ -57,6 +58,7 @@ const template = `
                                 <i class="bi bi-play-fill"></i> Play
                             </button>
                             <a v-if="online.original_url" class="btn btn-outline-secondary btn-sm m-1" :href="online.original_url" target="_blank"><i class="bi bi-link"></i> Original Link</a>
+                            <button v-if="online.original_url && !online.download_date" class="btn btn-outline-secondary btn-sm m-1" @click="downloadOnlineVideo(online)"><i class="bi bi-download"></i> Download</button>
                             <button class="btn btn-outline-danger btn-sm m-1" @click="confirmDeleteOnline(online)"><i class="bi bi-trash"></i> Delete</button>
                         </div>
                     </div>
@@ -69,7 +71,7 @@ const template = `
 export const Online = {
     template: template,
     setup() {
-        return { sharedState, settings, formatDate };
+        return { sharedState, settings, formatDate, videoUrl };
     },
     data() {
         return {
@@ -159,6 +161,16 @@ export const Online = {
                 .then(data => {
                     this.fetchOnlines();
                 });
+        },
+        downloadOnlineVideo(online) {
+            if (!online.original_url) {
+                showToast('No original URL available for download');
+                return;
+            }
+            handleViewChange('')
+            setTimeout(() => {
+                videoUrl(online.original_url);
+            })
         }
     },
     mounted() {

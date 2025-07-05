@@ -225,6 +225,7 @@ def download_video(url, title):
                 db.for_video_table.upsert_video(video_url, video)
 
         clear_similarity_cache()
+        list_onlines.cache__clear()
         logger.debug(f"Download finished: {video_url}")
         push_text_to_client(f"Download finished: {video_url}")
     except Exception as e:
