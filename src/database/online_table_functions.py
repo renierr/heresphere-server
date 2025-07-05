@@ -29,11 +29,11 @@ class ForOnline:
 
     def get_online(self, video_url: str) -> Optional[Online]:
         session = self.db.get_session()
-        return session.query(Online).filter_by(video_url=video_url).first()
+        return session.query(Online).filter_by(original_url=video_url).first()
 
     def delete_online(self, video_path) -> None:
         session = self.db.get_session()
-        download = session.query(Online).filter_by(video_url=video_path).first()
+        download = session.query(Online).filter_by(original_url=video_path).first()
         if download:
             session.delete(download)
 

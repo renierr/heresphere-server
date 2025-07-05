@@ -5,6 +5,7 @@ import urllib.parse
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 
+from database.video_database import get_video_db
 from files import list_files, get_basic_save_video_info, library_subfolders, set_favorite
 from globals import get_static_directory, VideoFolder
 from thumbnail import ThumbnailFormat, get_thumbnails
@@ -22,6 +23,11 @@ def heresphere_file(file_base64):
     data = request.get_json(force=True, silent=True)
     return jsonify(generate_heresphere_json_item(request.root_url.rstrip('/'), file_base64, data))
 
+@heresphere_bp.route('/heresphere/online/<file_base64>', methods=['POST', 'GET'])
+def heresphere_online(file_base64):
+    data = request.get_json(force=True, silent=True)
+    return jsonify(generate_heresphere_online_json_item(request.root_url.rstrip('/'), file_base64, data))
+
 
 def generate_heresphere_json(server_path):
     """
@@ -34,7 +40,7 @@ def generate_heresphere_json(server_path):
 
     result_json = {
         "access": 1,
-        "library": []
+        "library": [],
     }
 
     subfolders = library_subfolders()
@@ -49,6 +55,15 @@ def generate_heresphere_json(server_path):
         name = "Library" if subfolder == '' else f"{subfolder}"
         result_json["library"].append({"name": name, "list": url_list})
 
+    # add online section from DB
+    with get_video_db() as db:
+        online_files = db.for_online_table.list_online()
+        if online_files and len(online_files) > 0:
+            online_list = [
+                f"{server_path}/heresphere/online/{base64.urlsafe_b64encode(online.original_url.encode()).decode()}"
+                for online in online_files
+            ]
+            result_json["library"].append({"name": "Online", "list": online_list})
 
     return result_json
 
@@ -213,3 +228,62 @@ def detect_vr_format(filename, sbs):
         "fov": fov,
         "lens": lens
     }
+
+def generate_heresphere_online_json_item(server_path, file_base64, data):
+    if 'scan' in file_base64:
+        return {}
+
+    url = base64.urlsafe_b64decode(file_base64.encode()).decode()
+    with get_video_db() as db:
+        online = db.for_online_table.get_online(url)
+        if not online:
+            return {}
+
+        # see if it needMediaSource
+        data = data or {}
+        is_favorite = data.get('isFavorite', None)
+
+        if is_favorite is not None:
+            # TODO not implemented DB has no favorite flag: set_favorite(filename, is_favorite)
+            pass
+
+        title = online.title or url
+        thumbnail = online.thumbnail_url or f"{server_path}{urllib.parse.quote("/static/images/placeholder.png")}"
+        date_last = datetime.fromtimestamp(online.date).strftime('%Y-%m-%d')
+        favorite = False # TODO no favority flag in DB
+
+        result = {
+            "access": 1,
+            "title": title,
+            "description": "",
+            "thumbnailImage": thumbnail,
+            "dateReleased": "",
+            "dateAdded": date_last,
+            "duration": 0,
+            "projection": "",
+            "isEyeSwapped": "",
+            "fov": "",
+            "lens": "",
+            "tags": [],
+            "media": [
+                {
+                    "name": "Video",
+                    "sources": [
+                        {
+                            "resolution": online.resolution,
+                            "url": online.video_url,
+                            "stream": ""
+                        }
+                    ]
+                }
+            ],
+            "favorites": 0,
+            "comments": [],
+            "rating": 0,
+            "isFavorite": favorite,
+            "writeFavorite": False
+        }
+
+        return result
+
+

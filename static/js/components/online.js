@@ -138,7 +138,7 @@ export const Online = {
             const confirmData = {
                 title: 'Delete Online tracked entry',
                 message: `Are you sure you want to delete the tracked online entry from DB?`,
-                url: online.url,
+                url: online.original_url,
                 file: online.title,
                 submit: 'Delete',
                 action: this.deleteOnlineEntry,
