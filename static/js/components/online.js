@@ -58,8 +58,15 @@ const template = `
                                 <i class="bi bi-play-fill"></i> Play
                             </button>
                             <a v-if="online.original_url" class="btn btn-outline-secondary btn-sm m-1" :href="online.original_url" target="_blank"><i class="bi bi-link"></i> Original Link</a>
-                            <button v-if="online.original_url && !online.download_date" class="btn btn-outline-secondary btn-sm m-1" @click="downloadOnlineVideo(online)"><i class="bi bi-download"></i> Download</button>
-                            <button class="btn btn-outline-danger btn-sm m-1" @click="confirmDeleteOnline(online)"><i class="bi bi-trash"></i> Delete</button>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle m-1" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <i class="bi bi-gear-fill"></i> Actions
+                                </button>
+                                <ul class="dropdown-menu">
+                                  <li><button v-if="online.original_url && !online.download_date" class="dropdown-item" @click="downloadOnlineVideo(online)"><i class="bi bi-download text-secondary"></i> Download</button></li>
+                                  <li><button class="dropdown-item" @click="confirmDeleteOnline(online)"><i class="bi bi-trash text-danger"></i> Delete</button></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
