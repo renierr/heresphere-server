@@ -19,6 +19,7 @@ from globals import get_application_path, \
 from onlines import list_onlines
 from similar import build_features_for_video, clear_similarity_cache
 from thumbnail import generate_thumbnail_for_path, get_video_info
+from utils import check_video_url_stale
 
 root_path = get_application_path()
 video_bp = Blueprint('video', __name__)
@@ -115,6 +116,17 @@ def get_stream(url) -> tuple:
     }
 
     try:
+        # find entry in DB and serve from their if available
+        with get_video_db() as db:
+            online = db.for_online_table.get_online(url)
+            if online and online.video_url:
+                # check if video url is stale
+                if not check_video_url_stale(online.video_url):
+                    # if not stale, return the online video url
+                    logger.debug(f"Serving video from online database: {online.video_url}")
+                    online.stream_count += 1
+                    return online.video_url, None, online.title, None
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
             video_url = audio_url = cookies = None

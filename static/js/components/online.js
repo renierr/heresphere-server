@@ -1,4 +1,4 @@
-import {showToast, handleViewChange, formatDate, playVideo, showConfirmDialog, apiCall, videoUrl} from "helper";
+import {showToast, formatDate, playVideo, showConfirmDialog, apiCall, videoUrl} from "helper";
 import { sharedState, settings } from "shared-state";
 
 // language=Vue
@@ -176,7 +176,6 @@ export const Online = {
                 showToast('No original URL available for download');
                 return;
             }
-            handleViewChange('')
             setTimeout(() => {
                 videoUrl(online.original_url);
             })
@@ -186,7 +185,6 @@ export const Online = {
                 showToast('No original URL available for refresh');
                 return;
             }
-            handleViewChange('')
             setTimeout(() => {
                 videoUrl(online.original_url, true);
             })

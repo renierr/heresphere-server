@@ -180,3 +180,19 @@ def get_mime_type(file_path):
 
     return mime_type, encoding
 
+def check_video_url_stale(url: str) -> bool:
+    """
+    Checks if the video URL is stale by making a HEAD request.
+    If the request fails with a 404 or 410 status code or redirected 302, the URL is considered stale.
+
+    :param url: The video URL to check.
+    :return: True if the URL is stale, False otherwise.
+    """
+    try:
+        response = requests.head(url, timeout=5, allow_redirects=False)
+        if response.status_code in (404, 410, 302, 301):
+            return True
+        return False
+    except requests.RequestException as e:
+        logger.error(f"Error checking video URL {url}: {e}")
+        return True  # Consider it stale if we can't reach it

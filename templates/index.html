@@ -63,6 +63,7 @@
         <hs-page-functions :update-possible="[[ server_update_possible | lower ]]"></hs-page-functions>
     </template>
     <template v-else-if="sharedState.currentView === 'online'">
+        <hs-video-url></hs-video-url>
         <hs-online></hs-online>
         <hs-video-player></hs-video-player>
     </template>
