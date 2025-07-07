@@ -10,6 +10,8 @@ from files import list_files, get_basic_save_video_info, library_subfolders, set
 from globals import get_static_directory, VideoFolder
 from onlines import list_onlines
 from thumbnail import ThumbnailFormat, get_thumbnails
+from utils import check_video_url_stale
+from videos import get_stream
 
 heresphere_bp = Blueprint('heresphere', __name__)
 
@@ -239,6 +241,13 @@ def generate_heresphere_online_json_item(server_path, file_base64, data):
         online = db.for_online_table.get_online(url)
         if not online:
             return {}
+
+        # check stale video URL
+        if check_video_url_stale(online.video_url):
+            # refetch online url
+            video_url, _, title, _ = get_stream(online.original_url)
+            online.video_url = video_url
+            online.title = title
 
         # see if it needMediaSource
         data = data or {}
