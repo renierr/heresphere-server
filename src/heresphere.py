@@ -263,11 +263,12 @@ def generate_heresphere_online_json_item(server_path, file_base64, data):
         date_last = datetime.fromtimestamp(online.date).strftime('%Y-%m-%d')
         favorite = False # TODO no favority flag in DB
         duration = online.duration * 1000 if online.duration else 0
+        description = online.description or ""
 
         result = {
             "access": 1,
             "title": title,
-            "description": "",
+            "description": description,
             "thumbnailImage": thumbnail,
             "dateReleased": "",
             "dateAdded": date_last,
