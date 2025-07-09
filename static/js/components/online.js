@@ -49,12 +49,12 @@ const template = `
                             </h5>
                             <p class="mb-0">
                                 <span v-if="online.duration" class="text-nowrap me-2"><i class="bi bi-clock"></i> {{ formatDuration(online.duration) }}</span>
+                                <span v-if="online.size" class="text-nowrap me-2"><i class="bi bi-asterisk"></i> {{ formatFileSize(online.size) }}</span>
                                 <span v-if="online.resolution" class="text-nowrap me-2"><i class="bi bi-aspect-ratio"></i> {{ online.resolution }}</span>
                             </p>
                             <p v-if="online.date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.date) }} (Added)</p>
                             <p v-if="online.download_date" class="mb-0"><i class="bi bi-calendar"></i> {{ formatDate(online.download_date) }} (Downloaded)</p>
                             <p v-if="online.stream_count" class="mb-0"><i class="bi bi-activity"></i> {{ online.stream_count }} (Times Streamed)</p>
-                            <p v-if="online.size" class="mb-0"><i class="bi bi-asterisk"></i> {{ formatFileSize(online.size) }}</p>
                         </div>
                         <div class="card-footer p-2 d-flex flex-wrap gap-2">
                             <button v-if="online.url" class="btn btn-outline-success btn-sm m-1" @click="playOnlineVideo(online)">

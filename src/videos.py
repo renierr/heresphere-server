@@ -168,7 +168,6 @@ def get_stream(url) -> tuple:
                 # clear list cache
                 list_onlines.cache__clear()
 
-
         return video_url, audio_url, title, cookies
     except Exception as e:
         logger.error(f"Error retrieving video and audio streams: {e}")
