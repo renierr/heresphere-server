@@ -11,9 +11,11 @@ def migrate_online_db_duration_description():
         # drop similar table from videos.db - easiest way. will get created again on start of the app, Data is lost but not accessible anyway
         with sqlite3.connect(os.path.join(get_data_directory(), 'videos.db')) as conn:
             cursor = conn.cursor()
-            # Add columns for duration and description
-            safe_add_column(cursor, "online", "size", "INTEGER")
-            safe_add_column(cursor, "online", "duration", "INTEGER")
-            safe_add_column(cursor, "online", "description", "TEXT")
-            conn.commit()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='online'")
+            if cursor.fetchone():
+                # Add columns for duration and description
+                safe_add_column(cursor, "online", "size", "INTEGER")
+                safe_add_column(cursor, "online", "duration", "INTEGER")
+                safe_add_column(cursor, "online", "description", "TEXT")
+                conn.commit()
         print("Migrated online table description and duration columns")
