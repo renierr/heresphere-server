@@ -35,11 +35,11 @@ const template = `
         <span v-if="totalPages > 1" class="p-2">Page {{ currentPage }}&nbsp;/&nbsp;{{ totalPages }}</span>
         <span class="p-2">Items&nbsp;total {{ totalItems }}</span>
       </div>
-      <div class="container mt-4">
+      <div class="container mt-4 mb-4">
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                 <div class="col" v-for="online in filteredOnlines" :key="online.url">
                     <div class="card h-100 d-flex flex-column"
-                         :class="{ 'border-success border-2': online.download_date, 'border-secondary': !online.download_date }">
+                         :class="{ 'border-success border-4': online.download_date, 'border-secondary': !online.download_date }">
                         <img v-if="online.thumbnail" :src="online.thumbnail" class="card-img-top" :alt="online.title" />
                         <div class="card-body flex-grow-1">
                             <h5 class="card-title text-truncate" data-bs-toggle="tooltip" :title="online.title">
