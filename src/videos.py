@@ -116,14 +116,18 @@ def get_stream(url) -> tuple:
     }
 
     try:
+        content_length = None
         # find entry in DB and serve from their if available
         with get_video_db() as db:
             online = db.for_online_table.get_online(url)
             if online and online.video_url:
                 # check if video url is stale
-                if not check_video_url_stale(online.video_url):
+                stale, content_length = check_video_url_stale(online.video_url)
+                if not stale:
                     # if not stale, return the online video url
                     logger.debug(f"Serving video from online database: {online.video_url}")
+                    if content_length:
+                        online.size = content_length
                     online.stream_count += 1
                     return online.video_url, None, online.title, None
 
@@ -131,6 +135,8 @@ def get_stream(url) -> tuple:
             info = ydl.extract_info(url, download=False)
             video_url = audio_url = cookies = None
             title = info.get('title', None)
+            duration = info.get('duration', None)
+            description = info.get('description', None)
             if is_youtube_url(url):
                 if 'requested_formats' in info:
                     video_url = info['requested_formats'][0]['url']
@@ -156,7 +162,8 @@ def get_stream(url) -> tuple:
                 with get_video_db() as db:
                     online = Online(video_url=video_url, original_url=url, title=title,
                                     date=int(datetime.now().timestamp()), thumbnail_url=online_thumbnail,
-                                    resolution=online_resolution, info=json.dumps(info, default=str))
+                                    resolution=online_resolution, info=json.dumps(info, default=str),
+                                    size=content_length, duration=duration, description=description)
                     db.for_online_table.upsert_online(url, online)
                 # clear list cache
                 list_onlines.cache__clear()

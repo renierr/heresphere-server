@@ -62,6 +62,9 @@ class Online(VideoBase, ReprMixin):
     date: Mapped[int | None] = mapped_column(Integer)
     stream_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     info: Mapped[str | None] = mapped_column(String)
+    size: Mapped[int | None] = mapped_column(Integer)
+    duration: Mapped[int | None] = mapped_column(Integer)
+    description: Mapped[str | None] = mapped_column(String)
 
     __table_args__ = (
         UniqueConstraint('original_url', sqlite_on_conflict='IGNORE'),

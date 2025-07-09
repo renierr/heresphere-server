@@ -243,7 +243,8 @@ def generate_heresphere_online_json_item(server_path, file_base64, data):
             return {}
 
         # check stale video URL
-        if check_video_url_stale(online.video_url):
+        stale, content_length = check_video_url_stale(online.video_url)
+        if stale:
             # refetch online url
             video_url, _, _, _ = get_stream(online.original_url)
             online.video_url = video_url

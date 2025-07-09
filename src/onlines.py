@@ -21,7 +21,10 @@ def list_onlines():
                     'date': online.date,
                     'resolution': online.resolution,
                     'stream_count': online.stream_count,
-                    'download_date': existing_dict.get(online.original_url)
+                    'download_date': existing_dict.get(online.original_url),
+                    'size': online.size,
+                    'duration': online.duration,
+                    'description': online.description,
                 })
     return sorted(onlines, key=lambda x: x['date'] or '', reverse=True)
 
